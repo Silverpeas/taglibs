@@ -1,0 +1,73 @@
+package com.silverpeas.tags.homepage;
+
+import java.io.IOException;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspTagException;
+import javax.servlet.jsp.tagext.TagSupport;
+
+public class DomainsBarLayerTag extends TagSupport 
+{
+
+	public int doStartTag() throws JspException
+    {
+        try
+		{
+			pageContext.getOut().println("<div id='Layer1' style='position:absolute; left:0px; top:70px; width:135px; height:50px; z-index:10; visibility: hidden'>");
+			pageContext.getOut().println("	<table width='100%' cellspacing='0' cellpadding='0' border='0'>");
+			pageContext.getOut().println("		<tr class='intfdcolor13'>");
+			pageContext.getOut().println("			<td width='100%'><img src='icons/1px.gif'></td>");
+			pageContext.getOut().println("			<td><img src='icons/1px.gif'></td>");
+			pageContext.getOut().println("			<td class='intfdcolor4'><img src='icons/1px.gif'></td>");
+			pageContext.getOut().println("		</tr>");
+			pageContext.getOut().println("		<tr class='intfdcolor4'>");
+			pageContext.getOut().println("			<td width='100%'><img src='icons/1px.gif'></td>");
+			pageContext.getOut().println("			<td class='intfdcolor4'><img src='icons/1px.gif'></td>");
+			pageContext.getOut().println("			<td class='intfdcolor13'><img src='icons/1px.gif'></td>");
+			pageContext.getOut().println("		</tr>");
+			pageContext.getOut().println("		<tr class='intfdcolor51'>");
+			pageContext.getOut().println("			<td width='100%'><img src='icons/1px.gif' width='1' height='10'></td>");
+			pageContext.getOut().println("			<td class='intfdcolor51'><img src='icons/1px.gif'></td>");
+			pageContext.getOut().println("			<td class='intfdcolor13'><img src='icons/1px.gif'></td>");
+			pageContext.getOut().println("		</tr>");
+			pageContext.getOut().println("		<tr class='intfdcolor51'>");
+			pageContext.getOut().println("			<td width='100%'>");
+/****
+            &nbsp;<select name="navigation' onchange="top.scriptFrame.jumpDomainsbar()'>
+              <option value=''><%=message.getString("Choose')%></option>
+                <option value=''>--------------------</option>
+                <option value="DomainsBar.jsp'><%=message.getString("bySpace')%></option>
+                <option value="DomainsBarComponent.jsp'><%=message.getString("byComponent')%></option>
+            </select>
+*****/		
+			pageContext.getOut().println("			</td>");
+			pageContext.getOut().println("			<td><img src='icons/1px.gif'></td>");
+			pageContext.getOut().println("			<td class='intfdcolor'><img src='icons/1px.gif'></td>");
+			pageContext.getOut().println("		</tr>");
+			pageContext.getOut().println("		<tr class='intfdcolor51'>");
+			pageContext.getOut().println("			<td width='100%'><img src='icons/1px.gif' width='1' height='10'></td>");
+			pageContext.getOut().println("			<td class='intfdcolor51'><img src='icons/1px.gif'></td>");
+			pageContext.getOut().println("			<td class='intfdcolor13'><img src='icons/1px.gif'></td>");
+			pageContext.getOut().println("		</tr>");
+			pageContext.getOut().println("		<tr class='intfdcolor4'>");
+			pageContext.getOut().println("			<td width='100%'><img src='icons/1px.gif'></td>");
+			pageContext.getOut().println("			<td class='intfdcolor4'><img src='icons/1px.gif'></td>");
+			pageContext.getOut().println("			<td class='intfdcolor13'><img src='icons/1px.gif'></td>");
+			pageContext.getOut().println("		</tr>");
+			pageContext.getOut().println("		<tr class='intfdcolor13'>");
+			pageContext.getOut().println("			<td width='100%'><img src='icons/1px.gif'></td>");
+			pageContext.getOut().println("			<td><img src='icons/1px.gif'></td>");
+			pageContext.getOut().println("			<td class='intfdcolor4'><img src='icons/1px.gif'></td>");
+			pageContext.getOut().println("		</tr>");
+			pageContext.getOut().println("	</table>");
+			pageContext.getOut().println("</div>");
+		} 
+		catch(IOException ioe) 
+		{
+            // User probably disconnected ...
+            throw new JspTagException("IO_ERROR");
+        }
+
+        return SKIP_BODY;
+    }
+
+}
