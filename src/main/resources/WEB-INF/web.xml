@@ -4,7 +4,7 @@
 <web-app>
 <taglib>
 	<taglib-uri>silverpeas</taglib-uri>
-	<taglib-location>/WEB-INF/lib/taglibs.jar</taglib-location>
+	<taglib-location>/WEB-INF/lib/taglibs-${project.version}.jar</taglib-location>
 </taglib>
 <taglib>
 	<taglib-uri>struts</taglib-uri>
@@ -19,7 +19,7 @@
 </servlet>
 <servlet-mapping>
 	<servlet-name>WebFileServer</servlet-name>
-	<url-pattern>/SilverpeasWebFileServer/*</url-pattern>
+	<url-pattern>/attached_file/*</url-pattern>
 </servlet-mapping>
 
 <error-page>

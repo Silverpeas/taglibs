@@ -7,6 +7,7 @@
   <includeBaseDirectory>false</includeBaseDirectory>
    <fileSets>
     <fileSet>
+      <filtered>true</filtered>
       <directory>src/main/resources/WEB-INF</directory>
       <outputDirectory>WEB-INF</outputDirectory>
     </fileSet>
