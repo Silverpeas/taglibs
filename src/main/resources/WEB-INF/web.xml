@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN" "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd">
+
+<web-app>
+<taglib>
+	<taglib-uri>silverpeas</taglib-uri>
+	<taglib-location>/WEB-INF/lib/taglibs.jar</taglib-location>
+</taglib>
+<taglib>
+	<taglib-uri>struts</taglib-uri>
+	<taglib-location>/WEB-INF/lib/struts.jar</taglib-location>
+</taglib>
+
+<servlet>
+	<servlet-name>WebFileServer</servlet-name>
+	<display-name>WebFileServer</display-name>
+	<description>no description</description>
+	<servlet-class>com.silverpeas.tags.servlets.WebFileServer</servlet-class>
+</servlet>
+<servlet-mapping>
+	<servlet-name>WebFileServer</servlet-name>
+	<url-pattern>/SilverpeasWebFileServer/*</url-pattern>
+</servlet-mapping>
+
+<error-page>
+	<exception-type>java.lang.Throwable</exception-type>
+	<location>printErrors.jsp</location>
+</error-page>
+
+</web-app>

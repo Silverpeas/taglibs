@@ -11,7 +11,7 @@
 
   <groupId>com.silverpeas</groupId>
   <artifactId>taglibs</artifactId>
-  <packaging>war</packaging>
+  <packaging>jar</packaging>
   <version>5.1-SNAPSHOT</version>
   <name>taglibs J2EE 1.4 Webapp</name>
   <url>http://www.silverpeas.com</url>
@@ -38,104 +38,150 @@
     <dependency>
       <groupId>taglibs</groupId>
       <artifactId>standard</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core</groupId>
       <artifactId>lib-core</artifactId>
       <version>${core.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core</groupId>
       <artifactId>web-core</artifactId>
       <version>${core.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>admin</artifactId>
       <classifier>client</classifier>
       <version>${core.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>authentication</artifactId>
       <classifier>client</classifier>
       <version>${core.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>pdc</artifactId>
       <classifier>client</classifier>
       <version>${core.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>node</artifactId>
       <classifier>client</classifier>
       <version>${core.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>publication</artifactId>
       <classifier>client</classifier>
       <version>${core.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>comment</artifactId>
       <classifier>client</classifier>
       <version>${core.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>tagcloud</artifactId>
       <classifier>client</classifier>
       <version>${core.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>notation</artifactId>
       <classifier>client</classifier>
       <version>${core.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>searchengine</artifactId>
       <classifier>client</classifier>
       <version>${core.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.components.almanach</groupId>
       <artifactId>almanach-ejb</artifactId>
       <classifier>client</classifier>
       <version>${component.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.components.kmelia</groupId>
       <artifactId>kmelia-ejb</artifactId>
       <classifier>client</classifier>
       <version>${component.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.components.forums</groupId>
       <artifactId>forums-ejb</artifactId>
       <classifier>client</classifier>
       <version>${component.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.components.gallery</groupId>
       <artifactId>gallery-ejb</artifactId>
       <classifier>client</classifier>
       <version>${component.version}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
   <build>
+    <finalName>taglibs-${project.version}</finalName>
+    <resources>
+      <resource>
+        <directory>${project.basedir}/resources</directory>
+        <excludes>
+          <exclude>WEB-INF</exclude>
+        </excludes>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>net.sourceforge.maven-taglib</groupId>
         <artifactId>maven-taglib-plugin</artifactId>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>release-package</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>src/main/assemblies/assembly-taglib.xml</descriptor>
+              </descriptors>
+              <appendAssemblyId>false</appendAssemblyId>
+              <attach>false</attach>
+              <skipAssembly>false</skipAssembly>
+              <finalName>taglibs-${project.version}</finalName>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
-    <finalName>taglibs</finalName>
   </build>
 </project>

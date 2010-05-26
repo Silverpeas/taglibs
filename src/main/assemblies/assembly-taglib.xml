@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+  <id>installation</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+   <fileSets>
+    <fileSet>
+      <directory>src/main/resources/WEB-INF</directory>
+      <outputDirectory>WEB-INF</outputDirectory>
+    </fileSet>
+     <fileSet>
+      <directory>src/main/resources/META-INF</directory>
+      <outputDirectory>WEB-INF</outputDirectory>
+    </fileSet>
+  </fileSets>
+  <dependencySets>
+    <dependencySet>
+     <outputDirectory>WEB-INF/lib</outputDirectory>
+      <directoryMode/>
+    </dependencySet>
+  </dependencySets>
+</assembly>
