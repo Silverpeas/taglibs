@@ -1,3 +1,4 @@
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
@@ -5,15 +6,21 @@
   <parent>
     <groupId>com.silverpeas</groupId>
     <artifactId>parent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>11</version>
   </parent>
 
   <groupId>com.silverpeas</groupId>
   <artifactId>taglibs</artifactId>
   <packaging>war</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>5.1-SNAPSHOT</version>
   <name>taglibs J2EE 1.4 Webapp</name>
   <url>http://www.silverpeas.com</url>
+
+  <properties>
+    <core.version>5.1.1</core.version>
+    <component.version>5.1.1</component.version>
+  </properties>
+
 
   <dependencies>
     <dependency>
@@ -37,7 +44,7 @@
       <artifactId>lib-core</artifactId>
       <version>${core.version}</version>
     </dependency>
-     <dependency>
+    <dependency>
       <groupId>com.silverpeas.core</groupId>
       <artifactId>web-core</artifactId>
       <version>${core.version}</version>
@@ -100,25 +107,25 @@
       <groupId>com.silverpeas.components.almanach</groupId>
       <artifactId>almanach-ejb</artifactId>
       <classifier>client</classifier>
-      <version>1.0-SNAPSHOT</version>
+      <version>${component.version}</version>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.components.kmelia</groupId>
       <artifactId>kmelia-ejb</artifactId>
       <classifier>client</classifier>
-      <version>1.0-SNAPSHOT</version>
+      <version>${component.version}</version>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.components.forums</groupId>
       <artifactId>forums-ejb</artifactId>
       <classifier>client</classifier>
-      <version>1.0-SNAPSHOT</version>
+      <version>${component.version}</version>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.components.gallery</groupId>
       <artifactId>gallery-ejb</artifactId>
       <classifier>client</classifier>
-      <version>1.0-SNAPSHOT</version>
+      <version>${component.version}</version>
     </dependency>
   </dependencies>
 
