@@ -15,6 +15,7 @@ import com.silverpeas.tags.ComponentTagUtil;
 import com.silverpeas.tags.util.EJBDynaProxy;
 import com.silverpeas.tags.util.SiteTagUtil;
 import com.silverpeas.tags.util.VisibilityException;
+import com.silverpeas.util.ForeignPK;
 import com.silverpeas.util.StringUtil;
 import com.stratelia.silverpeas.comment.ejb.CommentBm;
 import com.stratelia.silverpeas.comment.model.CommentInfo;
@@ -45,7 +46,6 @@ import com.stratelia.webactiv.util.node.model.NodePK;
 import com.stratelia.webactiv.util.publication.control.PublicationBm;
 import com.stratelia.webactiv.util.publication.info.model.InfoDetail;
 import com.stratelia.webactiv.util.publication.info.model.InfoImageDetail;
-import com.stratelia.webactiv.util.publication.info.model.InfoLinkDetail;
 import com.stratelia.webactiv.util.publication.info.model.InfoTextDetail;
 import com.stratelia.webactiv.util.publication.info.model.ModelDetail;
 import com.stratelia.webactiv.util.publication.model.CompletePublication;
@@ -233,28 +233,18 @@ public class KmeliaTagUtil extends ComponentTagUtil {
    * @param publicationDetails
    * @return Collection
    */
-  private Collection filterPublications(Collection publicationDetails) {
-    List filteredPublications = new ArrayList();
-    Iterator publications = publicationDetails.iterator();
-
-    PublicationDetail pubDetail = null;
-    while (publications.hasNext()) {
-      pubDetail = (PublicationDetail) publications.next();
-
+  private Collection<PublicationDetail> filterPublications(Collection<PublicationDetail> publicationDetails) {
+    List<PublicationDetail> filteredPublications = new ArrayList<PublicationDetail>();
+    for(PublicationDetail pubDetail : publicationDetails) {
       try {
-        /*
-         * publication is ignored if pub name starts with visibility filter
-         */
         if (visibilityFilter != null) {
           if (pubDetail.getName().startsWith(visibilityFilter)) {
             continue;
           }
         }
-
         checkPublicationStatus(pubDetail);
         checkPublicationLocation(pubDetail);
-        pubDetail = getTranslatedPublication(pubDetail, null);
-        filteredPublications.add(pubDetail);
+        filteredPublications.add( getTranslatedPublication(pubDetail, null));
       } catch (VisibilityException ae) {
         //this publication cannot be display according its status and site's mode
       } catch (RemoteException ae) {
@@ -339,15 +329,12 @@ public class KmeliaTagUtil extends ComponentTagUtil {
           "root.MSG_GEN_ENTER_METHOD", "pubId = " + pubId);
       CompletePublication pubComplete = getPublicationBm().getCompletePublication(getPublicationPK(
           pubId));
-      Collection targets = pubComplete.getInfoDetail().getInfoLinkList();
-
+      List<ForeignPK> targets = pubComplete.getLinkList();
       SilverTrace.info("kmelia", "KMeliaTagUtil.getLinkedPublications()",
           "root.MSG_GEN_ENTER_METHOD", "nb linked publications = " + targets.size());
-      Iterator targetIterator = targets.iterator();
-      ArrayList targetPKs = new ArrayList();
-      while (targetIterator.hasNext()) {
-        String targetId = ((InfoLinkDetail) targetIterator.next()).getTargetId();
-        targetPKs.add(getPublicationPK(targetId));
+      List<PublicationPK> targetPKs = new ArrayList<PublicationPK>();
+      for(ForeignPK foreignPk : targets) {       
+        targetPKs.add(new PublicationPK(foreignPk.getId(), foreignPk.getInstanceId()));
       }
       return filterPublications(getPublicationBm().getPublications(targetPKs));
     } catch (NoSuchObjectException nsoe) {
