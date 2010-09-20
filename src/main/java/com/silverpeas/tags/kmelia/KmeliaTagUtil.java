@@ -333,7 +333,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       SilverTrace.info("kmelia", "KMeliaTagUtil.getLinkedPublications()",
           "root.MSG_GEN_ENTER_METHOD", "nb linked publications = " + targets.size());
       List<PublicationPK> targetPKs = new ArrayList<PublicationPK>();
-      for(ForeignPK foreignPk : targets) {       
+      for(ForeignPK foreignPk : targets) {
         targetPKs.add(new PublicationPK(foreignPk.getId(), foreignPk.getInstanceId()));
       }
       return filterPublications(getPublicationBm().getPublications(targetPKs));
@@ -358,22 +358,17 @@ public class KmeliaTagUtil extends ComponentTagUtil {
           getKeywords());
       query.setSearchingUser(getUserId());
       query.addSpaceComponentPair(getSpaceId(), getComponentId());
-      MatchingIndexEntry[] result = null;
-      try {
-        getSearchEngineBm().search(query);
-        result = getSearchEngineBm().getRange(0, getSearchEngineBm().getResultLength());
-      } catch (com.stratelia.webactiv.searchEngine.model.ParseException pe) {
-        throw new KmeliaRuntimeException("KmeliaTagUtil.getPublicationsOnSameSubject",
-            SilverpeasRuntimeException.ERROR, "root.EX_CANT_GET_REMOTE_OBJECT", pe);
-      }
+      getSearchEngineBm().search(query);
+      MatchingIndexEntry[] result = getSearchEngineBm().getRange(0, getSearchEngineBm().getResultLength());
+
 
       //get each publication according to result's list
       MatchingIndexEntry mie = null;
-      ArrayList pubPKs = new ArrayList();
+      List<PublicationPK> pubPKs = new ArrayList<PublicationPK>();
       for (int r = 0; r < result.length; r++) {
         mie = result[r];
         if (mie != null && !mie.getObjectId().equals(pubId)) {
-          if (mie.getObjectType().equals("Publication")) {
+          if ("Publication".equals(mie.getObjectType())) {
             pubPKs.add(getPublicationPK(mie.getObjectId()));
           }
         }

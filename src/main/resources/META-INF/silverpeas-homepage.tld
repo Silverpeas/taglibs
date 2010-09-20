@@ -1,309 +1,307 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
-<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd"> 
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
+<taglib>
+  <tlibversion>1.0</tlibversion>
+  <jspversion>1.1</jspversion>
+  <shortname>silverpeas-homepage</shortname>
+  <uri>http://www.silverpeas.com/tld/silverpeas-homepage</uri>
+  <info>Taglib to manage gui of Silverpeas</info>
+  <tag>
+    <name>DomainsBarHeading</name>
+    <tagclass>com.silverpeas.tags.homepage.DomainsBarHeadingTag</tagclass>
+    <bodycontent>empty</bodycontent>
 
-<taglib> 
-<tlibversion>1.0</tlibversion>
-<jspversion>1.1</jspversion>
-<shortname>silverpeas-homepage</shortname>
-<uri>silverpeas</uri>
-<info>Taglib to manage gui of Silverpeas</info> 
+    <attribute>
+      <name>iconAngleHaut</name>
+      <required>true</required>
+    </attribute>
+  </tag>
 
-<tag>
-        <name>DomainsBarHeading</name>
-        <tagclass>com.silverpeas.tags.homepage.DomainsBarHeadingTag</tagclass>
-        <bodycontent>empty</bodycontent>
+  <tag>
+    <name>CollaborativeSpaceTitleTag</name>
+    <tagclass>com.silverpeas.tags.homepage.CollaborativeSpaceTitleTag</tagclass>
+    <bodycontent>empty</bodycontent>
 
-	<attribute>
-		<name>iconAngleHaut</name>
-		<required>true</required>
-	</attribute>
-</tag>
+    <attribute>
+      <name>iconAngleHaut</name>
+      <required>true</required>
+    </attribute>
 
-<tag>
-        <name>CollaborativeSpaceTitleTag</name>
-        <tagclass>com.silverpeas.tags.homepage.CollaborativeSpaceTitleTag</tagclass>
-        <bodycontent>empty</bodycontent>
+    <attribute>
+      <name>iconCollaborative</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>iconAngleHaut</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>messageSpaceCollaboration</name>
+      <required>true</required>
+    </attribute>
+  </tag>
 
-	<attribute>
-		<name>iconCollaborative</name>
-		<required>true</required>
-	</attribute>
+  <tag>
+    <name>SpaceChoiceTag</name>
+    <tagclass>com.silverpeas.tags.homepage.SpaceChoiceTag</tagclass>
+    <bodycontent>empty</bodycontent>
 
-	<attribute>
-		<name>messageSpaceCollaboration</name>
-		<required>true</required>
-	</attribute>
-</tag>
+    <attribute>
+      <name>SContext</name>
+      <required>true</required>
+    </attribute>
 
-<tag>
-        <name>SpaceChoiceTag</name>
-        <tagclass>com.silverpeas.tags.homepage.SpaceChoiceTag</tagclass>
-        <bodycontent>empty</bodycontent>
+    <attribute>
+      <name>SPrivateDomain</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>SContext</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>asPrivateDomainsIds</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>SPrivateDomain</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>organizationCtrl</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>asPrivateDomainsIds</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>mainSessionCtrl</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>organizationCtrl</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>currentSpaceInMaintenance</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>mainSessionCtrl</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>NMax</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>currentSpaceInMaintenance</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>homeSpaceIcon</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>NMax</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>messageBackToMainPage</name>
+      <required>true</required>
+    </attribute>
+  </tag>
 
-	<attribute>
-		<name>homeSpaceIcon</name>
-		<required>true</required>
-	</attribute>
+  <tag>
+    <name>CategoriesTitleTag</name>
+    <tagclass>com.silverpeas.tags.homepage.CategoriesTitleTag</tagclass>
+    <bodycontent>empty</bodycontent>
 
-	<attribute>
-		<name>messageBackToMainPage</name>
-		<required>true</required>
-	</attribute>
-</tag>
+    <attribute>
+      <name>component_id</name>
+      <required>true</required>
+    </attribute>
 
-<tag>
-        <name>CategoriesTitleTag</name>
-        <tagclass>com.silverpeas.tags.homepage.CategoriesTitleTag</tagclass>
-        <bodycontent>empty</bodycontent>
+    <attribute>
+      <name>spaceOrSubSpace</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>component_id</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>message</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>spaceOrSubSpace</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>mainSessionCtrl</name>
+      <required>true</required>
+    </attribute>
+  </tag>
 
-	<attribute>
-		<name>message</name>
-		<required>true</required>
-	</attribute>
+  <tag>
+    <name>CategoriesTreeTag</name>
+    <tagclass>com.silverpeas.tags.homepage.CategoriesTreeTag</tagclass>
+    <bodycontent>empty</bodycontent>
 
-	<attribute>
-		<name>mainSessionCtrl</name>
-		<required>true</required>
-	</attribute>
-</tag>
+    <attribute>
+      <name>component_id</name>
+      <required>true</required>
+    </attribute>
 
-<tag>
-        <name>CategoriesTreeTag</name>
-        <tagclass>com.silverpeas.tags.homepage.CategoriesTreeTag</tagclass>
-        <bodycontent>empty</bodycontent>
+    <attribute>
+      <name>SContext</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>component_id</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>spaceOrSubSpace</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>SContext</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>selected_axis_id</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>spaceOrSubSpace</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>selected_axis_path</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>selected_axis_id</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>state</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>selected_axis_path</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>organizationCtrl</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>state</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>mainSessionCtrl</name>
+      <required>true</required>
+    </attribute>
+  </tag>
 
-	<attribute>
-		<name>organizationCtrl</name>
-		<required>true</required>
-	</attribute>
+  <tag>
+    <name>CollaborativeSpaceTreeTag</name>
+    <tagclass>com.silverpeas.tags.homepage.CollaborativeSpaceTreeTag</tagclass>
+    <bodycontent>empty</bodycontent>
 
-	<attribute>
-		<name>mainSessionCtrl</name>
-		<required>true</required>
-	</attribute>
-</tag>
+    <attribute>
+      <name>SPrivateDomain</name>
+      <required>true</required>
+    </attribute>
 
-<tag>
-        <name>CollaborativeSpaceTreeTag</name>
-        <tagclass>com.silverpeas.tags.homepage.CollaborativeSpaceTreeTag</tagclass>
-        <bodycontent>empty</bodycontent>
+    <attribute>
+      <name>organizationCtrl</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>SPrivateDomain</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>asPrivateDomainsIds</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>organizationCtrl</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>subDomain</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>asPrivateDomainsIds</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>SContext</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>subDomain</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>mainSessionCtrl</name>
+      <required>true</required>
+    </attribute>
+  </tag>
 
-	<attribute>
-		<name>SContext</name>
-		<required>true</required>
-	</attribute>
+  <tag>
+    <name>DomainsBarLayerTag</name>
+    <tagclass>com.silverpeas.tags.homepage.DomainsBarLayerTag</tagclass>
+    <bodycontent>empty</bodycontent>
+  </tag>
 
-	<attribute>
-		<name>mainSessionCtrl</name>
-		<required>true</required>
-	</attribute>
-</tag>
+  <tag>
+    <name>DomainsBarFooterTag</name>
+    <tagclass>com.silverpeas.tags.homepage.DomainsBarFooterTag</tagclass>
+    <bodycontent>empty</bodycontent>
 
-<tag>
-	<name>DomainsBarLayerTag</name>
-	<tagclass>com.silverpeas.tags.homepage.DomainsBarLayerTag</tagclass>
-	<bodycontent>empty</bodycontent>
-</tag>
-
-<tag>
-	<name>DomainsBarFooterTag</name>
-	<tagclass>com.silverpeas.tags.homepage.DomainsBarFooterTag</tagclass>
-	<bodycontent>empty</bodycontent>
-
-	<attribute>
-		<name>iconAngleBas</name>
-		<required>true</required>
-	</attribute>
-</tag>
+    <attribute>
+      <name>iconAngleBas</name>
+      <required>true</required>
+    </attribute>
+  </tag>
 
 
 
 
 
-<tag>
-	<name>TopBarIconsTag</name>
-	<tagclass>com.silverpeas.tags.homepage.TopBarIconsTag</tagclass>
-	<bodycontent>empty</bodycontent>
+  <tag>
+    <name>TopBarIconsTag</name>
+    <tagclass>com.silverpeas.tags.homepage.TopBarIconsTag</tagclass>
+    <bodycontent>empty</bodycontent>
 
-	<attribute>
-		<name>message</name>
-		<required></required>
-	</attribute>
+    <attribute>
+      <name>message</name>
+      <required></required>
+    </attribute>
 
-	<attribute>
-		<name>icons</name>
-		<required></required>
-	</attribute>
+    <attribute>
+      <name>icons</name>
+      <required></required>
+    </attribute>
 
-	<attribute>
-		<name>SContext</name>
-		<required></required>
-	</attribute>
+    <attribute>
+      <name>SContext</name>
+      <required></required>
+    </attribute>
 
-	<attribute>
-		<name>mainSessionCtrl</name>
-		<required></required>
-	</attribute>
-</tag>
+    <attribute>
+      <name>mainSessionCtrl</name>
+      <required></required>
+    </attribute>
+  </tag>
 
-<tag>
-	<name>PersonnalSpaceChoiceTag</name>
-	<tagclass>com.silverpeas.tags.homepage.PersonnalSpaceChoiceTag</tagclass>
-	<bodycontent>empty</bodycontent>
+  <tag>
+    <name>PersonnalSpaceChoiceTag</name>
+    <tagclass>com.silverpeas.tags.homepage.PersonnalSpaceChoiceTag</tagclass>
+    <bodycontent>empty</bodycontent>
 
-	<attribute>
-		<name>message</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>message</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>icons</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>icons</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>SContext</name>
-		<required>true</required>
-	</attribute>
-</tag>
+    <attribute>
+      <name>SContext</name>
+      <required>true</required>
+    </attribute>
+  </tag>
 
-<tag>
-	<name>SearchEngineTag</name>
-	<tagclass>com.silverpeas.tags.homepage.SearchEngineTag</tagclass>
-	<bodycontent>empty</bodycontent>
+  <tag>
+    <name>SearchEngineTag</name>
+    <tagclass>com.silverpeas.tags.homepage.SearchEngineTag</tagclass>
+    <bodycontent>empty</bodycontent>
 
-	<attribute>
-		<name>message</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>message</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>icons</name>
-		<required>true</required>
-	</attribute>
-</tag>
+    <attribute>
+      <name>icons</name>
+      <required>true</required>
+    </attribute>
+  </tag>
 
-<tag>
-        <name>MapPersonnalSpaceTag</name>
-        <tagclass>com.silverpeas.tags.homepage.MapPersonnalSpaceTag</tagclass>
-        <bodycontent>empty</bodycontent>
+  <tag>
+    <name>MapPersonnalSpaceTag</name>
+    <tagclass>com.silverpeas.tags.homepage.MapPersonnalSpaceTag</tagclass>
+    <bodycontent>empty</bodycontent>
 
-	<attribute>
-		<name>message</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>message</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>SContext</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>SContext</name>
+      <required>true</required>
+    </attribute>
 
-	<attribute>
-		<name>iconPersonnalSpace</name>
-		<required>true</required>
-	</attribute>
+    <attribute>
+      <name>iconPersonnalSpace</name>
+      <required>true</required>
+    </attribute>
 
-</tag>
+  </tag>
 
 
 </taglib>

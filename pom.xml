@@ -5,13 +5,13 @@
   <parent>
     <groupId>com.silverpeas</groupId>
     <artifactId>parent</artifactId>
-    <version>11</version>
+    <version>14</version>
   </parent>
 
   <groupId>com.silverpeas</groupId>
   <artifactId>taglibs</artifactId>
   <packaging>jar</packaging>
-  <version>5.2-SNAPSHOT</version>
+  <version>5.3-SNAPSHOT</version>
   <name>taglibs J2EE 1.4 Webapp</name>
   <url>http://www.silverpeas.com</url>
 
@@ -22,8 +22,8 @@
   </scm>
 
   <properties>
-    <core.version>5.1.3</core.version>
-    <component.version>5.1.3</component.version>
+    <core.version>5.3.1</core.version>
+    <component.version>5.3.1</component.version>
   </properties>
 
 
@@ -151,7 +151,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.4</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

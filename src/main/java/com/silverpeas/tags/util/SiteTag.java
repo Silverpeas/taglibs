@@ -7,6 +7,7 @@ import javax.servlet.jsp.tagext.TagSupport;
 import com.stratelia.silverpeas.silvertrace.SilverTrace;
 
 public class SiteTag extends TagSupport {
+  private static final long serialVersionUID = 4514691251508452414L;
 
 	int		mode					= 0;
 	String	userId					= "undefined";
@@ -17,7 +18,7 @@ public class SiteTag extends TagSupport {
 	String 	userAuthenticationClass	= "com.silverpeas.tags.authentication.BasicAuthentication";
 	String	language 				= null;
 	String	httpMode				= null;
-	
+
 	public void setMode(int mode)
 	{
 		this.mode = mode;
@@ -48,7 +49,7 @@ public class SiteTag extends TagSupport {
 	{
 		this.fileServerName = fileServerName;
 	}
-	
+
 	public void setUserAuthenticationClass(String userAuthenticationClass) {
 		this.userAuthenticationClass = userAuthenticationClass;
 	}

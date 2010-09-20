@@ -4,11 +4,11 @@ import com.silverpeas.util.StringUtil;
 import com.stratelia.silverpeas.silvertrace.SilverTrace;
 
 public class SiteTagUtil implements java.io.Serializable
-{	
+{
 	public static int MODE_PROD		= 0;
 	public static int MODE_RECETTE	= 1;
 	public static int MODE_DEV		= 2;
-	
+
 	private static int		currentMode				= MODE_PROD;
 	private static String	currentUserId			= "undefined";
 	private static String	serverName				= "undefined";
@@ -22,7 +22,7 @@ public class SiteTagUtil implements java.io.Serializable
 
 	private static String	language		= null;
 	private static String	httpMode		= null;
-	
+
     public SiteTagUtil()
     {
     }
@@ -93,10 +93,12 @@ public class SiteTagUtil implements java.io.Serializable
 		if (serverInfo == null)
 		{
 			serverInfo = getHttpMode() + getServerName();
-			if (!getServerPort().equals("80"))
-				serverInfo = getHttpMode() + getServerName() + ":"+getServerPort();
-			if (getServerContext() != null)
-				serverInfo += "/"+getServerContext();
+			if (!getServerPort().equals("80")) {
+        serverInfo = getHttpMode() + getServerName() + ":"+getServerPort();
+      }
+			if (getServerContext() != null) {
+        serverInfo += "/"+getServerContext();
+      }
 		}
 		return serverInfo;
 	}
@@ -109,7 +111,7 @@ public class SiteTagUtil implements java.io.Serializable
 		}
 		return fileServerInfo;
 	}
-	
+
 	public static String getUserAuthenticationClass()
     {
         return userAuthenticationClass;

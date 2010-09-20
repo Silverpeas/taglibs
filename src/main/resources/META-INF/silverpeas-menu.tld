@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
-<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd"> 
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
 
-<taglib> 
+<taglib>
 <tlibversion>1.0</tlibversion>
 <jspversion>1.1</jspversion>
 <shortname>silverpeas-menu</shortname>
-<uri>silverpeas-menu</uri>
-<info>Silverpeas Menu taglib</info> 
+<uri>http://www.silverpeas.com/tld/silverpeas-menu</uri>
+<info>Silverpeas Menu taglib</info>
 
 <tag>
 	<name>organization</name>
@@ -24,7 +24,7 @@
 		<name>visibilityFilter</name>
 		<required>false</required>
 	</attribute>
-	
+
 	<attribute>
 		<name>scope</name>
 		<required>false</required>
@@ -65,7 +65,7 @@
 		<required>false</required>
 		<rtexprvalue>true</rtexprvalue>
 	</attribute>
-	
+
 	<attribute>
 		<name>componentId</name>
 		<required>false</required>
@@ -81,7 +81,7 @@
 		<name>depth</name>
 		<required>false</required>
 	</attribute>
-	
+
 	<attribute>
 		<name>scope</name>
 		<required>false</required>
@@ -117,7 +117,7 @@
 		<required>false</required>
 		<rtexprvalue>true</rtexprvalue>
 	</attribute>
-	
+
 	<attribute>
 		<name>scope</name>
 		<required>false</required>

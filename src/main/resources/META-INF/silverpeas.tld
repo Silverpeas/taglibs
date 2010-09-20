@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
-<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd"> 
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
 
-<taglib> 
+<taglib>
 <tlibversion>1.1</tlibversion>
 <jspversion>1.1</jspversion>
 <shortname>silverpeas-tags</shortname>
-<uri>silverpeas</uri>
-<info>Silverpeas taglib</info> 
+<uri>http://www.silverpeas.com/tld/silverpeas-web</uri>
+<info>Silverpeas taglib</info>
 
-<tag>                                                     
+<tag>
         <name>hello</name>
         <tagclass>com.silverpeas.tags.HelloWorldTag</tagclass>
         <bodycontent>empty</bodycontent>
@@ -57,13 +57,13 @@
 		<required>false</required>
 		<rtexprvalue>true</rtexprvalue>
 	</attribute>
-	
+
 	<attribute>
 		<name>userAuthenticationClass</name>
 		<required>false</required>
 		<rtexprvalue>true</rtexprvalue>
 	</attribute>
-	
+
 	<attribute>
 		<name>language</name>
 		<required>false</required>
@@ -100,7 +100,7 @@
 		<required>false</required>
 		<rtexprvalue>true</rtexprvalue>
 	</attribute>
-	
+
 	<attribute>
 		<name>componentId</name>
 		<required>true</required>
@@ -166,13 +166,13 @@
 		<required>false</required>
 		<rtexprvalue>true</rtexprvalue>
 	</attribute>
-	
+
 	<attribute>
 		<name>xmlTemplate</name>
 		<required>false</required>
 		<rtexprvalue>true</rtexprvalue>
 	</attribute>
-	
+
 	<attribute>
 		<name>xmlQuery</name>
 		<required>false</required>
@@ -184,19 +184,19 @@
 		<required>false</required>
 		<rtexprvalue>true</rtexprvalue>
 	</attribute>
-	
+
 	<attribute>
 		<name>publicationEnabled</name>
 		<required>false</required>
 		<rtexprvalue>true</rtexprvalue>
 	</attribute>
-	
+
 	<attribute>
 		<name>forumEnabled</name>
 		<required>false</required>
 		<rtexprvalue>true</rtexprvalue>
 	</attribute>
-	
+
 	<attribute>
 		<name>scope</name>
 		<required>false</required>
@@ -276,13 +276,13 @@
 		<required>false</required>
 		<rtexprvalue>true</rtexprvalue>
 	</attribute>
-	
+
 	<attribute>
 		<name>elementId</name>
 		<required>false</required>
 		<rtexprvalue>true</rtexprvalue>
 	</attribute>
-	
+
 	<attribute>
 		<name>forceReload</name>
 		<required>false</required>
@@ -311,13 +311,13 @@
 		<required>false</required>
 		<rtexprvalue>true</rtexprvalue>
 	</attribute>
-	
+
 	<attribute>
 		<name>elementId</name>
 		<required>false</required>
 		<rtexprvalue>true</rtexprvalue>
 	</attribute>
-	
+
 	<attribute>
 		<name>authorId</name>
 		<required>false</required>
@@ -352,13 +352,13 @@
 		<required>true</required>
 		<rtexprvalue>true</rtexprvalue>
 	</attribute>
-	
+
 	<attribute>
 		<name>elementId</name>
 		<required>true</required>
 		<rtexprvalue>true</rtexprvalue>
 	</attribute>
-	
+
 	<attribute>
 		<name>forceReload</name>
 		<required>false</required>
@@ -470,13 +470,13 @@
 		<required>false</required>
 		<rtexprvalue>true</rtexprvalue>
 	</attribute>
-	
+
 	<attribute>
 		<name>elementId</name>
 		<required>false</required>
 		<rtexprvalue>true</rtexprvalue>
 	</attribute>
-	
+
 	<attribute>
 		<name>forceReload</name>
 		<required>false</required>
