@@ -52,6 +52,8 @@ import com.stratelia.webactiv.util.publication.model.CompletePublication;
 import com.stratelia.webactiv.util.publication.model.PublicationDetail;
 import com.stratelia.webactiv.util.publication.model.PublicationI18N;
 import com.stratelia.webactiv.util.publication.model.PublicationPK;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class KmeliaTagUtil extends ComponentTagUtil {
 
@@ -1148,6 +1150,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       String webContext = SiteTagUtil.getServerContext() + SiteTagUtil.getFileServerName() + "/";
       content = convertToWebUrl(content, "/FileServer/", webContext);
       content = convertToWebUrl(content, "/GalleryInWysiwyg/", webContext);
+      content = convertRestToWebUrl(content, "/attached_file/", webContext);
 
       int finPath = 0;
       int debutPath = 0;
@@ -1184,6 +1187,10 @@ public class KmeliaTagUtil extends ComponentTagUtil {
 
   private NodePK getNodePK(String nodeId) {
     return new NodePK(nodeId, getComponentId());
+  }
+
+  public String convertRestToWebUrl(String content, String servletMapping, String attachmentUrl) {
+   return content.replaceAll("/[^/]*" + servletMapping , attachmentUrl);
   }
 
   public String convertToWebUrl(String content, String servletMapping, String webContext) {
