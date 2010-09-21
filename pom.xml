@@ -15,6 +15,22 @@
   <name>taglibs J2EE 1.4 Webapp</name>
   <url>http://www.silverpeas.com</url>
 
+
+   <distributionManagement>
+    <repository>
+      <id>silverpeas</id>
+      <name>Repository Silverpeas</name>
+      <layout>default</layout>
+      <url>https://www.silverpeas.org/nexus/content/repositories/non-free/</url>
+    </repository>
+    <snapshotRepository>
+      <id>silverpeas-snapshots</id>
+      <name>Snapshots Repository Silverpeas</name>
+      <layout>default</layout>
+      <url>hhttps://www.silverpeas.org/nexus/content/repositories/snapshots-non-free/</url>
+    </snapshotRepository>
+  </distributionManagement>
+
   <scm>
     <connection>scm:svn:https://www.silverpeas.org/svn/websites/professional-edition/taglibs/trunk</connection>
     <developerConnection>scm:svn:https://www.silverpeas.org/svn/websites/professional-edition/taglibs/trunk</developerConnection>
