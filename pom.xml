@@ -11,7 +11,7 @@
   <groupId>com.silverpeas</groupId>
   <artifactId>taglibs</artifactId>
   <packaging>jar</packaging>
-  <version>5.3</version>
+  <version>5.3-SNAPSHOT</version>
   <name>taglibs J2EE 1.4 Webapp</name>
   <url>http://www.silverpeas.com</url>
 
@@ -32,9 +32,9 @@
   </distributionManagement>
 
   <scm>
-    <connection>scm:svn:https://www.silverpeas.org/svn/websites/professional-edition/taglibs/tags/taglibs-5.3</connection>
-    <developerConnection>scm:svn:https://www.silverpeas.org/svn/websites/professional-edition/taglibs/tags/taglibs-5.3</developerConnection>
-    <url>https://www.silverpeas.org/svn/websites/professional-edition/taglibs/tags/taglibs-5.3</url>
+    <connection>scm:svn:https://www.silverpeas.org/svn/websites/professional-edition/taglibs/trunk</connection>
+    <developerConnection>scm:svn:https://www.silverpeas.org/svn/websites/professional-edition/taglibs/trunk</developerConnection>
+    <url>https://www.silverpeas.org/svn/websites/professional-edition/taglibs/</url>
   </scm>
 
   <properties>
