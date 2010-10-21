@@ -489,4 +489,39 @@
 	</attribute>
 </tag>
 
+<tag>
+    <name>photoGallery</name>
+    <tagclass>com.silverpeas.tags.gallery.GalleryTag</tagclass>
+    <bodycontent>empty</bodycontent>
+    <info>A gallery accessor</info>
+
+    <attribute>
+        <name>name</name>
+        <required>false</required>
+    </attribute>
+
+    <attribute>
+        <name>componentId</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+
+    <attribute>
+        <name>elementId</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+
+    <attribute>
+        <name>forceReload</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+
+    <attribute>
+        <name>scope</name>
+        <required>false</required>
+    </attribute>
+</tag>
+
 </taglib>
