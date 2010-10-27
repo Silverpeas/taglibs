@@ -66,7 +66,7 @@ public class GalleryTagUtil extends ComponentTagUtil {
     if (galleryBm == null) {
       try {
         galleryBm =
-            (GalleryBm) EJBDynaProxy.createProxy(JNDINames.GALLERY_EJBHOME, GalleryBm.class);
+            (GalleryBm) EJBDynaProxy.createProxy(JNDINames.GALLERYBM_EJBHOME, GalleryBm.class);
       } catch (Exception e) {
         throw new KmeliaRuntimeException("KmeliaTagUtil.getGalleryBm",
             SilverpeasRuntimeException.ERROR, "root.EX_CANT_GET_REMOTE_OBJECT", e);
