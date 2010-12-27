@@ -148,6 +148,40 @@ public class KmeliaTagUtilTest {
     assertEquals(expResult, result);
   }
 
+  public void testParseHtml() throws Exception {
+   String html =  "<p style=\"text-align: left;\">&nbsp;</p><p style=\"text-align: left; margin-left: 80px;\">"
+        + "<a href=\"http://www.orange-business.com/fr/entreprise/index.jsp\"><img border=\"0\" "
+        + "style=\"width: 116px; height: 47px;\" alt=\"\" src=\"/silverpeas/GalleryInWysiwyg/dummy?ImageId=334&amp;ComponentId=gallery759\""
+        + " /></a> <br />&nbsp;</p><p style=\"text-align: left; margin-left: 80px;\">"
+        + "<a href=\"http://www.logica.com/france/400005040\"><img border=\"0\" alt=\"\" "
+        + "style=\"width: 88px; height: 44px;\" src=\"/silverpeas/GalleryInWysiwyg/dummy?ImageId=338&amp;ComponentId=gallery759\" "
+        + "/></a></p><p style=\"text-align: left; margin-left: 80px;\">&nbsp;&nbsp;&nbsp;"
+            + "<a href=\"http://www.oevo.com\"><img border=\"0\" style=\"width: 49px; height: 59px;\""
+            + " alt=\"\" src=\"/silverpeas/GalleryInWysiwyg/dummy?ImageId=220&amp;ComponentId=gallery759\" "
+            + "/></a>&nbsp;&nbsp;&nbsp;</p><p style=\"text - align: left;margin - left: 80px;\">"
+        + "<a href=\"http://www.oosphere.ch\"><img border=\"0\" style=\"width: 70px; height: 57px;\""
+        + " alt=\"OOsphere\" src=\"/silverpeas/FileServer/LogoOOsphere.gif?ComponentId=kmelia560&amp;"
+       + "SourceFile=1166866926810.gif&amp;MimeType=image/gif&amp;Directory=Attachment/1205Images/\" /></a></p>";
+   SiteTagUtil.setServerContext("");
+   SiteTagUtil.setFileServerName("/attached_file");
+   String expectedResult = "<p style=\"text-align: left;\">&nbsp;</p><p style=\"text-align: left; margin-left: 80px;\">"
+        + "<a href=\"http://www.orange-business.com/fr/entreprise/index.jsp\"><img border=\"0\" "
+        + "style=\"width: 116px; height: 47px;\" alt=\"\" src=\"/silverpeas/GalleryInWysiwyg/dummy?ImageId=334&amp;ComponentId=gallery759\""
+        + " /></a> <br />&nbsp;</p><p style=\"text-align: left; margin-left: 80px;\">"
+        + "<a href=\"http://www.logica.com/france/400005040\"><img border=\"0\" alt=\"\" "
+        + "style=\"width: 88px; height: 44px;\" src=\"/silverpeas/GalleryInWysiwyg/dummy?ImageId=338&amp;ComponentId=gallery759\" "
+        + "/></a></p><p style=\"text-align: left; margin-left: 80px;\">&nbsp;&nbsp;&nbsp;"
+            + "<a href=\"http://www.oevo.com\"><img border=\"0\" style=\"width: 49px; height: 59px;\""
+            + " alt=\"\" src=\"/silverpeas/GalleryInWysiwyg/dummy?ImageId=220&amp;ComponentId=gallery759\" "
+            + "/></a>&nbsp;&nbsp;&nbsp;</p><p style=\"text - align: left;margin - left: 80px;\">"
+        + "<a href=\"http://www.oosphere.ch\"><img border=\"0\" style=\"width: 70px; height: 57px;\""
+        + " alt=\"OOsphere\" src=\"/silverpeas/attached_file/LogoOOsphere.gif?ComponentId=kmelia560&amp;"
+       + "SourceFile=1166866926810.gif&amp;MimeType=image/gif&amp;Directory=Attachment/1205Images/\" /></a></p>";
+   String result = instance.parseHtmlContent(html);
+   assertEquals(expectedResult, result);
+  
+  }
+
   /**
    * Test of convertToWebUrl method, of class KmeliaTagUtil.
    */
