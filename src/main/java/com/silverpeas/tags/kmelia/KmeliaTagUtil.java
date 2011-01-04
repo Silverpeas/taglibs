@@ -1,5 +1,7 @@
 package com.silverpeas.tags.kmelia;
 
+import com.silverpeas.comment.model.CommentPK;
+import com.silverpeas.comment.model.CommentedPublicationInfo;
 import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -8,6 +10,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import com.silverpeas.comment.service.CommentService;
+import com.silverpeas.comment.service.CommentServiceFactory;
 import com.silverpeas.notation.ejb.NotationBm;
 import com.silverpeas.notation.model.Notation;
 import com.silverpeas.notation.model.NotationPK;
@@ -17,9 +21,6 @@ import com.silverpeas.tags.util.SiteTagUtil;
 import com.silverpeas.tags.util.VisibilityException;
 import com.silverpeas.util.ForeignPK;
 import com.silverpeas.util.StringUtil;
-import com.stratelia.silverpeas.comment.ejb.CommentBm;
-import com.stratelia.silverpeas.comment.model.CommentInfo;
-import com.stratelia.silverpeas.comment.model.CommentPK;
 import com.stratelia.silverpeas.silvertrace.SilverTrace;
 import com.stratelia.silverpeas.wysiwyg.WysiwygException;
 import com.stratelia.silverpeas.wysiwyg.control.WysiwygController;
@@ -63,7 +64,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   private PublicationBm publicationBm = null;
   private NodeBm nodeBm = null;
   private SearchEngineBm searchEngineBm = null;
-  private CommentBm commentBm = null;
+  private CommentService commentService = null;
   private NotationBm notationBm = null;
 
   public KmeliaTagUtil(String spaceId, String componentId, String userId) {
@@ -138,16 +139,12 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     return searchEngineBm;
   }
 
-  private CommentBm getCommentBm() {
-    if (commentBm == null) {
-      try {
-        commentBm = (CommentBm) EJBDynaProxy.createProxy(JNDINames.COMMENT_EJBHOME, CommentBm.class);
-      } catch (Exception e) {
-        throw new KmeliaRuntimeException("KmeliaTagUtil.getCommentBm",
-            SilverpeasRuntimeException.ERROR, "root.EX_CANT_GET_REMOTE_OBJECT", e);
-      }
+  private CommentService getCommentService() {
+    if (commentService == null) {
+      CommentServiceFactory serviceFactory = CommentServiceFactory.getFactory();
+      commentService = serviceFactory.getCommentService();
     }
-    return commentBm;
+    return commentService;
   }
 
   private NotationBm getNotationBm() {
@@ -188,8 +185,8 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     SpaceInst spaceInst = null;
     ComponentInst componentInst = getComponentInst();
     if (componentInst != null) {
-      String spaceId = componentInst.getDomainFatherId();
-      spaceInst = getAdmin().getSpaceInst(spaceId);
+      String fatherSpaceId = componentInst.getDomainFatherId();
+      spaceInst = getAdmin().getSpaceInst(fatherSpaceId);
     }
     return spaceInst;
   }
@@ -274,7 +271,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       VisibilityException {
     Integer commentsCount = new Integer(0);
     PublicationPK publicationKey = new PublicationPK(pubId, this.getComponentId());
-    int count = getCommentBm().getCommentsCount(publicationKey);
+    int count = getCommentService().getCommentsCountOnPublication(publicationKey);
     if (count > 0) {
       commentsCount = new Integer(count);
     }
@@ -713,11 +710,11 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     try {
       if (topicId.equals("-1")) {
         ArrayList commentsCountSorted = new ArrayList();
-        commentsCountSorted.addAll(this.getCommentBm().getMostCommentedAllPublications());
+        commentsCountSorted.addAll(this.getCommentService().getAllMostCommentedPublicationsInfo());
         Iterator iter = commentsCountSorted.iterator();
         while (iter.hasNext() && comments.size() < numberPublication) {
-          CommentInfo commentInfo = (CommentInfo) iter.next();
-          PublicationDetail publication = this.getPublicationDetail(commentInfo.getElementId());
+          CommentedPublicationInfo commentInfo = (CommentedPublicationInfo) iter.next();
+          PublicationDetail publication = this.getPublicationDetail(commentInfo.getPublicationId());
           if (publication.getInfoId().equals(formName)) {
             comments.add(commentInfo);
           }
@@ -726,7 +723,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       } else {
         Collection publications = getPublications(topicId, true);
         Iterator iter = publications.iterator();
-        ArrayList commentsPks = new ArrayList();
+        List commentsPks = new ArrayList();
         PublicationDetail publication;
         PublicationPK publicationPK;
         while (iter.hasNext()) {
@@ -738,7 +735,10 @@ public class KmeliaTagUtil extends ComponentTagUtil {
           }
         }
         if (!commentsPks.isEmpty()) {
-          return getCommentBm().getMostCommented(commentsPks, numberPublication);
+          comments = getCommentService().getMostCommentedPublicationsInfo(commentsPks);
+          if (comments.size() > numberPublication) {
+            comments = comments.subList(0, numberPublication);
+          }
         }
       }
     } catch (Exception e) {

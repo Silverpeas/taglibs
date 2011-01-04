@@ -12,9 +12,9 @@ import com.silverpeas.tagcloud.model.TagCloud;
 import com.silverpeas.tagcloud.model.TagCloudPK;
 import com.silverpeas.tags.ComponentTagUtil;
 import com.silverpeas.tags.util.EJBDynaProxy;
-import com.stratelia.webactiv.forums.forumEntity.ejb.ForumPK;
 import com.stratelia.webactiv.forums.forumsManager.ejb.ForumsBM;
-import com.stratelia.webactiv.forums.messageEntity.ejb.MessagePK;
+import com.stratelia.webactiv.forums.models.ForumPK;
+import com.stratelia.webactiv.forums.models.MessagePK;
 import com.stratelia.webactiv.util.EJBUtilitaire;
 import com.stratelia.webactiv.util.JNDINames;
 import com.stratelia.webactiv.util.exception.SilverpeasRuntimeException;
@@ -24,11 +24,11 @@ import com.stratelia.webactiv.util.publication.model.PublicationPK;
 public class TagCloudTagUtil
 	extends ComponentTagUtil
 {
-	
+
 	private TagCloudBm tagCloudBm = null;
 	private PublicationBm publicationBm = null;
 	private ForumsBM forumsBm = null;
-	
+
 	private String componentId = null;
 	private String elementId = null;
 
@@ -38,7 +38,7 @@ public class TagCloudTagUtil
 		this.componentId = componentId;
 		this.elementId = elementId;
 	}
-	
+
 	public Collection getInstanceTagClouds(String maxCount) throws RemoteException
 	{
 		if (maxCount == null || maxCount.length() == 0)
@@ -50,50 +50,50 @@ public class TagCloudTagUtil
 			return getTagCloudBm().getInstanceTagClouds(componentId, Integer.parseInt(maxCount));
 		}
 	}
-	
+
 	public Collection getPublicationTagClouds() throws RemoteException
 	{
 		return getElementTagClouds(TagCloud.TYPE_PUBLICATION);
 	}
-	
+
 	public Collection getForumTagClouds() throws RemoteException
 	{
 		return getElementTagClouds(TagCloud.TYPE_FORUM);
 	}
-	
+
 	public Collection getMessageTagClouds() throws RemoteException
 	{
 		return getElementTagClouds(TagCloud.TYPE_MESSAGE);
 	}
-	
+
 	public String getPublicationTags() throws RemoteException
 	{
 		return getElementTags(TagCloud.TYPE_PUBLICATION);
 	}
-	
+
 	public String getForumTags() throws RemoteException
 	{
 		return getElementTags(TagCloud.TYPE_FORUM);
 	}
-	
+
 	public String getMessageTags() throws RemoteException
 	{
 		return getElementTags(TagCloud.TYPE_MESSAGE);
 	}
-	
+
 	public Collection getPublicationsByTags(String tags) throws RemoteException
 	{
 		Collection tagClouds = getTagCloudBm().getTagCloudsByTags(
 			tags, componentId, TagCloud.TYPE_PUBLICATION);
-		
+
 		return getPublications(tagClouds);
 	}
-	
+
 	public Collection getPublicationsByElement() throws RemoteException
 	{
 		Collection tagClouds = getTagCloudBm().getTagCloudsByElement(
 			componentId, elementId, TagCloud.TYPE_PUBLICATION);
-		
+
 		Collection linkedTagClouds = new ArrayList();
 		Iterator iter = tagClouds.iterator();
 		TagCloud tagCloud;
@@ -103,10 +103,10 @@ public class TagCloudTagUtil
 			linkedTagClouds.addAll(getTagCloudBm().getTagCloudsByTags(
 				tagCloud.getTag(), componentId, TagCloud.TYPE_PUBLICATION));
 		}
-		
+
 		return getPublications(linkedTagClouds);
 	}
-	
+
 	public Collection getForumsByTags(String tags) throws RemoteException
 	{
 		Collection tagClouds = getTagCloudBm().getTagCloudsByTags(
@@ -121,7 +121,7 @@ public class TagCloudTagUtil
 			{
 				tagCloud = (TagCloud)iter.next();
 				ForumPK forumPK = new ForumPK(
-					tagCloud.getInstanceId(), "", tagCloud.getExternalId());
+					tagCloud.getInstanceId(), tagCloud.getExternalId());
 				if (!forumPKs.contains(forumPK))
 				{
 					forumPKs.add(forumPK);
@@ -131,12 +131,12 @@ public class TagCloudTagUtil
 		}
 		return new ArrayList();
 	}
-	
+
 	public Collection getThreadsByTags(String tags) throws RemoteException
 	{
 		Collection tagClouds = getTagCloudBm().getTagCloudsByTags(
 			tags, componentId, TagCloud.TYPE_MESSAGE);
-		
+
 		ArrayList messagesList = new ArrayList();
 		Iterator iter = tagClouds.iterator();
 		TagCloud tagCloud;
@@ -147,7 +147,7 @@ public class TagCloudTagUtil
 			{
 				tagCloud = (TagCloud)iter.next();
 				MessagePK messagePK = new MessagePK(
-					tagCloud.getInstanceId(), "", tagCloud.getExternalId());
+					tagCloud.getInstanceId(), tagCloud.getExternalId());
 				if (!messagePKs.contains(messagePK))
 				{
 					messagePKs.add(messagePK);
@@ -157,17 +157,17 @@ public class TagCloudTagUtil
 		}
 		return messagesList;
 	}
-	
+
 	private Collection getElementTagClouds(int type) throws RemoteException
 	{
 		return getTagCloudBm().getElementTagClouds(new TagCloudPK(elementId, componentId, type));
 	}
-	
+
 	private String getElementTags(int type) throws RemoteException
 	{
 		return getTagCloudBm().getTagsByElement(new TagCloudPK(elementId, componentId, type));
 	}
-	
+
 	private Collection getPublications(Collection tagClouds) throws RemoteException
 	{
 		if (!tagClouds.isEmpty())
@@ -192,8 +192,8 @@ public class TagCloudTagUtil
 			return new ArrayList();
 		}
 	}
-	
-	private TagCloudBm getTagCloudBm() 
+
+	private TagCloudBm getTagCloudBm()
 	{
 		if (tagCloudBm == null)
 		{
@@ -206,13 +206,13 @@ public class TagCloudTagUtil
 			{
 				throw new TagCloudRuntimeException("TagCloudTagUtil.getTagCloudBm",
 					SilverpeasRuntimeException.ERROR, "root.EX_CANT_GET_REMOTE_OBJECT", e);
-				
+
 			}
 		}
 		return tagCloudBm;
 	}
-	
-	private PublicationBm getPublicationBm() 
+
+	private PublicationBm getPublicationBm()
 	{
 		if (publicationBm == null) {
 			try
@@ -228,8 +228,8 @@ public class TagCloudTagUtil
 		}
 		return publicationBm;
 	}
-	
-	private ForumsBM getForumsBm() 
+
+	private ForumsBM getForumsBm()
 	{
 		if (forumsBm == null) {
 			try
