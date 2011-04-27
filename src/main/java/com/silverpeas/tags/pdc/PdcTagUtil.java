@@ -583,8 +583,7 @@ public class PdcTagUtil implements java.io.Serializable
 		//get the unique id (silverContentId) of the object identified by objectId
 		int silverContentId = getPdcBm().getSilverContentId(objectId, componentId);
 
-		ArrayList positions = getPdcBm().getPositions(silverContentId, componentId);
-		return positions;
+		return getPdcBm().getPositions(silverContentId, componentId);
 	}
 
 	public Collection getValuesOnAxis(String objectIdAndComponentIdAndAxisId) throws Exception
