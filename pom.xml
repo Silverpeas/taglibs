@@ -21,13 +21,13 @@
       <id>silverpeas</id>
       <name>Repository Silverpeas</name>
       <layout>default</layout>
-      <url>https://www.silverpeas.org/nexus/content/repositories/sp-non-free/</url>
+      <url>http://www.silverpeas.org/nexus/content/repositories/sp-non-free/</url>
     </repository>
     <snapshotRepository>
       <id>silverpeas-snapshots</id>
       <name>Snapshots Repository Silverpeas</name>
       <layout>default</layout>
-      <url>https://www.silverpeas.org/nexus/content/repositories/sp-dev-non-free/</url>
+      <url>http://www.silverpeas.org/nexus/content/repositories/sp-dev-non-free/</url>
     </snapshotRepository>
   </distributionManagement>
 
