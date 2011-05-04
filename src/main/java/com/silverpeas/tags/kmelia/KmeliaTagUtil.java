@@ -955,6 +955,27 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     }
     return silverObjectId;
   }
+  
+
+  /**
+   * renvoit l'URL de la vignette de la publication, ou chaine vide s'il n'y a pas de vignette
+   * @param pubId
+   * @return String not null
+   */
+  public String getVignetteURL(String pubId) throws RemoteException, VisibilityException {
+    SilverTrace.info("kmelia", "KmeliaTagUtil.getVignetteURL()", "root.MSG_GEN_ENTER_METHOD",
+        "pubId = " + pubId);
+    String imageURL = "";
+    PublicationDetail pubDetail = getPublicationDetail(pubId);
+  	if(pubDetail.getImage() != null) {
+  		if(pubDetail.getImage().startsWith("/")) {//image provenant de la photothèque
+  			imageURL = pubDetail.getImage();
+  		} else {//image téléchargée
+  			imageURL = "vignette?ComponentId="+pubDetail.getInstanceId()+"&SourceFile="+pubDetail.getImage()+"&MimeType=image/jpeg&Directory=images";
+  		}
+  	}
+    return imageURL;
+  }
 
   /**************************************************************************************/
   /* KMelia - Gestion des validations                                                   */
@@ -1130,7 +1151,11 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     }
 
     PublicationDetail detail = getPublicationDetail(pubId);
-    return parseHtmlContent(detail.getFieldValue(fieldName));
+    String fieldValue = detail.getFieldValue(fieldName);
+    if(fieldValue == null) {
+      fieldValue = "";
+    }
+    return parseHtmlContent(fieldValue);
   }
 
   /**
@@ -1140,7 +1165,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
    * In taglibs context, the servlet WebFileServer must be used.
    * The string http://server_name:port/silverpeas/FileServer must be replaced by http://webServer_name:port/webContext/WebFileServer
    * The web context is provided by the tag Site.
-   * @param htmlContent
+   * @param htmlContent not null
    */
   public String parseHtmlContent(String htmlContent) {
     if (htmlContent != null && htmlContent.length() > 0) {
