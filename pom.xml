@@ -5,13 +5,13 @@
   <parent>
     <groupId>com.silverpeas</groupId>
     <artifactId>parent</artifactId>
-    <version>19-SNAPSHOT</version>
+    <version>19</version>
   </parent>
 
   <groupId>com.silverpeas</groupId>
   <artifactId>taglibs</artifactId>
   <packaging>jar</packaging>
-  <version>5.6-SNAPSHOT</version>
+  <version>5.6</version>
   <name>taglibs J2EE 1.4 Webapp</name>
   <url>http://www.silverpeas.com</url>
 
@@ -32,9 +32,9 @@
   </distributionManagement>
 
   <scm>
-    <connection>scm:svn:https://www.silverpeas.org/svn/websites/professional-edition/taglibs/trunk</connection>
-    <developerConnection>scm:svn:https://www.silverpeas.org/svn/websites/professional-edition/taglibs/trunk</developerConnection>
-    <url>https://www.silverpeas.org/svn/websites/professional-edition/taglibs/</url>
+    <connection>scm:svn:https://www.silverpeas.org/svn/websites/professional-edition/taglibs/tags/taglibs-5.6</connection>
+    <developerConnection>scm:svn:https://www.silverpeas.org/svn/websites/professional-edition/taglibs/tags/taglibs-5.6</developerConnection>
+    <url>https://www.silverpeas.org/svn/websites/professional-edition/taglibs/tags/taglibs-5.6</url>
   </scm>
 
   <repositories>
@@ -89,103 +89,103 @@
     <dependency>
       <groupId>com.silverpeas.core</groupId>
       <artifactId>lib-core</artifactId>
-      <version>${core.version}</version>
+      <version>5.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core</groupId>
       <artifactId>web-core</artifactId>
-      <version>${core.version}</version>
+      <version>5.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>admin</artifactId>
       <classifier>client</classifier>
-      <version>${core.version}</version>
+      <version>5.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>authentication</artifactId>
       <classifier>client</classifier>
-      <version>${core.version}</version>
+      <version>5.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>pdc</artifactId>
       <classifier>client</classifier>
-      <version>${core.version}</version>
+      <version>5.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>node</artifactId>
       <classifier>client</classifier>
-      <version>${core.version}</version>
+      <version>5.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>publication</artifactId>
       <classifier>client</classifier>
-      <version>${core.version}</version>
+      <version>5.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>comment</artifactId>
-      <version>${core.version}</version>
+      <version>5.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>tagcloud</artifactId>
       <classifier>client</classifier>
-      <version>${core.version}</version>
+      <version>5.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>notation</artifactId>
       <classifier>client</classifier>
-      <version>${core.version}</version>
+      <version>5.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>searchengine</artifactId>
       <classifier>client</classifier>
-      <version>${core.version}</version>
+      <version>5.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.components.almanach</groupId>
       <artifactId>almanach-ejb</artifactId>
       <classifier>client</classifier>
-      <version>${component.version}</version>
+      <version>5.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.components.kmelia</groupId>
       <artifactId>kmelia-ejb</artifactId>
       <classifier>client</classifier>
-      <version>${component.version}</version>
+      <version>5.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.components.forums</groupId>
       <artifactId>forums-ejb</artifactId>
       <classifier>client</classifier>
-      <version>${component.version}</version>
+      <version>5.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.components.gallery</groupId>
       <artifactId>gallery-ejb</artifactId>
       <classifier>client</classifier>
-      <version>${component.version}</version>
+      <version>5.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
