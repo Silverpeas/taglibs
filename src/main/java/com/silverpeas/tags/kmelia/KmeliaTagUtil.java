@@ -12,6 +12,7 @@ import java.util.StringTokenizer;
 
 import com.silverpeas.comment.service.CommentService;
 import com.silverpeas.comment.service.CommentServiceFactory;
+import com.silverpeas.form.importExport.XMLField;
 import com.silverpeas.notation.ejb.NotationBm;
 import com.silverpeas.notation.model.Notation;
 import com.silverpeas.notation.model.NotationPK;
@@ -1155,6 +1156,21 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     if(fieldValue == null) {
       fieldValue = "";
     }
+    
+    //Particular case of Image Field (in the XML forms) 
+    String webContext = SiteTagUtil.getServerContext();
+    List<XMLField> xmlFields = detail.getXmlFields();
+    XMLField xmlField = null;
+    for (int x = 0; x < xmlFields.size(); x++) {
+      xmlField = xmlFields.get(x);
+      if (fieldName.equals(xmlField.getName())) {
+        if (xmlField.getValue() != null && (xmlField.getValue().startsWith("image_") || xmlField.getValue().startsWith("file_"))) {
+          //prefix the value with the webContext
+          fieldValue = webContext + fieldValue;
+          break;
+        }
+      }
+    }
     return parseHtmlContent(fieldValue);
   }
 
@@ -1163,7 +1179,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
    * The servlet FileServer is used. This works in the traditional context of silverpeas.
    * But, it does not works in the taglibs context because the FileServer is securised.
    * In taglibs context, the servlet WebFileServer must be used.
-   * The string http://server_name:port/silverpeas/FileServer must be replaced by http://webServer_name:port/webContext/WebFileServer
+   * The string http://server_name:port/silverpeas/FileServer must be replaced by http://webServer_name:port/webContext/attached_file
    * The web context is provided by the tag Site.
    * @param htmlContent not null
    */
@@ -1212,6 +1228,15 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     return new NodePK(nodeId, getComponentId());
   }
 
+  /**
+   * Replace the String "/xxx/servletMapping par "attachmentUrl
+   * Used in the Wysiwyg field of the XML Forms
+   * @param content : the String to replace, for example the String /silverpeas/attached_file/componentId/kmelia24/attachmentId/19578/lang/fr/name/ESAT_Rhone-Alpes_synthese.jpg
+   * @param servletMapping : for example the String /attached_file/
+   * @param attachmentUrl :  the webContext, for example the String /webContext/attached_file/
+   * For example replace the String /silverpeas/attached_file/componentId/kmelia24/attachmentId/19578/lang/fr/name/ESAT_Rhone-Alpes_synthese.jpg
+   * @return the String replaced, in the example, return /webContext/attached_file/componentId/kmelia24/attachmentId/19578/lang/fr/name/ESAT_Rhone-Alpes_synthese.jpg 
+   */
   public String convertRestToWebUrl(String content, String servletMapping, String attachmentUrl) {
    return content.replaceAll("\"/[^/]*" + servletMapping , '"' + attachmentUrl);
   }
