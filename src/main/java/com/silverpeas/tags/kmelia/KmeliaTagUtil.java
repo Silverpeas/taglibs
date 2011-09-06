@@ -28,9 +28,8 @@ import com.stratelia.silverpeas.wysiwyg.control.WysiwygController;
 import com.stratelia.webactiv.beans.admin.ComponentInst;
 import com.stratelia.webactiv.beans.admin.SpaceInst;
 import com.stratelia.webactiv.kmelia.control.ejb.KmeliaBm;
-import com.stratelia.webactiv.kmelia.model.FullPublication;
+import com.stratelia.webactiv.kmelia.model.KmeliaPublication;
 import com.stratelia.webactiv.kmelia.model.KmeliaRuntimeException;
-import com.stratelia.webactiv.kmelia.model.UserCompletePublication;
 import com.stratelia.webactiv.searchEngine.control.ejb.SearchEngineBm;
 import com.stratelia.webactiv.searchEngine.model.MatchingIndexEntry;
 import com.stratelia.webactiv.searchEngine.model.QueryDescription;
@@ -54,6 +53,8 @@ import com.stratelia.webactiv.util.publication.model.CompletePublication;
 import com.stratelia.webactiv.util.publication.model.PublicationDetail;
 import com.stratelia.webactiv.util.publication.model.PublicationI18N;
 import com.stratelia.webactiv.util.publication.model.PublicationPK;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class KmeliaTagUtil extends ComponentTagUtil {
 
@@ -262,7 +263,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
 
     List fathers = (List) getKmeliaBm().getPublicationFathers(pubDetail.getPK());
 
-    if (fathers == null || fathers.size() == 0 || (fathers.size() == 1 && ((NodePK) fathers.get(0)).
+    if (fathers == null || fathers.isEmpty() || (fathers.size() == 1 && ((NodePK) fathers.get(0)).
         getId().equals("1"))) {
       throw new VisibilityException();
     }
@@ -392,25 +393,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     }
   }
 
-  public UserCompletePublication getUserCompletePublication(String pubId) throws RemoteException,
-      VisibilityException {
-    SilverTrace.info("kmelia", "KMeliaTagUtil.getUserCompletePublication()",
-        "root.MSG_GEN_ENTER_METHOD", "pubId = " + pubId);
-    try {
-      UserCompletePublication ucPublication = getKmeliaBm().getUserCompletePublication(getPublicationPK(
-          pubId), getUserId());
-
-      PublicationDetail pub = ucPublication.getPublication().getPublicationDetail();
-      checkPublicationStatus(pub);
-      checkPublicationLocation(pub);
-
-      return ucPublication;
-    } catch (NoSuchObjectException nsoe) {
-      initEJB();
-      return getUserCompletePublication(pubId);
-    }
-  }
-
+  @Deprecated
   public CompletePublication getCompletePublication(String pubId) throws RemoteException,
       VisibilityException {
     SilverTrace.info("kmelia", "KMeliaTagUtil.getCompletePublication()", "root.MSG_GEN_ENTER_METHOD",
@@ -430,22 +413,22 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     }
   }
 
-  public FullPublication getFullPublication(String pubId) throws RemoteException,
+  public KmeliaPublication getPublication(String pubId) throws RemoteException,
       VisibilityException {
     SilverTrace.info("kmelia", "KMeliaTagUtil.getFullPublication()", "root.MSG_GEN_ENTER_METHOD",
         "pubId = " + pubId);
     try {
-      FullPublication fullPublication = getKmeliaBm().getFullPublication(new PublicationPK(pubId,
+      KmeliaPublication publication = getKmeliaBm().getPublication(new PublicationPK(pubId,
           componentId));
 
-      PublicationDetail pub = fullPublication.getPublication().getPublicationDetail();
+      PublicationDetail pub = publication.getDetail();
       checkPublicationStatus(pub);
       checkPublicationLocation(pub);
 
-      return fullPublication;
+      return publication;
     } catch (NoSuchObjectException nsoe) {
       initEJB();
-      return getFullPublication(pubId);
+      return getPublication(pubId);
     }
   }
 
@@ -744,7 +727,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       }
     } catch (Exception e) {
       // TODO Auto-generated catch block
-      e.printStackTrace();
+      Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getMessage(), e);
     }
     return comments;
   }
@@ -1096,7 +1079,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
             String url = FileServerUtils.getUrl(imageDetail.getPK().getSpace(), imageDetail.getPK().
                 getComponentName(), logicalName, physicalName, mimeType, "images");
             url = "http://fakeServer:fakePort" + url;
-            htmlContent.append("<IMG BORDER=\"0\" SRC=\"" + url + "\">");
+            htmlContent.append("<IMG BORDER=\"0\" SRC=\"").append(url).append("\">");
           }
         }
         toParse = toParse.substring(11);
@@ -1109,7 +1092,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   }
 
   private String encode(String javastring) {
-    StringBuffer res = new StringBuffer();
+    StringBuilder res = new StringBuilder();
     if (javastring == null) {
       return res.toString();
     }

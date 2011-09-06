@@ -2,10 +2,8 @@ package com.silverpeas.tags.organization;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.StringTokenizer;
-import java.util.Vector;
 
 import com.silverpeas.admin.ejb.AdminBm;
 import com.silverpeas.admin.ejb.AdminBmRuntimeException;
@@ -21,6 +19,7 @@ import com.stratelia.webactiv.util.JNDINames;
 import com.stratelia.webactiv.util.exception.SilverpeasRuntimeException;
 import com.stratelia.webactiv.util.node.model.NodeDetail;
 import com.stratelia.webactiv.util.publication.model.PublicationDetail;
+import java.util.Map;
 
 public class OrganizationTagUtil implements java.io.Serializable
 {
@@ -108,7 +107,7 @@ public class OrganizationTagUtil implements java.io.Serializable
 					//put spaceInst
 					menuItems.add(spaceInst2MenuItem(spaceInstLight));
 
-					Hashtable spaceTrees = getAdminBm().getTreeView(mainSessionCtrl.getUserId(), spaceId);
+					Map spaceTrees = getAdminBm().getTreeView(mainSessionCtrl.getUserId(), spaceId);
 
 					//manage componentInsts
 					menuItems = processComponentInsts(menuItems, spaceInstLight, spaceTrees);
@@ -124,7 +123,7 @@ public class OrganizationTagUtil implements java.io.Serializable
 					//put spaceInst
 					menuItems.add(spaceInst2MenuItem(spaceInstLight));
 
-					Hashtable spaceTrees = getAdminBm().getTreeView(getUserId(), spaceId);
+					Map spaceTrees = getAdminBm().getTreeView(getUserId(), spaceId);
 
 					//manage componentInsts
 					menuItems = processComponentInsts(menuItems, spaceInstLight, spaceTrees);
@@ -164,10 +163,10 @@ public class OrganizationTagUtil implements java.io.Serializable
 		
 		ArrayList	menuItems	= new ArrayList();
 		int			level		= 0;
-		String 		userId 		= getUserId();
+		String 		theUserId 		= getUserId();
 		
 		// Step 1 - build hashtable for recursivity
-		Hashtable spaceTrees = getAdminBm().getTreeView(userId, spaceId);
+		Map spaceTrees = getAdminBm().getTreeView(theUserId, spaceId);
 				
 		// Step 2 - Use hashtable to recurse
 		SpaceInstLight rootSpace = getAdminBm().getSpaceInstLight(spaceId);
@@ -191,10 +190,10 @@ public class OrganizationTagUtil implements java.io.Serializable
 		System.out.println("getOrgaSubTreeView "+spaceId);
 		ArrayList	menuItems	= new ArrayList();
 		int			level		= 0;
-		String 		userId 		= getUserId();
+		String 		theUserId 		= getUserId();
 		
 		// Step 1 - build hashtable for recursivity
-		Hashtable spaceTrees = getAdminBm().getTreeView(userId, spaceId);
+		Map spaceTrees = getAdminBm().getTreeView(theUserId, spaceId);
 		
 		if (spaceTrees != null)
 			System.out.println("spaceTrees "+spaceTrees.size());
@@ -304,18 +303,18 @@ public class OrganizationTagUtil implements java.io.Serializable
 		return itemPath;
 	}
 	
-	private ArrayList processSpaceSubTree(ArrayList treeView, SpaceInstLight spaceInst, Hashtable spaceTrees, int level, int depth) throws Exception
+	private ArrayList processSpaceSubTree(ArrayList treeView, SpaceInstLight spaceInst, Map spaceTrees, int level, int depth) throws Exception
 	{
 		return processSpaceSubTree(treeView, spaceInst, spaceTrees, level, depth, MenuItem.TYPE_COMPONENT_CONTENT);
 	}
 
-	private ArrayList processSpaceSubTree(ArrayList treeView, SpaceInstLight spaceInst, Hashtable spaceTrees, int level, int depth, int leafItem) throws Exception
+	private ArrayList processSpaceSubTree(ArrayList treeView, SpaceInstLight spaceInst, Map spaceTrees, int level, int depth, int leafItem) throws Exception
 	{
 		SpaceInstLight   	subSpaceInst	= null;
 
 		//recursive starts here
 		SpaceAndChildren space = (SpaceAndChildren) spaceTrees.get(spaceInst.getFullId());
-		Collection subSpaces = new Vector();
+		Collection subSpaces = new ArrayList();
 		if (space != null)
 		    subSpaces = space.getSubspaces();
 		
@@ -343,12 +342,12 @@ public class OrganizationTagUtil implements java.io.Serializable
 		return treeView;
 	}
 	
-	private ArrayList processComponentInsts(ArrayList treeView, SpaceInstLight spaceInst, Hashtable spaceTrees)
+	private ArrayList processComponentInsts(ArrayList treeView, SpaceInstLight spaceInst, Map spaceTrees)
 	{
 		return processComponentInsts(treeView, spaceInst, spaceTrees, MenuItem.TYPE_COMPONENT_CONTENT);
 	}
 	
-	private ArrayList processComponentInsts(ArrayList treeView, SpaceInstLight spaceInst, Hashtable spaceTrees, int leafItem)
+	private ArrayList processComponentInsts(ArrayList treeView, SpaceInstLight spaceInst, Map spaceTrees, int leafItem)
 	{
 		if (leafItem >= MenuItem.TYPE_COMPONENT)
 		{
