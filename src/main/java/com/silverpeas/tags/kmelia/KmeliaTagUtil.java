@@ -894,7 +894,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     for (int i = 0; i < tree.size(); i++) {
       node = (NodeDetail) tree.get(i);
       node = getTranslatedNode(node, null);
-      if (NodeDetail.STATUS_INVISIBLE.equals(node.getStatus())) {
+      if ( (NodeDetail.STATUS_INVISIBLE.equals(node.getStatus())) || ( (visibilityFilter != null) && node.getName(getSiteLanguage()).startsWith(visibilityFilter)) ) {
         if (i == 0) {
           return visibleNodes;
         } else {
@@ -939,7 +939,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     }
     return silverObjectId;
   }
-  
+
 
   /**
    * renvoit l'URL de la vignette de la publication, ou chaine vide s'il n'y a pas de vignette
@@ -1139,8 +1139,8 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     if(fieldValue == null) {
       fieldValue = "";
     }
-    
-    //Particular case of Image Field (in the XML forms) 
+
+    //Particular case of Image Field (in the XML forms)
     String webContext = SiteTagUtil.getServerContext();
     List<XMLField> xmlFields = detail.getXmlFields();
     XMLField xmlField = null;
@@ -1218,7 +1218,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
    * @param servletMapping : for example the String /attached_file/
    * @param attachmentUrl :  the webContext, for example the String /webContext/attached_file/
    * For example replace the String /silverpeas/attached_file/componentId/kmelia24/attachmentId/19578/lang/fr/name/ESAT_Rhone-Alpes_synthese.jpg
-   * @return the String replaced, in the example, return /webContext/attached_file/componentId/kmelia24/attachmentId/19578/lang/fr/name/ESAT_Rhone-Alpes_synthese.jpg 
+   * @return the String replaced, in the example, return /webContext/attached_file/componentId/kmelia24/attachmentId/19578/lang/fr/name/ESAT_Rhone-Alpes_synthese.jpg
    */
   public String convertRestToWebUrl(String content, String servletMapping, String attachmentUrl) {
    return content.replaceAll("\"/[^/]*" + servletMapping , '"' + attachmentUrl);
