@@ -58,6 +58,7 @@ public class MenuTag extends TagSupport {
 	private String classNamesHierarchyFiltered;
 	private boolean breakWords;
 	private String classNameSeparator = null;
+	private boolean hierarchicSelection = true;
 
 	
 	/**
@@ -66,6 +67,14 @@ public class MenuTag extends TagSupport {
 	 */
 	public void setExcludeTopicsNamed(String excludeTopicsNamed) {
 		this.excludeTopicsNamed = excludeTopicsNamed;
+	}
+	
+	/**
+	 * Préfixe la classe css par "selected" de l'item selectionné et eventuellement de ses items parents.
+	 * @param hierarchicSelection
+	 */
+	public void setHierarchicSelection(String hierarchicSelection) {
+		this.hierarchicSelection = new Boolean(hierarchicSelection);
 	}
 	
 	/**
@@ -292,24 +301,29 @@ public class MenuTag extends TagSupport {
 	 */
 	private boolean isSelectedItem(NodeDetail theme) throws RemoteException, IOException, ServletException {
 		if (selectedTopicIdParameterName != null) {
-			String selectedTopicId = pageContext.getRequest().getParameter(selectedTopicIdParameterName);						
+			String selectedTopicId = pageContext.getRequest().getParameter(selectedTopicIdParameterName);
 			if (selectedTopicId != null) {
 				if (isInNavigationTree(selectedTopicId) == false) {
 					if(selectedTopicNameInSession==null) return false;
 					NodeDetail node = (NodeDetail) pageContext.getSession().getAttribute(selectedTopicNameInSession);
-					if (node == null) return false;					
+					if (node == null) return false;
 					selectedTopicId = String.valueOf(node.getId());
-				}				
-				String selectedTopicsIds = themetracker.getTopic(selectedTopicId).getFullPath();			
-				StringTokenizer tokenizer = new StringTokenizer(selectedTopicsIds, "/");				
-				while (tokenizer.hasMoreTokens()) {
-					String nodeId = tokenizer.nextToken();
-					if (String.valueOf(theme.getId()).equals(nodeId)) {
-						return true;
+				}
+
+				if (hierarchicSelection) {
+					String selectedTopicsIds = themetracker.getTopic(selectedTopicId).getFullPath();
+					StringTokenizer tokenizer = new StringTokenizer(selectedTopicsIds, "/");
+					while (tokenizer.hasMoreTokens()) {
+						String nodeId = tokenizer.nextToken();
+						if (String.valueOf(theme.getId()).equals(nodeId)) {
+							return true;
+						}
 					}
+				} else {
+					return selectedTopicId.equals(String.valueOf(theme.getId()));
 				}
 			}
-		}				
+		}
 		return false;
 	}
 	
