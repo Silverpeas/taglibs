@@ -257,7 +257,12 @@ public class MenuTag extends TagSupport {
 		}		
 		
 		// selection de la bonne classe css à appliquer
-		int rootLevel = themetracker.getTopic(String.valueOf(idTopicRoot)).getLevel();
+		int rootLevel = 0;
+		if (idTopicSubRoot == null) {
+			rootLevel = themetracker.getTopic(String.valueOf(idTopicRoot)).getLevel();
+		} else {
+			rootLevel = themetracker.getTopic(String.valueOf(idTopicSubRoot)).getLevel();
+		}
 		int level = theme.getLevel() - rootLevel; 
 		StringTokenizer tokenizer = null;
 		if (useAlternateClassNamesHierarchy) {
