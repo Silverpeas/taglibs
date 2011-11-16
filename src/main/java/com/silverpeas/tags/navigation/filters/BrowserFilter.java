@@ -38,7 +38,7 @@ public class BrowserFilter implements Filter {
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {		
 		String userAgent = ((HttpServletRequest) req).getHeader("User-Agent");
 		for (String browser_id : browserIds) {
-			if (userAgent.contains(browser_id)) {
+			if (userAgent.contains(browser_id.trim())) {
 				chain.doFilter(req, resp);
 				return;
 			}
