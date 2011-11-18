@@ -30,6 +30,17 @@ public class FilArianeTag extends TagSupport {
 	private String pageNumber;
 	private boolean displayPubName = false;
 	private String prefixIdHierarchyByIdTopicRoot = null;
+	private String prefixIdHierarchyByIdTopicRoot = null;
+
+	/**
+	 * Noms des classes CSS (séparés par des virgules) à appliquer à chaque niveau de l'arborescence.
+	 * Si le nombre de classes CSS est inférieur à la profondeur de l'arborescence, 
+	 * alors la dernières classes CSS est appliquée au niveau inférieurs.
+	 * @param classNamesHierarchy
+	 */
+	public void setClassNamesHierarchy(String classNamesHierarchy) {
+		this.classNamesHierarchy = classNamesHierarchy;
+	}
 	
 	/**
 	 * Syntaxe : rootID1[prefix1,prefix2];rootID2[prefix3, prefix4]
@@ -102,6 +113,7 @@ public class FilArianeTag extends TagSupport {
 		
 		StringTokenizer nodes = new StringTokenizer(node.getPath(), "/");
 		boolean beginPath = false;
+		int level=0;
 		while (nodes.hasMoreTokens()) {
 			String nodeId = nodes.nextToken();
 			if (beginPath) {
@@ -110,10 +122,13 @@ public class FilArianeTag extends TagSupport {
 				path.append(generateFullSemanticPath(n));
 				path.append("' title='");
 				path.append(StringEscapeUtils.escapeHtml(n.getDescription()));
+				path.append("' class='");
+				path.append(getCssClass(level));
 				path.append("'>");
 				path.append(transformLabel(n.getName()));
 				path.append("</a>");
 				path.append(separator);
+				level++;
 			} else {
 				beginPath = isRootTopic(nodeId);
 			}			
@@ -137,6 +152,24 @@ public class FilArianeTag extends TagSupport {
 		}
 				
 		return path.toString();
+	}
+
+	/**
+	 * Récupère la classe css du niveau hierarchique.
+	 * @param level
+	 * @return
+	 */
+	private String getCssClass(int level) {
+		if (classNamesHierarchy != null) {
+			StringTokenizer classes = new StringTokenizer(classNamesHierarchy, ",");
+			int i = 0;
+			while (classes.hasMoreTokens()) {
+				String classe = classes.nextToken();
+				if (level == i) return classe;
+				i++;
+			}
+		}		
+		return "";
 	}
 	
 	/**
