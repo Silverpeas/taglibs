@@ -45,7 +45,9 @@ public class BrowserFilter implements Filter {
 		}
 		// Unsupported browser
 		String url = ((HttpServletRequest) req).getRequestURL().toString();
-		if (url.contains(this.badBrowserUrl)) {
+		if (url.contains(this.badBrowserUrl) || url.toLowerCase().endsWith(".jpg")
+				|| url.toLowerCase().endsWith(".png") || url.toLowerCase().endsWith(".gif") 
+				|| url.toLowerCase().endsWith(".ico") || url.toLowerCase().endsWith(".css") || url.toLowerCase().endsWith(".js")) {
 			chain.doFilter(req, resp);
 			return;
 		}
