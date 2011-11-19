@@ -1,4 +1,4 @@
-package com.silverpeas.filters;
+package com.silverpeas.tags.navigation.filters;
 
 import java.io.IOException;
 

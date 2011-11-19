@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -37,6 +38,7 @@ public class MenuTag extends TagSupport {
 	private static final String TOPIC_ID_PREFIX = "topicId-";
 	private static final String PARENT_TOPIC_ID_PREFIX = "parentTopicId-";
 	private String cachePrefixName = "ARBO";
+	private String cachePrefixIdByLevel = "ARBO";
 	
 	private int cacheScope = PageContext.PAGE_SCOPE;
 
@@ -207,20 +209,32 @@ public class MenuTag extends TagSupport {
 	 */
 	private String getPrefixIdByLevel(NodeDetail theme) throws Exception {
 		if (prefixIdHierarchy != null) {
-			// selection du bon prefix à appliquer
-			int rootLevel = themetracker.getTopic(String.valueOf(idTopicRoot)).getLevel();
-			int level = theme.getLevel() - rootLevel; 
-			StringTokenizer tokenizer = null;
-			tokenizer = new StringTokenizer(prefixIdHierarchy, ",");						
-			int l = 1;
-			String prefix = null;
-			while (tokenizer.hasMoreTokens()) {
-				prefix = tokenizer.nextToken();
-				if (level == l) {				
-					return prefix;				
-				}
-				l++;
-			}
+			@SuppressWarnings("unchecked")
+			HashMap<Integer, String> cache = (HashMap<Integer,String>) pageContext.getAttribute(cachePrefixIdByLevel, cacheScope);
+			if (cache == null || cache.get(theme.getLevel()) == null) {
+				if (cache == null) {
+					cache = new HashMap<Integer, String>();
+				}				
+				// selection du bon prefix à appliquer
+				int rootLevel = themetracker.getTopic(String.valueOf(idTopicRoot)).getLevel();
+				int level = theme.getLevel() - rootLevel; 
+				StringTokenizer tokenizer = null;
+				tokenizer = new StringTokenizer(prefixIdHierarchy, ",");						
+				int l = 1;
+				String prefix = null;
+				while (tokenizer.hasMoreTokens()) {
+					prefix = tokenizer.nextToken();
+					if (level == l) {						
+						cache.put(theme.getLevel(), prefix);
+						pageContext.setAttribute(cachePrefixIdByLevel, cache, cacheScope);						
+						return prefix;				
+					}
+					l++;
+				}			
+				
+			} else {
+				return cache.get(theme.getLevel());			
+			}			
 		}		
 		return null;		
 	}
@@ -368,6 +382,7 @@ public class MenuTag extends TagSupport {
 	public int doStartTag() throws JspException {
 		try {
 			cachePrefixName = "ARBO"+ idTopicRoot;
+			cachePrefixIdByLevel = "PrefixIdByLevel" + idTopicRoot;
 			JspWriter out = pageContext.getOut();	
 			NodeDetail root = themetracker.getTopic(idTopicRoot);	
 			

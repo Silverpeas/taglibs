@@ -29,7 +29,7 @@ public class FilArianeTag extends TagSupport {
 	private String separator;
 	private String pageNumber;
 	private boolean displayPubName = false;
-	private String prefixIdHierarchyByIdTopicRoot = null;
+	private String classNamesHierarchy = null;
 	private String prefixIdHierarchyByIdTopicRoot = null;
 
 	/**
