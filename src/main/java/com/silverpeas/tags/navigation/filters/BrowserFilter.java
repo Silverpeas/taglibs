@@ -1,4 +1,4 @@
-package com.silverpeas.tags.navigation.filters;
+package com.silverpeas.filters;
 
 import java.io.IOException;
 
@@ -38,7 +38,7 @@ public class BrowserFilter implements Filter {
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {		
 		String userAgent = ((HttpServletRequest) req).getHeader("User-Agent");
 		for (String browser_id : browserIds) {
-			if (userAgent.contains(browser_id.trim())) {
+			if (userAgent.contains(browser_id)) {
 				chain.doFilter(req, resp);
 				return;
 			}
@@ -58,6 +58,10 @@ public class BrowserFilter implements Filter {
 	public void init(FilterConfig cfg) throws ServletException {
 		String ids = cfg.getInitParameter(KEY_BROWSER_IDS);
 		this.browserIds = (ids != null) ? ids.split(",") : DEFAULT_BROWSERS;
+		for (int i = 0; i < browserIds.length; i++) {
+			browserIds[i] = browserIds[i].trim();			
+		}
+		
 		badBrowserUrl = cfg.getInitParameter(KEY_BAD_BROWSER_URL);
 		if (badBrowserUrl == null) {
 			throw new IllegalArgumentException("BrowserFilter requires param badBrowserUrl");
