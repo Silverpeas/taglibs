@@ -1,7 +1,7 @@
 package com.silverpeas.tags.navigation.config;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URL;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Properties;
@@ -10,7 +10,7 @@ import java.util.ResourceBundle;
 /**
  * Permet de configurer la connexion avec les éléments présents dans le fichier website.properties
  *
- * @author jvi
+ * @author svuillet
  */
 public class Configurateur {
 
@@ -24,19 +24,17 @@ public class Configurateur {
 		private static final String BUNDLE_FILE_NAME = "resources";
 		private static Hashtable<Locale,ResourceBundle> bundles = new Hashtable<Locale,ResourceBundle>();
 
-		static {
-			InputStream configFile = Configurateur.class.getClassLoader().getResourceAsStream(APP_CONFIG_FILENAME);
+		static {			
+			URL configFile = Configurateur.class.getClassLoader().getResource(APP_CONFIG_FILENAME);
 			if (configFile == null) {
 				throw new RuntimeException("Impossible de trouver le fichier de configuration principal");
 			} else {
 				try {
-					conf = new Properties();
-					conf.load(configFile);
+					conf = new AutoRefreshingProperties(null, configFile.getPath());
 				} catch (IOException e) {
 					throw new RuntimeException("Impossible de charger le fichier de configuration principal");
 				}
 			}
-
 		}
 
 		public static String getConfigValue(String key) {
