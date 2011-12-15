@@ -320,12 +320,12 @@ public class MenuTag extends TagSupport {
 			NodeDetail node = (NodeDetail) pageContext.getSession().getAttribute(selectedTopicNameInSession);
 			if (node == null) return false;					
 			String selectedTopicId = String.valueOf(node.getId());			
-			isInSelectionPath(selectedTopicId, theme);
+			return isInSelectionPath(selectedTopicId, theme);
 		}		
 		if (selectedTopicIdParameterName != null) {
 			String selectedTopicId = pageContext.getRequest().getParameter(selectedTopicIdParameterName);						
 			if (selectedTopicId != null) {			
-				isInSelectionPath(selectedTopicId, theme);
+				return isInSelectionPath(selectedTopicId, theme);
 			}
 		}				
 		return false;
