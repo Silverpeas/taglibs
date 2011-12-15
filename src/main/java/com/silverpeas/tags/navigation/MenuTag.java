@@ -304,9 +304,6 @@ public class MenuTag extends TagSupport {
 	 */
 	private String getFinalClassName(NodeDetail theme, String className) throws RemoteException, IOException, ServletException {		
 		if (isSelectedItem(theme)) {
-			if (selectedTopicNameInSession != null) {
-				pageContext.getSession().setAttribute(selectedTopicNameInSession, theme);
-			}
 			return "selected-" + className;
 		} else {
 			return className;
@@ -319,30 +316,43 @@ public class MenuTag extends TagSupport {
 	 * @return
 	 */
 	private boolean isSelectedItem(NodeDetail theme) throws RemoteException, IOException, ServletException {
+		if (selectedTopicNameInSession != null) {
+			NodeDetail node = (NodeDetail) pageContext.getSession().getAttribute(selectedTopicNameInSession);
+			if (node == null) return false;					
+			String selectedTopicId = String.valueOf(node.getId());			
+			isInSelectionPath(selectedTopicId, theme);
+		}		
 		if (selectedTopicIdParameterName != null) {
-			String selectedTopicId = pageContext.getRequest().getParameter(selectedTopicIdParameterName);
-			if (selectedTopicId != null) {
-				if (isInNavigationTree(selectedTopicId) == false) {
-					if(selectedTopicNameInSession==null) return false;
-					NodeDetail node = (NodeDetail) pageContext.getSession().getAttribute(selectedTopicNameInSession);
-					if (node == null) return false;
-					selectedTopicId = String.valueOf(node.getId());
-				}
-
-				if (hierarchicSelection) {
-					String selectedTopicsIds = themetracker.getTopic(selectedTopicId).getFullPath();
-					StringTokenizer tokenizer = new StringTokenizer(selectedTopicsIds, "/");
-					while (tokenizer.hasMoreTokens()) {
-						String nodeId = tokenizer.nextToken();
-						if (String.valueOf(theme.getId()).equals(nodeId)) {
-							return true;
-						}
-					}
-				} else {
-					return selectedTopicId.equals(String.valueOf(theme.getId()));
+			String selectedTopicId = pageContext.getRequest().getParameter(selectedTopicIdParameterName);						
+			if (selectedTopicId != null) {			
+				isInSelectionPath(selectedTopicId, theme);
+			}
+		}				
+		return false;
+	}
+	
+	/**
+	 * Test si un item est dans l'arborescence de selection.
+	 * @param selectedTopicId
+	 * @param currentNode
+	 * @return
+	 * @throws RemoteException
+	 */
+	private boolean isInSelectionPath(String selectedTopicId, NodeDetail currentNode)  throws RemoteException {
+		
+		if (hierarchicSelection) {
+			String selectedTopicsIds = themetracker.getTopic(selectedTopicId).getFullPath();			
+			StringTokenizer tokenizer = new StringTokenizer(selectedTopicsIds, "/");				
+			while (tokenizer.hasMoreTokens()) {
+				String nodeId = tokenizer.nextToken();
+				if (String.valueOf(currentNode.getId()).equals(nodeId)) {
+					return true;
 				}
 			}
-		}
+		} else {
+			return selectedTopicId.equals(String.valueOf(currentNode.getId()));
+		}		
+		
 		return false;
 	}
 	
