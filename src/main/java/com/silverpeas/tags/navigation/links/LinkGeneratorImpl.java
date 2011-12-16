@@ -1,6 +1,7 @@
 package com.silverpeas.tags.navigation.links;
 
 import java.rmi.RemoteException;
+import java.text.Normalizer;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
