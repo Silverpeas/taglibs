@@ -59,6 +59,7 @@ public class LinkGeneratorImpl implements LinkGenerator {
 	 * @return
 	 */
 	private String tranformName(String name) {
+		name = name.toLowerCase();
 		name = name.replace("'","_");
 		name = name.replace(" ","_");
 		name = name.replace("?","");
