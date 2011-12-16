@@ -74,7 +74,7 @@ public class LinkGeneratorImpl implements LinkGenerator {
 	 * @param s
 	 * @return
 	 */
-	public String stripAccents(String s) {
+	private String stripAccents(String s) {
 		s = Normalizer.normalize(s, Normalizer.Form.NFD);
 		s = s.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
 		return s;	
