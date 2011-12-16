@@ -58,14 +58,26 @@ public class LinkGeneratorImpl implements LinkGenerator {
 	 * @param name
 	 * @return
 	 */
-	private String tranformName(String name) {
+	private String tranformName(String name) {		
 		name = name.toLowerCase();
+		name = stripAccents(name);
 		name = name.replace("'","_");
 		name = name.replace(" ","_");
 		name = name.replace("?","");
 		name = name.replaceAll("\\<.*?>","");
 		name = StringEscapeUtils.escapeHtml(name);
 		return name;
+	}
+
+	/**
+	 * Suppresion des accents d'une chaine de caractères.
+	 * @param s
+	 * @return
+	 */
+	public String stripAccents(String s) {
+		s = Normalizer.normalize(s, Normalizer.Form.NFD);
+		s = s.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+		return s;	
 	}
 	
 	/**
