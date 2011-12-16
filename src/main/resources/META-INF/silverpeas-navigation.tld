@@ -77,11 +77,6 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
-			<name>breakWords</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
 			<name>classNameSeparator</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>

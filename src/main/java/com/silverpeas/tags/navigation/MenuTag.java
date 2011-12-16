@@ -57,8 +57,7 @@ public class MenuTag extends TagSupport {
 	private String idAxisFiltering = null;
 	private String axisValueFilter = null;
 	private String prefixIdHierarchy = null;
-	private String classNamesHierarchyFiltered;
-	private boolean breakWords;
+	private String classNamesHierarchyFiltered;	
 	private String classNameSeparator = null;
 	private boolean hierarchicSelection = true;
 
@@ -93,14 +92,6 @@ public class MenuTag extends TagSupport {
 	 */
 	public void setClassNameSeparator(String classNameSeparator) {
 		this.classNameSeparator = classNameSeparator;
-	}
-	
-	/**
-	 * Retour à ligne à chaque mot du titre d'un item.
-	 * @param breakWords
-	 */
-	public void setBreakWords(String breakWords) {
-		this.breakWords = Boolean.parseBoolean(breakWords);
 	}
 
 	/**
@@ -439,13 +430,8 @@ public class MenuTag extends TagSupport {
 					html.append(generateFullSemanticPath(theme, getPrefixIdByLevel(theme)));
 					html.append("' title='");
 					html.append(StringEscapeUtils.escapeHtml(theme.getDescription()));
-					html.append("'><span>");
-					
-					String name = theme.getName();
-					if (breakWords) {
-						 name = StringEscapeUtils.escapeHtml(name).replaceAll(" ", "<br> ");
-					}
-					html.append(name);				
+					html.append("'><span>");				
+					html.append(theme.getName());				
 					html.append("</span></a>");				
 					print(out, html.toString(), display);
 					
