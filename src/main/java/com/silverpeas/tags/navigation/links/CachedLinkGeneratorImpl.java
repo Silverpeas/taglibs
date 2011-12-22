@@ -1,4 +1,4 @@
-package com.silverpeas.tags.links;
+package com.silverpeas.tags.navigation.links;
 
 import java.rmi.RemoteException;
 import java.text.Normalizer;
@@ -10,8 +10,8 @@ import javax.servlet.jsp.PageContext;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
-import com.silverpeas.tags.config.Configurateur;
 import com.silverpeas.tags.kmelia.KmeliaTagUtil;
+import com.silverpeas.tags.navigation.config.Configurateur;
 import com.stratelia.webactiv.util.node.model.NodeDetail;
 import com.stratelia.webactiv.util.publication.model.PublicationDetail;
 
