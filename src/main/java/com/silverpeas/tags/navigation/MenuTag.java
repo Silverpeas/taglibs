@@ -5,7 +5,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -13,7 +12,6 @@ import java.util.StringTokenizer;
 import javax.servlet.ServletException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -37,10 +35,6 @@ public class MenuTag extends TagSupport {
 	
 	private static final String TOPIC_ID_PREFIX = "topicId-";
 	private static final String PARENT_TOPIC_ID_PREFIX = "parentTopicId-";
-	private String cachePrefixName = "ARBO";
-	private String cachePrefixIdByLevel = "ARBO";
-	
-	private int cacheScope = PageContext.PAGE_SCOPE;
 
 	private KmeliaTagUtil themetracker = null;
 	private PdcTagUtil pdc = new PdcTagUtil(null, null, 0, null);
@@ -57,18 +51,10 @@ public class MenuTag extends TagSupport {
 	private String idAxisFiltering = null;
 	private String axisValueFilter = null;
 	private String prefixIdHierarchy = null;
-	private String classNamesHierarchyFiltered;	
+	private String classNamesHierarchyFiltered;
 	private String classNameSeparator = null;
 	private boolean hierarchicSelection = true;
 
-	
-	/**
-	 * Nom des thèmes qui seront exclus du menu.
-	 * @param excludeTopicsNamed
-	 */
-	public void setExcludeTopicsNamed(String excludeTopicsNamed) {
-		this.excludeTopicsNamed = excludeTopicsNamed;
-	}
 	
 	/**
 	 * Préfixe la classe css par "selected" de l'item selectionné et eventuellement de ses items parents.
@@ -76,6 +62,14 @@ public class MenuTag extends TagSupport {
 	 */
 	public void setHierarchicSelection(String hierarchicSelection) {
 		this.hierarchicSelection = new Boolean(hierarchicSelection);
+	}
+	
+	/**
+	 * Nom des thèmes qui seront exclus du menu.
+	 * @param excludeTopicsNamed
+	 */
+	public void setExcludeTopicsNamed(String excludeTopicsNamed) {
+		this.excludeTopicsNamed = excludeTopicsNamed;
 	}
 	
 	/**
@@ -117,14 +111,6 @@ public class MenuTag extends TagSupport {
 	 */
 	public void setClassNamesHierarchyFiltered(String classNamesHierarchyFiltered) {
 		this.classNamesHierarchyFiltered = classNamesHierarchyFiltered;
-	}
-	
-	public void setCachePrefixName(String cachePrefixName) {
-		this.cachePrefixName = cachePrefixName;
-	}
-
-	public void setCacheScope(int cacheScope) {
-		this.cacheScope = cacheScope;
 	}
 	
 	/**
@@ -200,32 +186,20 @@ public class MenuTag extends TagSupport {
 	 */
 	private String getPrefixIdByLevel(NodeDetail theme) throws Exception {
 		if (prefixIdHierarchy != null) {
-			@SuppressWarnings("unchecked")
-			HashMap<Integer, String> cache = (HashMap<Integer,String>) pageContext.getAttribute(cachePrefixIdByLevel, cacheScope);
-			if (cache == null || cache.get(theme.getLevel()) == null) {
-				if (cache == null) {
-					cache = new HashMap<Integer, String>();
-				}				
-				// selection du bon prefix à appliquer
-				int rootLevel = themetracker.getTopic(String.valueOf(idTopicRoot)).getLevel();
-				int level = theme.getLevel() - rootLevel; 
-				StringTokenizer tokenizer = null;
-				tokenizer = new StringTokenizer(prefixIdHierarchy, ",");						
-				int l = 1;
-				String prefix = null;
-				while (tokenizer.hasMoreTokens()) {
-					prefix = tokenizer.nextToken();
-					if (level == l) {						
-						cache.put(theme.getLevel(), prefix);
-						pageContext.setAttribute(cachePrefixIdByLevel, cache, cacheScope);						
-						return prefix;				
-					}
-					l++;
-				}			
-				
-			} else {
-				return cache.get(theme.getLevel());			
-			}			
+			// selection du bon prefix à appliquer
+			int rootLevel = KmeliaCaching.getInstance(themetracker).getTopic(Integer.valueOf(idTopicRoot)).getLevel();
+			int level = theme.getLevel() - rootLevel; 
+			StringTokenizer tokenizer = null;
+			tokenizer = new StringTokenizer(prefixIdHierarchy, ",");						
+			int l = 1;
+			String prefix = null;
+			while (tokenizer.hasMoreTokens()) {
+				prefix = tokenizer.nextToken();
+				if (level == l) {					
+					return prefix;				
+				}
+				l++;
+			}	
 		}		
 		return null;		
 	}
@@ -240,7 +214,6 @@ public class MenuTag extends TagSupport {
 		
 		boolean useAlternateClassNamesHierarchy = false;
 		// gestion du filtrage
-		//TODO : mettre en place un cache (hashmap) pour améliorer les performances
 		if (idAxisFiltering != null && axisValueFilter != null && !idAxisFiltering.isEmpty() && !axisValueFilter.isEmpty()) {
 			@SuppressWarnings("unchecked")
 			Collection<PublicationDetail> pubs = themetracker.getPublicationsByTopic(String.valueOf(theme.getId()));
@@ -262,12 +235,7 @@ public class MenuTag extends TagSupport {
 		}		
 		
 		// selection de la bonne classe css à appliquer
-		int rootLevel = 0;
-		if (idTopicSubRoot == null) {
-			rootLevel = themetracker.getTopic(String.valueOf(idTopicRoot)).getLevel();
-		} else {
-			rootLevel = themetracker.getTopic(String.valueOf(idTopicSubRoot)).getLevel();
-		}
+		int rootLevel = KmeliaCaching.getInstance(themetracker).getTopic(Integer.valueOf(idTopicRoot)).getLevel();
 		int level = theme.getLevel() - rootLevel; 
 		StringTokenizer tokenizer = null;
 		if (useAlternateClassNamesHierarchy) {
@@ -330,9 +298,8 @@ public class MenuTag extends TagSupport {
 	 * @throws RemoteException
 	 */
 	private boolean isInSelectionPath(String selectedTopicId, NodeDetail currentNode)  throws RemoteException {
-		
 		if (hierarchicSelection) {
-			String selectedTopicsIds = themetracker.getTopic(selectedTopicId).getFullPath();			
+			String selectedTopicsIds = KmeliaCaching.getInstance(themetracker).getTopic(Integer.valueOf(selectedTopicId)).getFullPath();			
 			StringTokenizer tokenizer = new StringTokenizer(selectedTopicsIds, "/");				
 			while (tokenizer.hasMoreTokens()) {
 				String nodeId = tokenizer.nextToken();
@@ -344,23 +311,6 @@ public class MenuTag extends TagSupport {
 			return selectedTopicId.equals(String.valueOf(currentNode.getId()));
 		}		
 		
-		return false;
-	}
-	
-	/**
-	 * Test si l'item selectionné est dans l'arborescence de navigation.
-	 * @param topicId
-	 * @return
-	 */
-	private boolean isInNavigationTree(String topicId) throws RemoteException {
-		String topicsIds = themetracker.getTopic(topicId).getFullPath();		
-		StringTokenizer tokenizer = new StringTokenizer(topicsIds, "/");			
-		while (tokenizer.hasMoreTokens()) {
-			String nodeId = tokenizer.nextToken();
-			if (idTopicRoot.equals(nodeId)) {
-				return true;
-			}
-		}		
 		return false;
 	}
 	
@@ -382,8 +332,6 @@ public class MenuTag extends TagSupport {
 	@Override
 	public int doStartTag() throws JspException {
 		try {
-			cachePrefixName = "ARBO"+ idTopicRoot;
-			cachePrefixIdByLevel = "PrefixIdByLevel" + idTopicRoot;
 			JspWriter out = pageContext.getOut();	
 			NodeDetail root = themetracker.getTopic(idTopicRoot);	
 			
@@ -430,8 +378,8 @@ public class MenuTag extends TagSupport {
 					html.append(generateFullSemanticPath(theme, getPrefixIdByLevel(theme)));
 					html.append("' title='");
 					html.append(StringEscapeUtils.escapeHtml(theme.getDescription()));
-					html.append("'><span>");				
-					html.append(theme.getName());				
+					html.append("'><span>");
+					html.append(theme.getName());					
 					html.append("</span></a>");				
 					print(out, html.toString(), display);
 					
@@ -493,15 +441,9 @@ public class MenuTag extends TagSupport {
 	 * @return
 	 * @throws RemoteException
 	 */
-	@SuppressWarnings("unchecked")
 	private List<NodeDetail> getSubTopics(KmeliaTagUtil themetracker, int topicId) throws RemoteException {
 		
-		// Memorisation de l'arborescence du site (pour de raison de performance)
-		Collection<NodeDetail> arbo = (Collection<NodeDetail>) pageContext.getAttribute(cachePrefixName, cacheScope);
-		if (arbo == null) {
-			arbo = themetracker.getTreeView(String.valueOf(topicId));
-			pageContext.setAttribute(cachePrefixName , arbo, cacheScope);
-		}		
+		Collection<NodeDetail> arbo = KmeliaCaching.getInstance(themetracker).getTreeView(String.valueOf(topicId));
 		
 		// Calcul du niveau du topic racine
 		Iterator<NodeDetail>  i = arbo.iterator();
