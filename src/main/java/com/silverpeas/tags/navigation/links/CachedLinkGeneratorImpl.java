@@ -40,6 +40,7 @@ public class CachedLinkGeneratorImpl implements LinkGenerator {
     }
     if ((System.currentTimeMillis() - cacheAge >= REFRESH_DELAY) || "false".equals(cacheActivate)) {
       cache.clear();
+      cacheAge = System.currentTimeMillis();
     }
     String cachedValue = cache.get(node.getId());
     if (cachedValue == null) {
