@@ -35,9 +35,9 @@ public class CachedLinkGeneratorImpl implements LinkGenerator {
 	public String generateFullSemanticPath(PageContext pageContext, KmeliaTagUtil themetracker, NodeDetail node, String idsTopicsRoots, PublicationDetail pub, String prefixId) throws RemoteException {		
 		String cacheActivate = Configurateur.getConfigValue("urlCache");
 		String refreshDelay = Configurateur.getConfigValue("urlCache.refreshDelay");
-		if (refreshDelay == null) refreshDelay = "3600000";
+		if (refreshDelay == null) refreshDelay = "3600";
 		if (cacheActivate == null) cacheActivate = "true";
-		if ((System.currentTimeMillis()-cacheAge >= Long.valueOf(refreshDelay)) || cacheActivate.equals("false")) {
+		if ((System.currentTimeMillis()-cacheAge >= Long.valueOf(refreshDelay)*1000) || cacheActivate.equals("false")) {
 			cache.clear();
 			cacheAge = System.currentTimeMillis();
 		}		

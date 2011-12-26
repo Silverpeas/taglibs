@@ -61,9 +61,9 @@ public class KmeliaCaching {
 	private void manageCache() {		
 		String cacheActivate = Configurateur.getConfigValue("topicsCache");
 		String refreshDelay = Configurateur.getConfigValue("topicsCache.refreshDelay");
-		if (refreshDelay == null) refreshDelay = "3600000";
+		if (refreshDelay == null) refreshDelay = "3600";
 		if (cacheActivate == null) cacheActivate = "true";
-		if ((System.currentTimeMillis()-treeViewCacheAge >= Long.valueOf(refreshDelay)) || cacheActivate.equals("false")) {
+		if ((System.currentTimeMillis()-treeViewCacheAge >= Long.valueOf(refreshDelay)*1000) || cacheActivate.equals("false")) {
 			treeViewCache.clear();
 			treeViewCacheAge = System.currentTimeMillis();
 		}
