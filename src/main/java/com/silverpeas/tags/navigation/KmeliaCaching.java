@@ -31,6 +31,7 @@ public class KmeliaCaching {
     }
 	
 	public NodeDetail getTopic(int topicId) throws RemoteException {		
+		manageCache();
 		Iterator<Collection<NodeDetail>> iTree = treeViewCache.values().iterator();
 		while (iTree.hasNext()) {
 			Collection<NodeDetail> trees = (Collection<NodeDetail>) iTree.next();
