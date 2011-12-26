@@ -2,8 +2,8 @@ package com.silverpeas.tags.navigation;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.silverpeas.tags.kmelia.KmeliaTagUtil;
 import com.silverpeas.tags.navigation.config.Configurateur;
@@ -15,7 +15,7 @@ public class KmeliaCaching {
 	private KmeliaTagUtil themetracker = null;
 	
 	// Cache treeview
-	private HashMap<String, Collection<NodeDetail>> treeViewCache = new HashMap<String, Collection<NodeDetail>>();
+	private ConcurrentHashMap<String, Collection<NodeDetail>> treeViewCache = new ConcurrentHashMap<String, Collection<NodeDetail>>();
 	private long treeViewCacheAge = System.currentTimeMillis();
 	
 	private KmeliaCaching(KmeliaTagUtil themetracker) {
@@ -30,7 +30,7 @@ public class KmeliaCaching {
         return instance;
     }
 	
-	public NodeDetail getTopic(int topicId) throws RemoteException {		
+	public NodeDetail getTopic(int topicId) throws RemoteException {
 		manageCache();
 		Iterator<Collection<NodeDetail>> iTree = treeViewCache.values().iterator();
 		while (iTree.hasNext()) {
@@ -47,11 +47,13 @@ public class KmeliaCaching {
 	
 	@SuppressWarnings("unchecked")
 	public Collection<NodeDetail> getTreeView(String topicId) throws RemoteException {
-		manageCache();		
+		manageCache();
 		Collection<NodeDetail> treeView = treeViewCache.get(topicId);
-		if (treeView == null) {			
-			treeView = (Collection<NodeDetail>) themetracker.getTreeView(topicId);
-			treeViewCache.put(topicId, treeView);
+		if (treeView == null) {
+			synchronized(this) {
+				treeView = (Collection<NodeDetail>) themetracker.getTreeView(topicId);
+				treeViewCache.putIfAbsent(topicId, treeView);
+			}
 		}
 		return treeView;
 	}
