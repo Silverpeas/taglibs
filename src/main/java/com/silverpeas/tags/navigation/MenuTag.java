@@ -443,7 +443,7 @@ public class MenuTag extends TagSupport {
 	 */
 	private List<NodeDetail> getSubTopics(KmeliaTagUtil themetracker, int topicId) throws RemoteException {
 		
-		Collection<NodeDetail> arbo = KmeliaCaching.getInstance(themetracker).getTreeView(String.valueOf(topicId));
+		Collection<NodeDetail> arbo = KmeliaCaching.getInstance(themetracker).getTreeView(idTopicRoot);
 		
 		// Calcul du niveau du topic racine
 		Iterator<NodeDetail>  i = arbo.iterator();
