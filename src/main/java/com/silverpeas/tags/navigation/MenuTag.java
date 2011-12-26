@@ -333,7 +333,7 @@ public class MenuTag extends TagSupport {
 	public int doStartTag() throws JspException {
 		try {
 			JspWriter out = pageContext.getOut();	
-			NodeDetail root = themetracker.getTopic(idTopicRoot);	
+			NodeDetail root = KmeliaCaching.getInstance(themetracker).getTopic(Integer.valueOf(idTopicRoot));
 			
 			boolean display = true;
 			if (idTopicSubRoot != null) {
