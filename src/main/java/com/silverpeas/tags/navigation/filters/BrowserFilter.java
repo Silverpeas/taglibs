@@ -37,21 +37,26 @@ public class BrowserFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {		
 		String userAgent = ((HttpServletRequest) req).getHeader("User-Agent");
-		for (String browser_id : browserIds) {
-			if (userAgent.contains(browser_id)) {
+		if (userAgent != null) {
+			for (String browser_id : browserIds) {
+				if (userAgent.contains(browser_id)) {
+					chain.doFilter(req, resp);
+					return;
+				}
+			}
+			// Unsupported browser
+			String url = ((HttpServletRequest) req).getRequestURL().toString();
+			if (url.contains(this.badBrowserUrl) || url.toLowerCase().endsWith(".jpg")
+					|| url.toLowerCase().endsWith(".png") || url.toLowerCase().endsWith(".gif") 
+					|| url.toLowerCase().endsWith(".ico") || url.toLowerCase().endsWith(".css") || url.toLowerCase().endsWith(".js")) {
 				chain.doFilter(req, resp);
 				return;
 			}
-		}
-		// Unsupported browser
-		String url = ((HttpServletRequest) req).getRequestURL().toString();
-		if (url.contains(this.badBrowserUrl) || url.toLowerCase().endsWith(".jpg")
-				|| url.toLowerCase().endsWith(".png") || url.toLowerCase().endsWith(".gif") 
-				|| url.toLowerCase().endsWith(".ico") || url.toLowerCase().endsWith(".css") || url.toLowerCase().endsWith(".js")) {
+			((HttpServletResponse) resp).sendRedirect(((HttpServletRequest) req).getContextPath() + badBrowserUrl);
+		} else {
+			// No filter for robots
 			chain.doFilter(req, resp);
-			return;
-		}
-		((HttpServletResponse) resp).sendRedirect(((HttpServletRequest) req).getContextPath() + badBrowserUrl);
+		}	
 	}
 
 	@Override
