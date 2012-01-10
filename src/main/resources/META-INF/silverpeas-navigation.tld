@@ -193,5 +193,27 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>		
 	</tag>
+	
+	<tag>
+		<name>label</name>
+	    <tagclass>com.silverpeas.tags.navigation.LabelTag</tagclass>
+	    <bodycontent>empty</bodycontent>
+	    
+	    <attribute>
+			<name>themetracker</name>
+			<required>true</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>idPub</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>key</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>		
+	</tag>
 
 </taglib>
