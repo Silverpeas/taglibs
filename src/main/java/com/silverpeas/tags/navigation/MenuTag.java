@@ -141,8 +141,9 @@ public class MenuTag extends TagSupport {
 	 * Source de données.
 	 * @param tt
 	 */
-	public void setThemetracker(String tt) {
-		themetracker = (KmeliaTagUtil) pageContext.getAttribute(tt);
+	public void setThemetracker(String tt) {		
+		int scope = pageContext.getAttributesScope(tt);	
+		themetracker = (KmeliaTagUtil) pageContext.getAttribute(tt, scope);
 	}
 	
 	/**

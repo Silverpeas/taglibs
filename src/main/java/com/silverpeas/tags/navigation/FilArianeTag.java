@@ -55,7 +55,8 @@ public class FilArianeTag extends TagSupport {
 	 * @param tt
 	 */
 	public void setThemetracker(String tt) {
-		themetracker = (KmeliaTagUtil) pageContext.getAttribute(tt);
+		int scope = pageContext.getAttributesScope(tt);	
+		themetracker = (KmeliaTagUtil) pageContext.getAttribute(tt, scope);
 	}
 	
 	/**
