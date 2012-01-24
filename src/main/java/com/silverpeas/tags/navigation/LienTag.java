@@ -3,6 +3,7 @@ package com.silverpeas.tags.navigation;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
@@ -27,6 +28,15 @@ public class LienTag extends TagSupport {
 	private String idPub = null;
 	private String prefixId = null;
 	private KmeliaTagUtil themetracker = null;
+	private String excludeTopicNamed = null;
+	
+	/**
+	 * Exclusion d'un chemin (cas du multi-emplacement avec un emplacement technique).
+	 * @param excludeTopicNamed
+	 */
+	public void setExcludeTopicNamed(String excludeTopicNamed) {
+		this.excludeTopicNamed = excludeTopicNamed;
+	}
 	
 	/**
 	 * Racines des arborescences.
@@ -102,20 +112,52 @@ public class LienTag extends TagSupport {
 		}
 	}
 	
+	/**
+	 * Selection des éléments nécessaires à la construction de l'url de l'item.
+	 * @return
+	 * @throws Exception
+	 */
 	public String getUrl() throws Exception {
 		PublicationDetail pub = null;				
 		NodeDetail node = null;
+		String page = "";
 		if (idTopic != null) {
 			node = themetracker.getTopic(idTopic);	
 		} else if (idPub != null) {
 			pub = themetracker.getPublicationDetail(idPub);
 			Collection<NodePK>  fathers = pub.getPublicationBm().getAllFatherPK(pub.getPK());
 			Iterator<NodePK> it = fathers.iterator();
-			NodePK pk = it.next();
-			node = themetracker.getTopic(pk.getId());				
+			while (it.hasNext()) {
+				NodePK pk = it.next();			
+				node = themetracker.getTopic(pk.getId());
+				if (excludeTopicNamed != null) {
+					StringTokenizer st = new StringTokenizer(node.getFullPath(), "/");
+					boolean found = false;
+					while(st.hasMoreTokens()) {
+						if (themetracker.getTopic(st.nextToken()).getName().equals(excludeTopicNamed)) {							
+							found = true;
+							break;
+						}
+					}
+					if (found == false) break;
+				} else {
+					break;
+				}
+			}
+			
+			@SuppressWarnings("unchecked")
+			Collection<PublicationDetail> pubs = themetracker.getPublicationsByTopic(node.getId()+",order,asc");	
+			Iterator<PublicationDetail> iPubs = pubs.iterator();
+			int order = 1;
+			while (iPubs.hasNext()) {
+				PublicationDetail p = iPubs.next();	
+				if (p.getId().equals(pub.getId())) break;
+				order++;
+			}
+			if (order > 1) page = "-" + order;
 		} else {
 			throw new Exception("Pas de publication ou de theme");
 		}
-		return generateFullSemanticPath(node, pub);
+		return generateFullSemanticPath(node, pub) + page;
 	}
 }

@@ -164,7 +164,12 @@
 			<name>prefixId</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
-		</attribute>		
+		</attribute>
+		<attribute>
+			<name>excludeTopicNamed</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
 	</tag>
 	
 	<tag>
