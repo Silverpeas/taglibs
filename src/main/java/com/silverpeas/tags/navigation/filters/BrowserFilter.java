@@ -69,7 +69,7 @@ public class BrowserFilter implements Filter {
 	@Override
 	public void init(FilterConfig cfg) throws ServletException {
 		URL conf = BrowserFilter.class.getClassLoader().getResource("log4j.properties");	
-		PropertyConfigurator.configure(conf);
+		if (conf != null) PropertyConfigurator.configure(conf);
 		String ids = cfg.getInitParameter(KEY_BROWSER_IDS);
 		this.browserIds = (ids != null) ? ids.split(",") : DEFAULT_BROWSERS;
 		for (int i = 0; i < browserIds.length; i++) {
