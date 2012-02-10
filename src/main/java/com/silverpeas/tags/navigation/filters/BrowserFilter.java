@@ -1,6 +1,7 @@
 package com.silverpeas.tags.navigation.filters;
 
 import java.io.IOException;
+import java.net.URL;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -11,11 +12,16 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 /**
  * Redirect on page on user-agent conditions.
  * @author svuillet
  */
 public class BrowserFilter implements Filter {
+	
+	private final static Logger LOGGER = Logger.getLogger(BrowserFilter.class);
 
 	// Be default, support all moderns browsers
 	private static final String[] DEFAULT_BROWSERS = { "Chrome", "Firefox", "Safari", "Opera", "MSIE 9", "MSIE 8" };
@@ -39,7 +45,7 @@ public class BrowserFilter implements Filter {
 		String userAgent = ((HttpServletRequest) req).getHeader("User-Agent");
 		if (userAgent != null) {
 			for (String browser_id : browserIds) {
-				if (userAgent.contains(browser_id)) {
+				if (userAgent.toLowerCase().contains(browser_id.toLowerCase())) {
 					chain.doFilter(req, resp);
 					return;
 				}
@@ -52,15 +58,18 @@ public class BrowserFilter implements Filter {
 				chain.doFilter(req, resp);
 				return;
 			}
+			LOGGER.info("Badbrowser ! User-agent : " + userAgent);
 			((HttpServletResponse) resp).sendRedirect(((HttpServletRequest) req).getContextPath() + badBrowserUrl);
 		} else {
 			// No filter for robots
 			chain.doFilter(req, resp);
-		}	
+		}		
 	}
 
 	@Override
 	public void init(FilterConfig cfg) throws ServletException {
+		URL conf = BrowserFilter.class.getClassLoader().getResource("log4j.properties");	
+		PropertyConfigurator.configure(conf);
 		String ids = cfg.getInitParameter(KEY_BROWSER_IDS);
 		this.browserIds = (ids != null) ? ids.split(",") : DEFAULT_BROWSERS;
 		for (int i = 0; i < browserIds.length; i++) {
