@@ -264,6 +264,9 @@ public class MenuTag extends TagSupport {
 	 */
 	private String getFinalClassName(NodeDetail theme, String className) throws RemoteException, IOException, ServletException {		
 		if (isSelectedItem(theme)) {
+			if (selectedTopicNameInSession != null) {
+				pageContext.getSession().setAttribute(selectedTopicNameInSession, theme);
+			}
 			return "selected-" + className;
 		} else {
 			return className;
