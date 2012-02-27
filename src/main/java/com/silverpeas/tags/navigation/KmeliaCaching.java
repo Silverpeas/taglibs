@@ -16,7 +16,11 @@ public class KmeliaCaching {
 	
 	// Cache treeview
 	private ConcurrentHashMap<String, Collection<NodeDetail>> treeViewCache = new ConcurrentHashMap<String, Collection<NodeDetail>>();
-	private long treeViewCacheAge = System.currentTimeMillis();
+	
+	// Cache topic
+	private ConcurrentHashMap<String, NodeDetail> topicCache = new ConcurrentHashMap<String, NodeDetail>();
+	
+	private long cacheAge = System.currentTimeMillis();
 	
 	private KmeliaCaching(KmeliaTagUtil themetracker) {
         super();
@@ -32,17 +36,25 @@ public class KmeliaCaching {
 	
 	public NodeDetail getTopic(int topicId) throws RemoteException {
 		manageCache();
-		Iterator<Collection<NodeDetail>> iTree = treeViewCache.values().iterator();
-		while (iTree.hasNext()) {
-			Collection<NodeDetail> trees = (Collection<NodeDetail>) iTree.next();
-			Iterator<NodeDetail> iNodes = trees.iterator();
-			while (iNodes.hasNext()) {
-				NodeDetail node = (NodeDetail) iNodes.next();
-				if (node.getId() == topicId) return node;
-			}
-		}
 		
-		return themetracker.getTopic(String.valueOf(topicId));
+		NodeDetail topic = topicCache.get(String.valueOf(topicId));
+		if (topic == null) {
+			Iterator<Collection<NodeDetail>> iTree = treeViewCache.values().iterator();
+			while (iTree.hasNext()) {
+				Collection<NodeDetail> trees = (Collection<NodeDetail>) iTree.next();
+				Iterator<NodeDetail> iNodes = trees.iterator();
+				while (iNodes.hasNext()) {
+					NodeDetail node = (NodeDetail) iNodes.next();
+					if (node.getId() == topicId) return node;
+				}
+			}
+			
+			synchronized(this) {
+				topic = themetracker.getTopic(String.valueOf(topicId));
+				topicCache.putIfAbsent(String.valueOf(topicId), topic);				
+			}			
+		} 
+		return topic;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -63,9 +75,10 @@ public class KmeliaCaching {
 		String refreshDelay = Configurateur.getConfigValue("topicsCache.refreshDelay");
 		if (refreshDelay == null) refreshDelay = "3600";
 		if (cacheActivate == null) cacheActivate = "true";
-		if ((System.currentTimeMillis()-treeViewCacheAge >= Long.valueOf(refreshDelay)*1000) || cacheActivate.equals("false")) {
+		if ((System.currentTimeMillis()-cacheAge >= Long.valueOf(refreshDelay)*1000) || cacheActivate.equals("false")) {
 			treeViewCache.clear();
-			treeViewCacheAge = System.currentTimeMillis();
+			topicCache.clear();
+			cacheAge = System.currentTimeMillis();
 		}
 	}
 }
