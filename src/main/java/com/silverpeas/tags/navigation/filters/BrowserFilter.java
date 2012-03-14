@@ -23,20 +23,19 @@ public class BrowserFilter implements Filter {
 	
 	private final static Logger LOGGER = Logger.getLogger(BrowserFilter.class);
 
-	// Be default, support all moderns browsers
-	private static final String[] DEFAULT_BROWSERS = { "Chrome", "Firefox", "Safari", "Opera", "MSIE 9", "MSIE 8" };
-	
 	// Configured params
-	private String[] browserIds;
+	private String[] goodBrowserIds = null;
+	private String[] badBrowserIds = null;
 	private String badBrowserUrl;
 
 	// Filter param keys
 	public static final String KEY_BROWSER_IDS = "browserIds";
+	public static final String KEY_UNSUPPORTED_BROWSER_IDS = "unsupportedBrowserIds";
 	public static final String KEY_BAD_BROWSER_URL = "badBrowserUrl";
 
 	@Override
 	public void destroy() {
-		browserIds = null;
+		goodBrowserIds = null;
 		badBrowserUrl = null;
 	}
 
@@ -44,22 +43,41 @@ public class BrowserFilter implements Filter {
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {		
 		String userAgent = ((HttpServletRequest) req).getHeader("User-Agent");
 		if (userAgent != null) {
-			for (String browser_id : browserIds) {
-				if (userAgent.toLowerCase().contains(browser_id.toLowerCase())) {
+			if (goodBrowserIds != null) {
+				for (String browser_id : goodBrowserIds) {
+					if (userAgent.toLowerCase().contains(browser_id.toLowerCase())) {
+						chain.doFilter(req, resp);
+						return;
+					}
+				}
+				// Unsupported browser
+				String url = ((HttpServletRequest) req).getRequestURL().toString();
+				if (url.contains(this.badBrowserUrl) || url.toLowerCase().endsWith(".jpg")
+						|| url.toLowerCase().endsWith(".png") || url.toLowerCase().endsWith(".gif") 
+						|| url.toLowerCase().endsWith(".ico") || url.toLowerCase().endsWith(".css") || url.toLowerCase().endsWith(".js")) {
 					chain.doFilter(req, resp);
 					return;
 				}
-			}
-			// Unsupported browser
-			String url = ((HttpServletRequest) req).getRequestURL().toString();
-			if (url.contains(this.badBrowserUrl) || url.toLowerCase().endsWith(".jpg")
-					|| url.toLowerCase().endsWith(".png") || url.toLowerCase().endsWith(".gif") 
-					|| url.toLowerCase().endsWith(".ico") || url.toLowerCase().endsWith(".css") || url.toLowerCase().endsWith(".js")) {
+				LOGGER.info("Badbrowser ! User-agent : " + userAgent);
+				((HttpServletResponse) resp).sendRedirect(((HttpServletRequest) req).getContextPath() + badBrowserUrl);
+			} else {
+				// Unsupported browser
+				String url = ((HttpServletRequest) req).getRequestURL().toString();
+				if (url.contains(this.badBrowserUrl) || url.toLowerCase().endsWith(".jpg")
+						|| url.toLowerCase().endsWith(".png") || url.toLowerCase().endsWith(".gif") 
+						|| url.toLowerCase().endsWith(".ico") || url.toLowerCase().endsWith(".css") || url.toLowerCase().endsWith(".js")) {
+					chain.doFilter(req, resp);
+					return;
+				}				
+				for (String browser_id : badBrowserIds) {
+					if (userAgent.toLowerCase().contains(browser_id.toLowerCase())) {
+						LOGGER.info("Badbrowser ! User-agent : " + userAgent);
+						((HttpServletResponse) resp).sendRedirect(((HttpServletRequest) req).getContextPath() + badBrowserUrl);
+						return;
+					}
+				}
 				chain.doFilter(req, resp);
-				return;
-			}
-			LOGGER.info("Badbrowser ! User-agent : " + userAgent);
-			((HttpServletResponse) resp).sendRedirect(((HttpServletRequest) req).getContextPath() + badBrowserUrl);
+			}			
 		} else {
 			// No filter for robots
 			chain.doFilter(req, resp);
@@ -71,10 +89,22 @@ public class BrowserFilter implements Filter {
 		URL conf = BrowserFilter.class.getClassLoader().getResource("log4j.properties");	
 		if (conf != null) PropertyConfigurator.configure(conf);
 		String ids = cfg.getInitParameter(KEY_BROWSER_IDS);
-		this.browserIds = (ids != null) ? ids.split(",") : DEFAULT_BROWSERS;
-		for (int i = 0; i < browserIds.length; i++) {
-			browserIds[i] = browserIds[i].trim();			
-		}
+		if (ids != null) {
+			this.goodBrowserIds = ids.split(",");
+			for (int i = 0; i < goodBrowserIds.length; i++) {
+				goodBrowserIds[i] = goodBrowserIds[i].trim();			
+			}
+		} else {
+			ids = cfg.getInitParameter(KEY_UNSUPPORTED_BROWSER_IDS);
+			if (ids != null) {
+				this.badBrowserIds = ids.split(",");
+				for (int i = 0; i < badBrowserIds.length; i++) {
+					badBrowserIds[i] = badBrowserIds[i].trim();
+				}
+			} else {
+				throw new IllegalArgumentException("BrowserFilter requires param browserIds or unsupportedBrowserIds");
+			}
+		}		
 		
 		badBrowserUrl = cfg.getInitParameter(KEY_BAD_BROWSER_URL);
 		if (badBrowserUrl == null) {
