@@ -30,7 +30,6 @@ import com.stratelia.webactiv.beans.admin.SpaceInst;
 import com.stratelia.webactiv.kmelia.control.ejb.KmeliaBm;
 import com.stratelia.webactiv.kmelia.model.KmeliaPublication;
 import com.stratelia.webactiv.kmelia.model.KmeliaRuntimeException;
-import com.stratelia.webactiv.searchEngine.control.ejb.SearchEngineBm;
 import com.stratelia.webactiv.searchEngine.model.MatchingIndexEntry;
 import com.stratelia.webactiv.searchEngine.model.QueryDescription;
 import com.stratelia.webactiv.util.FileServerUtils;
@@ -55,6 +54,8 @@ import com.stratelia.webactiv.util.publication.model.PublicationI18N;
 import com.stratelia.webactiv.util.publication.model.PublicationPK;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.silverpeas.search.PlainSearchResult;
+import org.silverpeas.search.SearchEngineFactory;
 
 public class KmeliaTagUtil extends ComponentTagUtil {
 
@@ -65,7 +66,6 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   private KmeliaBm kscEjb = null;
   private PublicationBm publicationBm = null;
   private NodeBm nodeBm = null;
-  private SearchEngineBm searchEngineBm = null;
   private CommentService commentService = null;
   private NotationBm notationBm = null;
 
@@ -126,19 +126,6 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       }
     }
     return kscEjb;
-  }
-
-  private SearchEngineBm getSearchEngineBm() {
-    if (searchEngineBm == null) {
-      try {
-        searchEngineBm = (SearchEngineBm) EJBDynaProxy.createProxy(JNDINames.SEARCHBM_EJBHOME,
-            SearchEngineBm.class);
-      } catch (Exception e) {
-        throw new KmeliaRuntimeException("KmeliaTagUtil.getSearchEngineBm",
-            SilverpeasRuntimeException.ERROR, "root.EX_CANT_GET_REMOTE_OBJECT", e);
-      }
-    }
-    return searchEngineBm;
   }
 
   private CommentService getCommentService() {
@@ -260,11 +247,9 @@ public class KmeliaTagUtil extends ComponentTagUtil {
 
   private void checkPublicationLocation(PublicationDetail pubDetail) throws RemoteException,
       VisibilityException {
-
     List fathers = (List) getKmeliaBm().getPublicationFathers(pubDetail.getPK());
-
-    if (fathers == null || fathers.isEmpty() || (fathers.size() == 1 && ((NodePK) fathers.get(0)).
-        getId().equals("1"))) {
+    if (fathers == null || fathers.isEmpty() || (fathers.size() == 1 
+          && "1".equals(((NodePK) fathers.get(0)).getId()))) {
       throw new VisibilityException();
     }
   }
@@ -338,7 +323,6 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       return filterPublications(getPublicationBm().getPublications(targetPKs));
     } catch (NoSuchObjectException nsoe) {
       initPublicationEJB();
-      //			initEJB();
       return getLinkedPublications(pubId);
     }
   }
@@ -357,17 +341,12 @@ public class KmeliaTagUtil extends ComponentTagUtil {
           getKeywords());
       query.setSearchingUser(getUserId());
       query.addSpaceComponentPair(getSpaceId(), getComponentId());
-      getSearchEngineBm().search(query);
-      MatchingIndexEntry[] result = getSearchEngineBm().getRange(0, getSearchEngineBm().getResultLength());
-
-
+      List<MatchingIndexEntry> searchResult = SearchEngineFactory.getSearchEngine().search(query).getEntries();
       //get each publication according to result's list
-      MatchingIndexEntry mie = null;
-      List<PublicationPK> pubPKs = new ArrayList<PublicationPK>();
-      for (int r = 0; r < result.length; r++) {
-        mie = result[r];
+      List<PublicationPK> pubPKs = new ArrayList<PublicationPK>(searchResult.size());
+      for (MatchingIndexEntry mie : searchResult) {
         if (mie != null && !mie.getObjectId().equals(pubId)) {
-          if ("Publication".equals(mie.getObjectType())) {
+          if ("Publication".equalsIgnoreCase(mie.getObjectType())) {
             pubPKs.add(getPublicationPK(mie.getObjectId()));
           }
         }
@@ -385,7 +364,6 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     try {
       checkPublicationStatus(pubId);
       checkPublicationLocation(pubId);
-
       return getPublicationBm().getInfoDetail(getPublicationPK(pubId));
     } catch (NoSuchObjectException nsoe) {
       initEJB();

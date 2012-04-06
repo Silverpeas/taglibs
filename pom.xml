@@ -1,11 +1,13 @@
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>com.silverpeas</groupId>
     <artifactId>parent</artifactId>
-    <version>21</version>
+    <version>22-SNAPSHOT</version>
   </parent>
 
   <groupId>com.silverpeas</groupId>
@@ -53,8 +55,8 @@
   </repositories>
 
   <properties>
-    <core.version>5.8</core.version>
-    <component.version>5.8</component.version>
+    <core.version>5.9-SNAPSHOT</core.version>
+    <component.version>5.9-SNAPSHOT</component.version>
   </properties>
 
 
@@ -156,7 +158,6 @@
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>searchengine</artifactId>
-      <classifier>client</classifier>
       <version>${core.version}</version>
       <scope>provided</scope>
     </dependency>
