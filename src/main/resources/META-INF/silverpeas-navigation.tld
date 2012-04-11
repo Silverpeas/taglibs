@@ -146,6 +146,11 @@
 			<rtexprvalue>false</rtexprvalue>
 		</attribute>
 		<attribute>
+			<name>usePageNumber</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
 			<name>idTopic</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>

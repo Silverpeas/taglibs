@@ -29,6 +29,16 @@ public class LienTag extends TagSupport {
 	private String prefixId = null;
 	private KmeliaTagUtil themetracker = null;
 	private String excludeTopicNamed = null;
+	private String usePageNumber = "true";
+	
+	/**
+	 * Si true : ajoute le numéro de page à la fin de l'url.
+	 * Si false : ajoute l'id de la publication à la fin de l'url.
+	 * @param usePageNumber
+	 */
+	public void setUsePageNumber(String usePageNumber) {
+		this.usePageNumber = usePageNumber;
+	}
 	
 	/**
 	 * Exclusion d'un chemin (cas du multi-emplacement avec un emplacement technique).
@@ -158,6 +168,11 @@ public class LienTag extends TagSupport {
 		} else {
 			throw new Exception("Pas de publication ou de theme");
 		}
-		return generateFullSemanticPath(node, pub) + page;
+		
+		if (Boolean.parseBoolean(usePageNumber)) {
+			return generateFullSemanticPath(node, pub) + page;
+		} else {
+			return generateFullSemanticPath(node, pub) + "-" + idPub;
+		}
 	}
 }
