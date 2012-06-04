@@ -201,7 +201,22 @@
 			<name>currentNumber</name>
 			<required>true</required>
 			<rtexprvalue>true</rtexprvalue>
-		</attribute>		
+		</attribute>
+		<attribute>
+			<name>idAxisFiltering</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>axisValueFilter</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>classNamesFiltered</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>			
 	</tag>
 	
 	<tag>

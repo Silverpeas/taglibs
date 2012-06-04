@@ -14,6 +14,8 @@ import org.apache.commons.lang.StringEscapeUtils;
 import com.silverpeas.tags.kmelia.KmeliaTagUtil;
 import com.silverpeas.tags.navigation.config.Configurateur;
 import com.silverpeas.tags.navigation.links.LinkGeneratorFactory;
+import com.silverpeas.tags.pdc.PdcTagUtil;
+import com.stratelia.silverpeas.pdc.model.Value;
 import com.stratelia.webactiv.util.node.model.NodeDetail;
 import com.stratelia.webactiv.util.publication.model.PublicationDetail;
 
@@ -26,10 +28,14 @@ public class PageListeTag extends TagSupport {
 	private static final long serialVersionUID = 7316128024807549206L;	
 	private static final String TOPIC_ID_PREFIX = "topicId-";
 
-	private KmeliaTagUtil themetracker = null;	
+	private KmeliaTagUtil themetracker = null;
+	private PdcTagUtil pdc = new PdcTagUtil(null, null, 0, null);
 	private String idTopicRoot;
 	private String currentNumber;
+	private String idAxisFiltering = null;
+	private String axisValueFilter = null;
 	private String id;
+	private String classNamesFiltered;
 	
 	
 	/**
@@ -38,6 +44,30 @@ public class PageListeTag extends TagSupport {
 	 */
 	public void setIdTopicRoot(String idTopicRoot) {
 		this.idTopicRoot = idTopicRoot;
+	}
+	
+	/**
+	 * Classes appliquées si la publication est positionnée sur idAxisFiltering avec la valeurs "axisValueFilter". 
+	 * @param classNamesFiltered
+	 */
+	public void setClassNamesFiltered(String classNamesFiltered) {
+		this.classNamesFiltered = classNamesFiltered;
+	}
+	
+	/**
+	 * Id de l'axe qui va servir pour filtrer l'arborescence.
+	 * @param idAxisFiltering
+	 */
+	public void setIdAxisFiltering(String idAxisFiltering) {
+		this.idAxisFiltering = idAxisFiltering;
+	}
+	
+	/**
+	 * Valeur du filtre de l'arborescence.
+	 * @param axisValueFilter
+	 */
+	public void setAxisValueFilter(String axisValueFilter) {
+		this.axisValueFilter = axisValueFilter;
 	}
 	
 	/**
@@ -110,10 +140,12 @@ public class PageListeTag extends TagSupport {
 				PublicationDetail pub = (PublicationDetail) iPubs.next();				
 				html.setLength(0);
 				html.append("<li id='");
-				html.append(buildId(TOPIC_ID_PREFIX, rootTopic, number) + "'");
-				if (Integer.parseInt(currentNumber)==number) {
-					html.append("' class='item-selected'");
-				}	
+				html.append(buildId(TOPIC_ID_PREFIX, rootTopic, number));
+								
+				html.append("' class='");
+				html.append(getClassNameByPublication(pub, number));
+				html.append("'");
+				
 				html.append(">");			
 				html.append("<a href='");
 				html.append(generateFullSemanticPath(rootTopic, pub, number));
@@ -129,6 +161,34 @@ public class PageListeTag extends TagSupport {
 		} catch (Exception e) {
             e.printStackTrace();
         }		
+	}
+	
+	/**
+	 * Retourne le nom de la classe css à appliquer pour lien donné. 
+	 * @param pub
+	 * @return
+	 * @throws Exception 
+	 */
+	private String getClassNameByPublication(PublicationDetail pub, int number) throws Exception {
+		StringBuffer className = new StringBuffer("");
+		if (Integer.parseInt(currentNumber)==number) {
+			className.append("item-selected");
+		}		
+		
+		if (idAxisFiltering != null && axisValueFilter != null && !idAxisFiltering.isEmpty() && !axisValueFilter.isEmpty()) {
+			@SuppressWarnings("unchecked")
+			Collection<Value> values = pdc.getValuesOnAxis(pub.getId()+","+themetracker.getComponentInst().getId()+","+idAxisFiltering);
+			Iterator<Value> iValues = values.iterator();
+			while (iValues.hasNext()) {
+				Value v = (Value) iValues.next();
+				if (v.getName().equals(axisValueFilter) && classNamesFiltered != null) {
+					className.append(" ");
+					className.append(classNamesFiltered);					
+					break;
+				}
+			}
+		}		
+		return className.toString().trim();
 	}
 	
 	/**
