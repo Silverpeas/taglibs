@@ -29,9 +29,10 @@ public class FilArianeTag extends TagSupport {
 	private String separator;
 	private String pageNumber;
 	private boolean displayPubName = false;
+	private boolean linkOnCurrentTopic = false;
 	private String classNamesHierarchy = null;
 	private String prefixIdHierarchyByIdTopicRoot = null;
-
+	
 	/**
 	 * Noms des classes CSS (séparés par des virgules) à appliquer à chaque niveau de l'arborescence.
 	 * Si le nombre de classes CSS est inférieur à la profondeur de l'arborescence, 
@@ -87,6 +88,10 @@ public class FilArianeTag extends TagSupport {
 		this.displayPubName = Boolean.parseBoolean(displayPubName);
 	}
 	
+	public void setLinkOnCurrentTopic(String linkOnCurrentTopic) {
+		this.linkOnCurrentTopic = Boolean.parseBoolean(linkOnCurrentTopic);
+	}
+	
 	@Override
 	public int doStartTag() throws JspException {
 
@@ -119,22 +124,21 @@ public class FilArianeTag extends TagSupport {
 			String nodeId = nodes.nextToken();
 			if (beginPath) {
 				NodeDetail n = themetracker.getTopic(nodeId);
-				path.append("<a href='");
-				path.append(generateFullSemanticPath(n));
-				path.append("' title='");
-				path.append(StringEscapeUtils.escapeHtml(n.getDescription()));
-				path.append("' class='");
-				path.append(getCssClass(level));
-				path.append("'>");
-				path.append(transformLabel(n.getName()));
-				path.append("</a>");
+				writeLink(n, path, level);
 				path.append(separator);
 				level++;
 			} else {
 				beginPath = isRootTopic(nodeId);
 			}			
 		}
-		if (beginPath) path.append(transformLabel(node.getName()));
+		
+		if (linkOnCurrentTopic) {
+			if (beginPath) {
+				writeLink(node, path, level);				
+			}
+		} else {
+			if (beginPath) path.append(transformLabel(node.getName()));	
+		}	
 		
 		if (displayPubName) {
 			@SuppressWarnings("rawtypes")
@@ -155,6 +159,25 @@ public class FilArianeTag extends TagSupport {
 		return path.toString();
 	}
 
+	/**
+	 * Génération du lien html.
+	 * @param node
+	 * @param path
+	 * @param level
+	 * @throws RemoteException
+	 */
+	private void writeLink(NodeDetail node, StringBuffer path, int level) throws RemoteException {
+		path.append("<a href='");
+		path.append(generateFullSemanticPath(node));
+		path.append("' title='");
+		path.append(StringEscapeUtils.escapeHtml(node.getDescription()));
+		path.append("' class='");
+		path.append(getCssClass(level));
+		path.append("'>");
+		path.append(transformLabel(node.getName()));
+		path.append("</a>");
+	}
+	
 	/**
 	 * Récupère la classe css du niveau hierarchique.
 	 * @param level

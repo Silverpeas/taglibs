@@ -122,7 +122,12 @@
 			<name>displayPubName</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
-		</attribute>		
+		</attribute>
+		<attribute>
+			<name>linkOnCurrentTopic</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>				
 		<attribute>
 			<name>prefixIdHierarchyByIdTopicRoot</name>
 			<required>false</required>
