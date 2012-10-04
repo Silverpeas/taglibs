@@ -22,8 +22,6 @@ import com.stratelia.webactiv.beans.admin.SpaceInst;
 import com.stratelia.webactiv.kmelia.control.ejb.KmeliaBm;
 import com.stratelia.webactiv.kmelia.model.KmeliaPublication;
 import com.stratelia.webactiv.kmelia.model.KmeliaRuntimeException;
-import com.stratelia.webactiv.searchEngine.model.MatchingIndexEntry;
-import com.stratelia.webactiv.searchEngine.model.QueryDescription;
 import com.stratelia.webactiv.util.FileServerUtils;
 import com.stratelia.webactiv.util.JNDINames;
 import com.stratelia.webactiv.util.attachment.control.AttachmentController;
@@ -54,6 +52,8 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.silverpeas.search.SearchEngineFactory;
+import org.silverpeas.search.searchEngine.model.MatchingIndexEntry;
+import org.silverpeas.search.searchEngine.model.QueryDescription;
 
 public class KmeliaTagUtil extends ComponentTagUtil {
 
@@ -364,6 +364,8 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     } catch (NoSuchObjectException nsoe) {
       initEJB();
       return getPublicationsOnSameSubject(pubId);
+    } catch (Exception ex) {
+      throw new RemoteException(pubId, ex);
     }
   }
 
@@ -472,7 +474,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
 
       StringTokenizer tokenizer = new StringTokenizer(topicIdAndColumnNameAndSort, ",");
       int i = 1;
-      String param = "";
+      String param;
       String topicId = "";
       String columnName = null;
       String sort = null;
@@ -497,13 +499,13 @@ public class KmeliaTagUtil extends ComponentTagUtil {
 
       //NodePK			nodePK			= new NodePK(topicId, spaceId, componentId);
       NodePK nodePK = getNodePK(topicId);
-      List publications = null;
+      List publications;
       ArrayList nodeIds = new ArrayList();
       if (recursive) {
         //get all nodes of the subtree where root is topicId
         ArrayList nodes = getNodeBm().getSubTree(nodePK);
 
-        NodeDetail nodeDetail = null;
+        NodeDetail nodeDetail;
         for (int n = 0; n < nodes.size(); n++) {
           nodeDetail = (NodeDetail) nodes.get(n);
           if (NodeDetail.STATUS_VISIBLE.equals(nodeDetail.getStatus())) {
@@ -553,7 +555,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       }
 
       if (publications != null && StringUtil.isDefined(getSiteLanguage())) {
-        PublicationDetail publi = null;
+        PublicationDetail publi;
         for (int p = 0; p < publications.size(); p++) {
           publi = (PublicationDetail) publications.get(p);
 
@@ -778,7 +780,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
 
     List subTopics = (List) node.getChildrenDetails();
     if (subTopics != null && subTopics.size() > 0) {
-      NodeDetail subTopic = null;
+      NodeDetail subTopic;
       for (int i = 0; i < subTopics.size(); i++) {
         subTopic = (NodeDetail) subTopics.get(i);
         subTopic = getTranslatedNode(subTopic, null);
@@ -829,7 +831,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   public Collection getTreeView(String topicId) throws RemoteException {
     SilverTrace.info("kmelia", "KMeliaTagUtil.getTreeView()", "root.MSG_GEN_ENTER_METHOD",
         "topicId = " + topicId);
-    List tree = new ArrayList();
+    List tree;
     try {
       tree = (ArrayList) getNodeBm().getSubTree(getNodePK(topicId));
 
@@ -842,7 +844,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
         //Web site is in developpement mode
         //We get all topics (visibles and invisibles)
         if (StringUtil.isDefined(SiteTagUtil.getLanguage())) {
-          NodeDetail node = null;
+          NodeDetail node;
           for (int n = 0; n < tree.size(); n++) {
             node = (NodeDetail) tree.get(n);
             getTranslatedNode(node, SiteTagUtil.getLanguage());
@@ -863,8 +865,8 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   }
 
   private List removeSpecificNodes(List tree) {
-    NodeDetail node = null;
-    String id = null;
+    NodeDetail node;
+    String id;
     List nodes = new ArrayList();
     for (int i = 0; i < tree.size(); i++) {
       node = (NodeDetail) tree.get(i);
@@ -879,7 +881,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   private Collection getVisibleTreeView(List tree) throws RemoteException {
     SilverTrace.info("kmelia", "KMeliaTagUtil.getVisibleTreeView()", "root.MSG_GEN_ENTER_METHOD");
 
-    NodeDetail node = null;
+    NodeDetail node;
     ArrayList visibleNodes = new ArrayList();
     ArrayList invisibleNodes = new ArrayList();
     for (int i = 0; i < tree.size(); i++) {
@@ -922,7 +924,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   public int getSilverObjectId(String pubId) throws RemoteException {
     SilverTrace.info("kmelia", "KmeliaTagUtil.getSilverObjectId()", "root.MSG_GEN_ENTER_METHOD",
         "pubId = " + pubId);
-    int silverObjectId = -1;
+    int silverObjectId;
     try {
       silverObjectId = getKmeliaBm().getSilverObjectId(getPublicationPK(pubId));
     } catch (NoSuchObjectException nsoe) {
@@ -993,7 +995,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
         return attachments;
       }
 
-      AttachmentDetail attachment = null;
+      AttachmentDetail attachment;
       for (int a = 0; a < attachments.size(); a++) {
         attachment = (AttachmentDetail) attachments.get(a);
         AttachmentDetailI18N translation = (AttachmentDetailI18N) attachment.
@@ -1147,7 +1149,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     //Particular case of Image Field (in the XML forms)
     String webContext = SiteTagUtil.getServerContext();
     List<XMLField> xmlFields = detail.getXmlFields();
-    XMLField xmlField = null;
+    XMLField xmlField;
     for (int x = 0; x < xmlFields.size(); x++) {
       xmlField = xmlFields.get(x);
       if (fieldName.equals(xmlField.getName())) {
@@ -1182,9 +1184,9 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       content = convertRestToWebUrl(content, "/attached_file/", webContext);
 
       int finPath = 0;
-      int debutPath = 0;
+      int debutPath;
       StringBuilder newWysiwygText = new StringBuilder();
-      String link = null;
+      String link;
       while (content.indexOf("href=\"", finPath) > -1) {
         debutPath = content.indexOf("href=\"", finPath);
         debutPath += 6;

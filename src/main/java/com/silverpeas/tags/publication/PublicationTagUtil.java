@@ -6,8 +6,6 @@
  */
 package com.silverpeas.tags.publication;
 
-import java.util.List;
-
 import com.silverpeas.tags.util.EJBDynaProxy;
 import com.silverpeas.tags.util.SiteTagUtil;
 import com.stratelia.silverpeas.silvertrace.SilverTrace;
@@ -20,6 +18,7 @@ import com.stratelia.webactiv.util.publication.control.PublicationBm;
 import com.stratelia.webactiv.util.publication.model.PublicationDetail;
 import com.stratelia.webactiv.util.publication.model.PublicationPK;
 import com.stratelia.webactiv.util.publication.model.PublicationRuntimeException;
+import java.util.List;
 
 /**
  * @author neysseri
@@ -55,18 +54,21 @@ public class PublicationTagUtil {
 				SilverTrace.info("searchEngine", "PublicationTagUtil.isPublicationVisible()", "root.MSG_GEN_PARAM_VALUE", "pubStatus = "+pubStatus);
 				if (SiteTagUtil.isDevMode())
 				{
-					if ("Valid".equals(pubStatus) || "ToValidate".equals(pubStatus) || "Draft".equals(pubStatus))
-						return true;
+					if ("Valid".equals(pubStatus) || "ToValidate".equals(pubStatus) || "Draft".equals(pubStatus)) {
+            return true;
+          }
 				}
 				else if (SiteTagUtil.isRecetteMode())
 				{
-					if (("Valid".equals(pubStatus) || "ToValidate".equals(pubStatus)) && isPublicationInVisiblePath(pubDetail))
-						return true;
+					if (("Valid".equals(pubStatus) || "ToValidate".equals(pubStatus)) && isPublicationInVisiblePath(pubDetail)) {
+            return true;
+          }
 				}
 				else
 				{
-					if ("Valid".equals(pubStatus) && isPublicationInVisiblePath(pubDetail))
-						return true;
+					if ("Valid".equals(pubStatus) && isPublicationInVisiblePath(pubDetail)) {
+            return true;
+          }
 				}
 			}
 			return false;
@@ -81,7 +83,7 @@ public class PublicationTagUtil {
 		{
 			//Recupere tous les thèmes dans lesquels la publication est classée
 			List 	allFathers 			= (List) getPublicationBm().getAllFatherPK(pub.getPK());
-			NodePK 	fatherPK 			= null;
+			NodePK 	fatherPK;
 			for (int f=0; f<allFathers.size();f++)
 			{
 				fatherPK = (NodePK) allFathers.get(f);
@@ -98,7 +100,7 @@ public class PublicationTagUtil {
 		private boolean isAVisiblePath(List path)
 		{
 			boolean 	isVisible 	= true;
-			NodeDetail 	node 		= null;
+			NodeDetail 	node;
 			for (int n=0; n<path.size();n++)
 			{
 				node = (NodeDetail) path.get(n);

@@ -1,13 +1,12 @@
 package com.silverpeas.tags.comment;
 
-import java.rmi.RemoteException;
-
+import com.silverpeas.comment.service.CommentService;
+import com.silverpeas.comment.service.CommentServiceFactory;
 import com.silverpeas.tags.ComponentTagUtil;
 import com.silverpeas.tags.util.VisibilityException;
-import com.silverpeas.comment.service.CommentServiceFactory;
-import com.silverpeas.comment.service.CommentService;
 import com.stratelia.webactiv.util.publication.model.PublicationDetail;
 import com.stratelia.webactiv.util.publication.model.PublicationPK;
+import java.rmi.RemoteException;
 
 public class CommentTagUtil extends ComponentTagUtil {
 
@@ -38,7 +37,7 @@ public class CommentTagUtil extends ComponentTagUtil {
   }
 
   public Integer getPublicationCommentsCount() throws RemoteException, VisibilityException {
-    int commentsCount = 0;
+    int commentsCount;
     PublicationPK publicationKey = new PublicationPK(this.getElementId(), this.getComponentId());
     commentsCount = getCommentService().getCommentsCountOnPublication(PublicationDetail.
         getResourceType(), publicationKey);

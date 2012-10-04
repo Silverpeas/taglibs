@@ -1,15 +1,5 @@
 package com.silverpeas.tags.searchEngine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import com.silverpeas.admin.ejb.AdminBm;
 import com.silverpeas.admin.ejb.AdminBmRuntimeException;
 import com.silverpeas.pdc.ejb.PdcBm;
@@ -22,17 +12,25 @@ import com.stratelia.silverpeas.contentManager.GlobalSilverContent;
 import com.stratelia.silverpeas.contentManager.GlobalSilverContentI18N;
 import com.stratelia.silverpeas.pdc.model.SearchContext;
 import com.stratelia.silverpeas.silvertrace.SilverTrace;
-import com.stratelia.webactiv.searchEngine.model.MatchingIndexEntry;
-import com.stratelia.webactiv.searchEngine.model.QueryDescription;
-import com.stratelia.webactiv.searchEngine.model.ScoreComparator;
 import com.stratelia.webactiv.util.DateUtil;
 import com.stratelia.webactiv.util.JNDINames;
 import com.stratelia.webactiv.util.exception.SilverpeasRuntimeException;
-import com.stratelia.webactiv.util.indexEngine.model.SpaceComponentPair;
 import com.stratelia.webactiv.util.publication.model.PublicationPK;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.silverpeas.search.SearchEngineFactory;
+import org.silverpeas.search.indexEngine.model.SpaceComponentPair;
+import org.silverpeas.search.searchEngine.model.MatchingIndexEntry;
+import org.silverpeas.search.searchEngine.model.QueryDescription;
+import org.silverpeas.search.searchEngine.model.ScoreComparator;
 
 public class SearchEngineTagUtil implements java.io.Serializable {
 
@@ -85,27 +83,27 @@ public class SearchEngineTagUtil implements java.io.Serializable {
 
   public Collection getResults() throws Exception {
     //build the search
-    QueryDescription query = new QueryDescription(getQuery());
+    QueryDescription theQuery = new QueryDescription(getQuery());
 
     //Set the identity of the user who processing the search
-    query.setSearchingUser(getUserId());
+    theQuery.setSearchingUser(getUserId());
 
     //Set the list of all components which are available for the user
-    buildSpaceComponentAvailableForUser(query, getSpaceId(), getComponentId());
+    buildSpaceComponentAvailableForUser(theQuery, getSpaceId(), getComponentId());
 
     //Set the filter according dates
     String afterDateSQL = getAfterDate();
-    query.setRequestedCreatedAfter(afterDateSQL);
+    theQuery.setRequestedCreatedAfter(afterDateSQL);
     SilverTrace.info("searchEngine", "SearchEngineTagUtil.getResults()", "root.MSG_GEN_PARAM_VALUE",
       "After date set !");
 
     String beforeDateSQL = getBeforeDate();
-    query.setRequestedCreatedBefore(beforeDateSQL);
+    theQuery.setRequestedCreatedBefore(beforeDateSQL);
     SilverTrace.info("searchEngine", "SearchEngineTagUtil.getResults()", "root.MSG_GEN_PARAM_VALUE",
       "Before date set !");
 
     //Set the filter on a particular author
-    query.setRequestedAuthor(getAuthorId());
+    theQuery.setRequestedAuthor(getAuthorId());
     SilverTrace.info("searchEngine", "SearchEngineTagUtil.getResults()", "root.MSG_GEN_PARAM_VALUE",
       "authorId set !");
 
@@ -119,7 +117,7 @@ public class SearchEngineTagUtil implements java.io.Serializable {
 
       //get all componentIds
       List<String> alComponentIds = new ArrayList<String>();
-      Set<SpaceComponentPair> spaceComponentPairs = query.getSpaceComponentPairSet();
+      Set<SpaceComponentPair> spaceComponentPairs = theQuery.getSpaceComponentPairSet();
       if (spaceComponentPairs != null) {
         for(SpaceComponentPair spaceComponentPair : spaceComponentPairs) {
           alComponentIds.add(spaceComponentPair.getComponent());
@@ -129,7 +127,7 @@ public class SearchEngineTagUtil implements java.io.Serializable {
       SilverTrace.info("searchEngine", "SearchEngineTagUtil.getResults()",
         "root.MSG_GEN_PARAM_VALUE", "component id list built !");
 
-      List alSilverContents = null;
+      List alSilverContents;
 
       boolean visibilitySensitive = true;
       if (SiteTagUtil.isDevMode() || SiteTagUtil.isRecetteMode()) {
@@ -139,7 +137,7 @@ public class SearchEngineTagUtil implements java.io.Serializable {
       alSilverContents = getPdcBm().findGlobalSilverContents(getPdcContext(), alComponentIds,
         getAuthorId(), afterDateSQL, beforeDateSQL, true, visibilitySensitive);
 
-      GlobalSilverContent silverContent = null;
+      GlobalSilverContent silverContent;
       if (getQuery() != null && getQuery().length() > 0) {
         //extract the silvercontent ids
         for (int sc = 0; sc < alSilverContents.size(); sc++) {
@@ -176,26 +174,26 @@ public class SearchEngineTagUtil implements java.io.Serializable {
           "newXmlQuery.put(" + xmlTemplate + "$$" + key + "," + value + ")");
       }
 
-      query.setXmlQuery(newXmlQuery);
+      theQuery.setXmlQuery(newXmlQuery);
     }
 
     if (xmlTitle != null && !xmlTitle.isEmpty() && !"null".equals(xmlTitle)) {
-      query.setXmlTitle(xmlTitle);
-      if (query.getXmlQuery() == null) {
-        query.setXmlQuery(new HashMap<String, String>()); //Mandatory to launch xml search
+      theQuery.setXmlTitle(xmlTitle);
+      if (theQuery.getXmlQuery() == null) {
+        theQuery.setXmlQuery(new HashMap<String, String>()); //Mandatory to launch xml search
       }
     }
 
     List<MatchingIndexEntry> result = null;
-    if (StringUtil.isDefined(query.getQuery()) || query.getXmlQuery() != null
-      || StringUtil.isDefined(query.getXmlTitle())) {
+    if (StringUtil.isDefined(theQuery.getQuery()) || theQuery.getXmlQuery() != null
+      || StringUtil.isDefined(theQuery.getXmlTitle())) {
       //launch the full text search
 
       SilverTrace.info("searchEngine", "SearchEngineTagUtil.getResults()",
         "root.MSG_GEN_PARAM_VALUE", "search processed !");
 
       //retrieve results
-      List<MatchingIndexEntry> fullTextResult = SearchEngineFactory.getSearchEngine().search(query)
+      List<MatchingIndexEntry> fullTextResult = SearchEngineFactory.getSearchEngine().search(theQuery)
         .getEntries();
       SilverTrace.info("searchEngine", "SearchEngineTagUtil.getResults()",
         "root.MSG_GEN_PARAM_VALUE", "results retrieved !");
@@ -214,7 +212,7 @@ public class SearchEngineTagUtil implements java.io.Serializable {
 
     if (result != null) {
       //get each result according to result's list
-      GlobalSilverContent silverContent = null;
+      GlobalSilverContent silverContent;
       List<String> returnedObjects = new LinkedList<String>();
       for (MatchingIndexEntry mie : result) {
         SilverTrace.info("searchEngine", "SearchEngineTagUtil.getResults()",
@@ -377,14 +375,14 @@ public class SearchEngineTagUtil implements java.io.Serializable {
 
   private boolean isMatchingIndexEntryVisible(MatchingIndexEntry mie) throws Exception {
     String objectType = mie.getObjectType();
-    String componentId = mie.getComponent();
+    String theComponentId = mie.getComponent();
     if ("Publication".equals(objectType) || "Wysiwyg".equals(objectType)) {
       return getPublicationTagUtil().isPublicationVisible(new PublicationPK(mie.getObjectId(),
-        "useless", componentId));
+        "useless", theComponentId));
     } else if (objectType != null && objectType.startsWith("Attachment")) {
-      if (componentId.startsWith(COMPONENT_FORUM_PREFIX)) {
+      if (theComponentId.startsWith(COMPONENT_FORUM_PREFIX)) {
         return getPublicationTagUtil().isPublicationVisible(new PublicationPK(mie.getObjectId(),
-          "useless", componentId));
+          "useless", theComponentId));
       } else {
         return true;
       }
