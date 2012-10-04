@@ -11,7 +11,7 @@
   <groupId>com.silverpeas</groupId>
   <artifactId>taglibs</artifactId>
   <packaging>jar</packaging>
-  <version>5.11-SNAPSHOT</version>
+  <version>5.10.1</version>
   <name>taglibs J2EE 1.4 Webapp</name>
   <url>http://www.silverpeas.com</url>
 
@@ -53,8 +53,8 @@
   </repositories>
 
   <properties>
-    <core.version>5.9</core.version>
-    <component.version>5.9</component.version>
+    <core.version>5.10.1</core.version>
+    <component.version>5.10.1</component.version>
   </properties>
 
 

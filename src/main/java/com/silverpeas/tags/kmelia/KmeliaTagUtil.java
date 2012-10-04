@@ -2,14 +2,6 @@ package com.silverpeas.tags.kmelia;
 
 import com.silverpeas.comment.model.CommentPK;
 import com.silverpeas.comment.model.CommentedPublicationInfo;
-import java.rmi.NoSuchObjectException;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.StringTokenizer;
-
 import com.silverpeas.comment.service.CommentService;
 import com.silverpeas.comment.service.CommentServiceFactory;
 import com.silverpeas.form.importExport.XMLField;
@@ -52,9 +44,15 @@ import com.stratelia.webactiv.util.publication.model.CompletePublication;
 import com.stratelia.webactiv.util.publication.model.PublicationDetail;
 import com.stratelia.webactiv.util.publication.model.PublicationI18N;
 import com.stratelia.webactiv.util.publication.model.PublicationPK;
+import java.rmi.NoSuchObjectException;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.silverpeas.search.PlainSearchResult;
 import org.silverpeas.search.SearchEngineFactory;
 
 public class KmeliaTagUtil extends ComponentTagUtil {
@@ -190,9 +188,13 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     return getComponentInst().getLabel();
   }
 
-  /**************************************************************************************/
+  /**
+   * ***********************************************************************************
+   */
   /* KMelia - Gestion des publications                                                  */
-  /**************************************************************************************/
+  /**
+   * ***********************************************************************************
+   */
   private boolean checkPublicationStatus(String pubId) throws RemoteException, VisibilityException {
     PublicationDetail pubDetail = getPublicationDetail(pubId);
     return checkPublicationStatus(pubDetail);
@@ -216,12 +218,14 @@ public class KmeliaTagUtil extends ComponentTagUtil {
 
   /**
    * Get filtered publications
+   *
    * @param publicationDetails
    * @return Collection
    */
-  private Collection<PublicationDetail> filterPublications(Collection<PublicationDetail> publicationDetails) {
+  private Collection<PublicationDetail> filterPublications(
+      Collection<PublicationDetail> publicationDetails) {
     List<PublicationDetail> filteredPublications = new ArrayList<PublicationDetail>();
-    for(PublicationDetail pubDetail : publicationDetails) {
+    for (PublicationDetail pubDetail : publicationDetails) {
       try {
         if (visibilityFilter != null) {
           if (pubDetail.getName().startsWith(visibilityFilter)) {
@@ -230,7 +234,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
         }
         checkPublicationStatus(pubDetail);
         checkPublicationLocation(pubDetail);
-        filteredPublications.add( getTranslatedPublication(pubDetail, null));
+        filteredPublications.add(getTranslatedPublication(pubDetail, null));
       } catch (VisibilityException ae) {
         //this publication cannot be display according its status and site's mode
       } catch (RemoteException ae) {
@@ -248,8 +252,8 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   private void checkPublicationLocation(PublicationDetail pubDetail) throws RemoteException,
       VisibilityException {
     List fathers = (List) getKmeliaBm().getPublicationFathers(pubDetail.getPK());
-    if (fathers == null || fathers.isEmpty() || (fathers.size() == 1 
-          && "1".equals(((NodePK) fathers.get(0)).getId()))) {
+    if (fathers == null || fathers.isEmpty() || (fathers.size() == 1
+        && "1".equals(((NodePK) fathers.get(0)).getId()))) {
       throw new VisibilityException();
     }
   }
@@ -258,7 +262,8 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       VisibilityException {
     Integer commentsCount = new Integer(0);
     PublicationPK publicationKey = new PublicationPK(pubId, this.getComponentId());
-    int count = getCommentService().getCommentsCountOnPublication(publicationKey);
+    int count = getCommentService().getCommentsCountOnPublication(PublicationDetail.
+        getResourceType(), publicationKey);
     if (count > 0) {
       commentsCount = new Integer(count);
     }
@@ -267,6 +272,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
 
   /**
    * Get publicationDetail
+   *
    * @param pubId
    * @return PublicationDetail
    * @throws RemoteException
@@ -279,6 +285,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
 
   /**
    * Get publicationDetail
+   *
    * @param pubId
    * @param language
    * @return PublicationDetail
@@ -288,7 +295,8 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   public PublicationDetail getPublicationDetail(String pubId, String language) throws
       RemoteException, VisibilityException {
     try {
-      SilverTrace.info("kmelia", "KMeliaTagUtil.getPublicationDetail()", "root.MSG_GEN_ENTER_METHOD",
+      SilverTrace.
+          info("kmelia", "KMeliaTagUtil.getPublicationDetail()", "root.MSG_GEN_ENTER_METHOD",
           "pubId = " + pubId);
       PublicationDetail pubDetail = getPublicationBm().getDetail(getPublicationPK(pubId));
 
@@ -317,7 +325,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       SilverTrace.info("kmelia", "KMeliaTagUtil.getLinkedPublications()",
           "root.MSG_GEN_ENTER_METHOD", "nb linked publications = " + targets.size());
       List<PublicationPK> targetPKs = new ArrayList<PublicationPK>();
-      for(ForeignPK foreignPk : targets) {
+      for (ForeignPK foreignPk : targets) {
         targetPKs.add(new PublicationPK(foreignPk.getId(), foreignPk.getInstanceId()));
       }
       return filterPublications(getPublicationBm().getPublications(targetPKs));
@@ -341,7 +349,8 @@ public class KmeliaTagUtil extends ComponentTagUtil {
           getKeywords());
       query.setSearchingUser(getUserId());
       query.addSpaceComponentPair(getSpaceId(), getComponentId());
-      List<MatchingIndexEntry> searchResult = SearchEngineFactory.getSearchEngine().search(query).getEntries();
+      List<MatchingIndexEntry> searchResult = SearchEngineFactory.getSearchEngine().search(query).
+          getEntries();
       //get each publication according to result's list
       List<PublicationPK> pubPKs = new ArrayList<PublicationPK>(searchResult.size());
       for (MatchingIndexEntry mie : searchResult) {
@@ -374,7 +383,8 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   @Deprecated
   public CompletePublication getCompletePublication(String pubId) throws RemoteException,
       VisibilityException {
-    SilverTrace.info("kmelia", "KMeliaTagUtil.getCompletePublication()", "root.MSG_GEN_ENTER_METHOD",
+    SilverTrace.
+        info("kmelia", "KMeliaTagUtil.getCompletePublication()", "root.MSG_GEN_ENTER_METHOD",
         "pubId = " + pubId);
     try {
       CompletePublication cPublication = getPublicationBm().getCompletePublication(getPublicationPK(
@@ -598,7 +608,8 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       //the publication have no content of type wysiwyg
       //The content is maybe stored in a database model
       //CompletePublication completePublication = getKmeliaBm().getCompletePublication(pubId);
-      CompletePublication completePublication = getPublicationBm().getCompletePublication(getPublicationPK(
+      CompletePublication completePublication = getPublicationBm().
+          getCompletePublication(getPublicationPK(
           pubId));
       InfoDetail infoDetail = completePublication.getInfoDetail();
       ModelDetail modelDetail = completePublication.getModelDetail();
@@ -658,8 +669,9 @@ public class KmeliaTagUtil extends ComponentTagUtil {
 
   /**
    * Used to get the most commented publication
-   * @param condition number,formName,topicId for
-   * for example 10,fiche_produit,30 or -1,fiche_article,22
+   *
+   * @param condition number,formName,topicId for for example 10,fiche_produit,30 or
+   * -1,fiche_article,22
    * @return Collection of PublicationDetail
    */
   public Collection getMostCommentedPublication(String condition) {
@@ -697,7 +709,8 @@ public class KmeliaTagUtil extends ComponentTagUtil {
           }
         }
         if (!commentsPks.isEmpty()) {
-          comments = getCommentService().getMostCommentedPublicationsInfo(commentsPks);
+          comments = getCommentService().getMostCommentedPublicationsInfo(PublicationDetail.
+              getResourceType(), commentsPks);
           if (comments.size() > numberPublication) {
             comments = comments.subList(0, numberPublication);
           }
@@ -872,7 +885,8 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     for (int i = 0; i < tree.size(); i++) {
       node = (NodeDetail) tree.get(i);
       node = getTranslatedNode(node, null);
-      if ( (NodeDetail.STATUS_INVISIBLE.equals(node.getStatus())) || ( (visibilityFilter != null) && node.getName(getSiteLanguage()).startsWith(visibilityFilter)) ) {
+      if ((NodeDetail.STATUS_INVISIBLE.equals(node.getStatus())) || ((visibilityFilter != null)
+          && node.getName(getSiteLanguage()).startsWith(visibilityFilter))) {
         if (i == 0) {
           return visibleNodes;
         } else {
@@ -918,9 +932,9 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     return silverObjectId;
   }
 
-
   /**
    * renvoit l'URL de la vignette de la publication, ou chaine vide s'il n'y a pas de vignette
+   *
    * @param pubId
    * @return String not null
    */
@@ -929,19 +943,24 @@ public class KmeliaTagUtil extends ComponentTagUtil {
         "pubId = " + pubId);
     String imageURL = "";
     PublicationDetail pubDetail = getPublicationDetail(pubId);
-  	if(pubDetail.getImage() != null) {
-  		if(pubDetail.getImage().startsWith("/")) {//image provenant de la photothèque
-  			imageURL = pubDetail.getImage();
-  		} else {//image téléchargée
-  			imageURL = "vignette?ComponentId="+pubDetail.getInstanceId()+"&SourceFile="+pubDetail.getImage()+"&MimeType=image/jpeg&Directory=images";
-  		}
-  	}
+    if (pubDetail.getImage() != null) {
+      if (pubDetail.getImage().startsWith("/")) {//image provenant de la photothèque
+        imageURL = pubDetail.getImage();
+      } else {//image téléchargée
+        imageURL = "vignette?ComponentId=" + pubDetail.getInstanceId() + "&SourceFile=" + pubDetail.
+            getImage() + "&MimeType=image/jpeg&Directory=images";
+      }
+    }
     return imageURL;
   }
 
-  /**************************************************************************************/
+  /**
+   * ***********************************************************************************
+   */
   /* KMelia - Gestion des validations                                                   */
-  /**************************************************************************************/
+  /**
+   * ***********************************************************************************
+   */
   public Collection getPublicationsToValidate() throws RemoteException {
     try {
       SilverTrace.info("kmelia", "KmeliaTagUtil.getPublicationsToValidate()",
@@ -953,9 +972,13 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     }
   }
 
-  /**************************************************************************************/
+  /**
+   * ***********************************************************************************
+   */
   /* Gestion des fichiers joints		                                                  */
-  /**************************************************************************************/
+  /**
+   * ***********************************************************************************
+   */
   public Collection getAttachments(String pubId) throws RemoteException, VisibilityException {
     SilverTrace.info("kmelia", "KmeliaTagUtil.getAttachments()", "root.MSG_GEN_ENTER_METHOD",
         "pubId = " + pubId);
@@ -973,7 +996,8 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       AttachmentDetail attachment = null;
       for (int a = 0; a < attachments.size(); a++) {
         attachment = (AttachmentDetail) attachments.get(a);
-        AttachmentDetailI18N translation = (AttachmentDetailI18N) attachment.getTranslation(SiteTagUtil.
+        AttachmentDetailI18N translation = (AttachmentDetailI18N) attachment.
+            getTranslation(SiteTagUtil.
             getLanguage());
         if (translation != null) {
           attachment.setLogicalName(translation.getLogicalName());
@@ -994,6 +1018,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
 
   /**
    * Get an attachmentDetail
+   *
    * @param attachmentId
    * @return AttachmentDetail
    */
@@ -1050,7 +1075,8 @@ public class KmeliaTagUtil extends ComponentTagUtil {
           String logicalName = imageDetail.getLogicalName();
           String physicalName = imageDetail.getPhysicalName();
           String mimeType = imageDetail.getType();
-          String type = logicalName.substring(logicalName.lastIndexOf(".") + 1, logicalName.length());
+          String type = logicalName.
+              substring(logicalName.lastIndexOf(".") + 1, logicalName.length());
 
           if (type.equalsIgnoreCase("gif") || type.equalsIgnoreCase("jpg") || type.equalsIgnoreCase(
               "jpe") || type.equalsIgnoreCase("jpeg") || type.equalsIgnoreCase("png")) {
@@ -1114,7 +1140,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
 
     PublicationDetail detail = getPublicationDetail(pubId);
     String fieldValue = detail.getFieldValue(fieldName);
-    if(fieldValue == null) {
+    if (fieldValue == null) {
       fieldValue = "";
     }
 
@@ -1125,7 +1151,8 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     for (int x = 0; x < xmlFields.size(); x++) {
       xmlField = xmlFields.get(x);
       if (fieldName.equals(xmlField.getName())) {
-        if (xmlField.getValue() != null && (xmlField.getValue().startsWith("image_") || xmlField.getValue().startsWith("file_"))) {
+        if (xmlField.getValue() != null && (xmlField.getValue().startsWith("image_") || xmlField.
+            getValue().startsWith("file_"))) {
           //prefix the value with the webContext
           fieldValue = webContext + fieldValue;
           break;
@@ -1136,12 +1163,14 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   }
 
   /**
-   * There's a problem with images. Links to images are like http://server_name:port/silverpeas/FileServer/image.jpg?...
-   * The servlet FileServer is used. This works in the traditional context of silverpeas.
-   * But, it does not works in the taglibs context because the FileServer is securised.
-   * In taglibs context, the servlet WebFileServer must be used.
-   * The string http://server_name:port/silverpeas/FileServer must be replaced by http://webServer_name:port/webContext/attached_file
-   * The web context is provided by the tag Site.
+   * There's a problem with images. Links to images are like
+   * http://server_name:port/silverpeas/FileServer/image.jpg?... The servlet FileServer is used.
+   * This works in the traditional context of silverpeas. But, it does not works in the taglibs
+   * context because the FileServer is securised. In taglibs context, the servlet WebFileServer must
+   * be used. The string http://server_name:port/silverpeas/FileServer must be replaced by
+   * http://webServer_name:port/webContext/attached_file The web context is provided by the tag
+   * Site.
+   *
    * @param htmlContent not null
    */
   public String parseHtmlContent(String htmlContent) {
@@ -1190,16 +1219,20 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   }
 
   /**
-   * Replace the String "/xxx/servletMapping par "attachmentUrl
-   * Used in the Wysiwyg field of the XML Forms
-   * @param content : the String to replace, for example the String /silverpeas/attached_file/componentId/kmelia24/attachmentId/19578/lang/fr/name/ESAT_Rhone-Alpes_synthese.jpg
+   * Replace the String "/xxx/servletMapping par "attachmentUrl Used in the Wysiwyg field of the XML
+   * Forms
+   *
+   * @param content : the String to replace, for example the String
+   * /silverpeas/attached_file/componentId/kmelia24/attachmentId/19578/lang/fr/name/ESAT_Rhone-Alpes_synthese.jpg
    * @param servletMapping : for example the String /attached_file/
-   * @param attachmentUrl :  the webContext, for example the String /webContext/attached_file/
-   * For example replace the String /silverpeas/attached_file/componentId/kmelia24/attachmentId/19578/lang/fr/name/ESAT_Rhone-Alpes_synthese.jpg
-   * @return the String replaced, in the example, return /webContext/attached_file/componentId/kmelia24/attachmentId/19578/lang/fr/name/ESAT_Rhone-Alpes_synthese.jpg
+   * @param attachmentUrl : the webContext, for example the String /webContext/attached_file/ For
+   * example replace the String
+   * /silverpeas/attached_file/componentId/kmelia24/attachmentId/19578/lang/fr/name/ESAT_Rhone-Alpes_synthese.jpg
+   * @return the String replaced, in the example, return
+   * /webContext/attached_file/componentId/kmelia24/attachmentId/19578/lang/fr/name/ESAT_Rhone-Alpes_synthese.jpg
    */
   public String convertRestToWebUrl(String content, String servletMapping, String attachmentUrl) {
-   return content.replaceAll("\"/[^/]*" + servletMapping , '"' + attachmentUrl);
+    return content.replaceAll("\"/[^/]*" + servletMapping, '"' + attachmentUrl);
   }
 
   public String convertToWebUrl(String content, String servletMapping, String webContext) {
@@ -1226,6 +1259,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
 
   /**
    * Get translated Publication in current site lang or lang as parameter
+   *
    * @param pubDetail
    * @return PublicationDetail
    */
@@ -1248,6 +1282,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
 
   /**
    * Get translated Node in current site lang or lang if parameter
+   *
    * @param nodeDetail
    * @param lang
    * @return NodeDetail
