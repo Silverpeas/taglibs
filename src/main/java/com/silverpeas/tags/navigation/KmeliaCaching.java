@@ -76,9 +76,13 @@ public class KmeliaCaching {
 		if (refreshDelay == null) refreshDelay = "3600";
 		if (cacheActivate == null) cacheActivate = "true";
 		if ((System.currentTimeMillis()-cacheAge >= Long.valueOf(refreshDelay)*1000) || cacheActivate.equals("false")) {
-			treeViewCache.clear();
-			topicCache.clear();
-			cacheAge = System.currentTimeMillis();
+			clearCache();
 		}
+	}
+
+	public void clearCache() {
+		treeViewCache.clear();
+		topicCache.clear();
+		cacheAge = System.currentTimeMillis();
 	}
 }
