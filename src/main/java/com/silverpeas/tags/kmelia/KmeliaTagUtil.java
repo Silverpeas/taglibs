@@ -1,4 +1,46 @@
+/**
+ * Copyright (C) 2000 - 2012 Silverpeas
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * As a special exception to the terms and conditions of version 3.0 of the GPL, you may
+ * redistribute this Program in connection with Free/Libre Open Source Software ("FLOSS")
+ * applications as described in Silverpeas's FLOSS exception. You should have received a copy of the
+ * text describing the FLOSS exception, and it is also available here:
+ * "http://www.silverpeas.org/legal/licensing"
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.silverpeas.tags.kmelia;
+
+import java.rmi.NoSuchObjectException;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.silverpeas.attachment.AttachmentServiceFactory;
+import org.silverpeas.attachment.model.DocumentType;
+import org.silverpeas.attachment.model.SimpleDocument;
+import org.silverpeas.attachment.model.SimpleDocumentPK;
+import org.silverpeas.search.SearchEngineFactory;
+import org.silverpeas.search.searchEngine.model.MatchingIndexEntry;
+import org.silverpeas.search.searchEngine.model.ParseException;
+import org.silverpeas.search.searchEngine.model.QueryDescription;
+import org.silverpeas.wysiwyg.WysiwygException;
+import org.silverpeas.wysiwyg.control.WysiwygController;
 
 import com.silverpeas.comment.model.CommentPK;
 import com.silverpeas.comment.model.CommentedPublicationInfo;
@@ -9,25 +51,21 @@ import com.silverpeas.notation.ejb.NotationBm;
 import com.silverpeas.notation.model.Notation;
 import com.silverpeas.notation.model.NotationPK;
 import com.silverpeas.tags.ComponentTagUtil;
-import com.silverpeas.tags.util.EJBDynaProxy;
 import com.silverpeas.tags.util.SiteTagUtil;
 import com.silverpeas.tags.util.VisibilityException;
+import com.silverpeas.util.FileUtil;
 import com.silverpeas.util.ForeignPK;
 import com.silverpeas.util.StringUtil;
+
 import com.stratelia.silverpeas.silvertrace.SilverTrace;
-import com.stratelia.silverpeas.wysiwyg.WysiwygException;
-import com.stratelia.silverpeas.wysiwyg.control.WysiwygController;
 import com.stratelia.webactiv.beans.admin.ComponentInst;
 import com.stratelia.webactiv.beans.admin.SpaceInst;
 import com.stratelia.webactiv.kmelia.control.ejb.KmeliaBm;
 import com.stratelia.webactiv.kmelia.model.KmeliaPublication;
 import com.stratelia.webactiv.kmelia.model.KmeliaRuntimeException;
+import com.stratelia.webactiv.util.EJBUtilitaire;
 import com.stratelia.webactiv.util.FileServerUtils;
 import com.stratelia.webactiv.util.JNDINames;
-import com.stratelia.webactiv.util.attachment.control.AttachmentController;
-import com.stratelia.webactiv.util.attachment.ejb.AttachmentPK;
-import com.stratelia.webactiv.util.attachment.model.AttachmentDetail;
-import com.stratelia.webactiv.util.attachment.model.AttachmentDetailI18N;
 import com.stratelia.webactiv.util.exception.SilverpeasRuntimeException;
 import com.stratelia.webactiv.util.node.control.NodeBm;
 import com.stratelia.webactiv.util.node.model.NodeDetail;
@@ -42,18 +80,6 @@ import com.stratelia.webactiv.util.publication.model.CompletePublication;
 import com.stratelia.webactiv.util.publication.model.PublicationDetail;
 import com.stratelia.webactiv.util.publication.model.PublicationI18N;
 import com.stratelia.webactiv.util.publication.model.PublicationPK;
-import java.rmi.NoSuchObjectException;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.silverpeas.search.SearchEngineFactory;
-import org.silverpeas.search.searchEngine.model.MatchingIndexEntry;
-import org.silverpeas.search.searchEngine.model.QueryDescription;
 
 public class KmeliaTagUtil extends ComponentTagUtil {
 
@@ -117,7 +143,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       try {
         SilverTrace.info("kmelia", "KMeliaTagUtil.getKmeliaBm()", "root.MSG_GEN_PARAM_VALUE",
             "Try to access to EJBHome " + JNDINames.KMELIABM_EJBHOME);
-        kscEjb = (KmeliaBm) EJBDynaProxy.createProxy(JNDINames.KMELIABM_EJBHOME, KmeliaBm.class);
+        kscEjb = EJBUtilitaire.getEJBObjectRef(JNDINames.KMELIABM_EJBHOME, KmeliaBm.class);
       } catch (Exception e) {
         throw new KmeliaRuntimeException("KmeliaTagUtil.getKmeliaBm()",
             SilverpeasRuntimeException.ERROR, "root.EX_CANT_GET_REMOTE_OBJECT", e);
@@ -137,8 +163,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   private NotationBm getNotationBm() {
     if (notationBm == null) {
       try {
-        notationBm = (NotationBm) EJBDynaProxy.createProxy(
-            JNDINames.NOTATIONBM_EJBHOME, NotationBm.class);
+        notationBm = EJBUtilitaire.getEJBObjectRef(JNDINames.NOTATIONBM_EJBHOME, NotationBm.class);
       } catch (Exception e) {
         throw new KmeliaRuntimeException("KmeliaTagUtil.getNotationBm",
             SilverpeasRuntimeException.ERROR, "root.EX_CANT_GET_REMOTE_OBJECT", e);
@@ -168,7 +193,6 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   }
 
   public SpaceInst getSpaceInst() throws Exception {
-    //SpaceInst spaceInst = getAdminBm().getSpaceInstById(this.spaceId);
     SpaceInst spaceInst = null;
     ComponentInst componentInst = getComponentInst();
     if (componentInst != null) {
@@ -179,7 +203,6 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   }
 
   public ComponentInst getComponentInst() throws Exception {
-    //ComponentInst compoInst = getAdminBm().getComponentInst(this.componentId);
     ComponentInst compoInst = getAdmin().getComponentInst(this.componentId);
     return compoInst;
   }
@@ -191,7 +214,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   /**
    * ***********************************************************************************
    */
-  /* KMelia - Gestion des publications                                                  */
+  /* KMelia - Gestion des publications */
   /**
    * ***********************************************************************************
    */
@@ -211,7 +234,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
         throw new VisibilityException();
       }
     } else {
-      //Site's mode is dev : all publications are visible
+      // Site's mode is dev : all publications are visible
     }
     return true;
   }
@@ -236,9 +259,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
         checkPublicationLocation(pubDetail);
         filteredPublications.add(getTranslatedPublication(pubDetail, null));
       } catch (VisibilityException ae) {
-        //this publication cannot be display according its status and site's mode
-      } catch (RemoteException ae) {
-        //this publication cannot be display according its status and site's mode
+        // this publication cannot be display according its status and site's mode
       }
     }
     return filteredPublications;
@@ -249,8 +270,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     checkPublicationLocation(pubDetail);
   }
 
-  private void checkPublicationLocation(PublicationDetail pubDetail) throws RemoteException,
-      VisibilityException {
+  private void checkPublicationLocation(PublicationDetail pubDetail) throws VisibilityException {
     List fathers = (List) getKmeliaBm().getPublicationFathers(pubDetail.getPK());
     if (fathers == null || fathers.isEmpty() || (fathers.size() == 1
         && "1".equals(((NodePK) fathers.get(0)).getId()))) {
@@ -293,80 +313,59 @@ public class KmeliaTagUtil extends ComponentTagUtil {
    * @throws VisibilityException
    */
   public PublicationDetail getPublicationDetail(String pubId, String language) throws
-      RemoteException, VisibilityException {
-    try {
-      SilverTrace.
-          info("kmelia", "KMeliaTagUtil.getPublicationDetail()", "root.MSG_GEN_ENTER_METHOD",
-          "pubId = " + pubId);
-      PublicationDetail pubDetail = getPublicationBm().getDetail(getPublicationPK(pubId));
-
-      //check status according to site's mode
-      checkPublicationStatus(pubDetail);
-      checkPublicationLocation(pubDetail);
-
-      pubDetail = getTranslatedPublication(pubDetail, language);
-
-      return pubDetail;
-    } catch (NoSuchObjectException nsoe) {
-      //initEJB();
-      initPublicationEJB();
-      return null;
-//			return getPublicationDetail(pubId);
-    }
-  }
-
-  public Collection getLinkedPublications(String pubId) throws RemoteException, VisibilityException {
-    try {
-      SilverTrace.info("kmelia", "KMeliaTagUtil.getLinkedPublications()",
-          "root.MSG_GEN_ENTER_METHOD", "pubId = " + pubId);
-      CompletePublication pubComplete = getPublicationBm().getCompletePublication(getPublicationPK(
-          pubId));
-      List<ForeignPK> targets = pubComplete.getLinkList();
-      SilverTrace.info("kmelia", "KMeliaTagUtil.getLinkedPublications()",
-          "root.MSG_GEN_ENTER_METHOD", "nb linked publications = " + targets.size());
-      List<PublicationPK> targetPKs = new ArrayList<PublicationPK>();
-      for (ForeignPK foreignPk : targets) {
-        targetPKs.add(new PublicationPK(foreignPk.getId(), foreignPk.getInstanceId()));
-      }
-      return filterPublications(getPublicationBm().getPublications(targetPKs));
-    } catch (NoSuchObjectException nsoe) {
-      initPublicationEJB();
-      return getLinkedPublications(pubId);
-    }
-  }
-
-  public Collection getPublicationsOnSameSubject(String pubId) throws RemoteException,
       VisibilityException {
-    try {
-      SilverTrace.info("kmelia", "KMeliaTagUtil.getPublicationsOnSameSubject()",
-          "root.MSG_GEN_ENTER_METHOD", "pubId = " + pubId);
+    SilverTrace.
+        info("kmelia", "KMeliaTagUtil.getPublicationDetail()", "root.MSG_GEN_ENTER_METHOD",
+        "pubId = " + pubId);
+    PublicationDetail pubDetail = getPublicationBm().getDetail(getPublicationPK(pubId));
+    // check status according to site's mode
+    checkPublicationStatus(pubDetail);
+    checkPublicationLocation(pubDetail);
+    pubDetail = getTranslatedPublication(pubDetail, language);
+    return pubDetail;
+  }
 
-      //get name and keywords of the publication to launch a request.
-      PublicationDetail pubDetail = getPublicationBm().getDetail(getPublicationPK(pubId));
+  public Collection<PublicationDetail> getLinkedPublications(String pubId) throws
+      VisibilityException {
+    SilverTrace.info("kmelia", "KMeliaTagUtil.getLinkedPublications()",
+        "root.MSG_GEN_ENTER_METHOD", "pubId = " + pubId);
+    CompletePublication pubComplete = getPublicationBm().getCompletePublication(getPublicationPK(
+        pubId));
+    List<ForeignPK> targets = pubComplete.getLinkList();
+    SilverTrace.info("kmelia", "KMeliaTagUtil.getLinkedPublications()",
+        "root.MSG_GEN_ENTER_METHOD", "nb linked publications = " + targets.size());
+    List<PublicationPK> targetPKs = new ArrayList<PublicationPK>();
+    for (ForeignPK foreignPk : targets) {
+      targetPKs.add(new PublicationPK(foreignPk.getId(), foreignPk.getInstanceId()));
+    }
+    return filterPublications(getPublicationBm().getPublications(targetPKs));
+  }
 
-      //launch the search
-      QueryDescription query = new QueryDescription(pubDetail.getName() + " " + pubDetail.
-          getKeywords());
-      query.setSearchingUser(getUserId());
-      query.addSpaceComponentPair(getSpaceId(), getComponentId());
-      List<MatchingIndexEntry> searchResult = SearchEngineFactory.getSearchEngine().search(query).
-          getEntries();
-      //get each publication according to result's list
-      List<PublicationPK> pubPKs = new ArrayList<PublicationPK>(searchResult.size());
-      for (MatchingIndexEntry mie : searchResult) {
-        if (mie != null && !mie.getObjectId().equals(pubId)) {
-          if ("Publication".equalsIgnoreCase(mie.getObjectType())) {
-            pubPKs.add(getPublicationPK(mie.getObjectId()));
-          }
+  public Collection<PublicationDetail> getPublicationsOnSameSubject(String pubId) throws
+      VisibilityException, ParseException {
+    SilverTrace.info("kmelia", "KMeliaTagUtil.getPublicationsOnSameSubject()",
+        "root.MSG_GEN_ENTER_METHOD", "pubId = " + pubId);
+
+    // get name and keywords of the publication to launch a request.
+    PublicationDetail pubDetail = getPublicationBm().getDetail(getPublicationPK(pubId));
+
+    // launch the search
+    QueryDescription query = new QueryDescription(pubDetail.getName() + " " + pubDetail.
+        getKeywords());
+    query.setSearchingUser(getUserId());
+    query.addSpaceComponentPair(getSpaceId(), getComponentId());
+    List<MatchingIndexEntry> searchResult = SearchEngineFactory.getSearchEngine().search(query).
+        getEntries();
+    // get each publication according to result's list
+    List<PublicationPK> pubPKs = new ArrayList<PublicationPK>(searchResult.size());
+    for (MatchingIndexEntry mie : searchResult) {
+      if (mie != null && !mie.getObjectId().equals(pubId)) {
+        if ("Publication".equalsIgnoreCase(mie.getObjectType())) {
+          pubPKs.add(getPublicationPK(mie.getObjectId()));
         }
       }
-      return filterPublications(getPublicationBm().getPublications(pubPKs));
-    } catch (NoSuchObjectException nsoe) {
-      initEJB();
-      return getPublicationsOnSameSubject(pubId);
-    } catch (Exception ex) {
-      throw new RemoteException(pubId, ex);
     }
+    return filterPublications(getPublicationBm().getPublications(pubPKs));
   }
 
   public InfoDetail getInfoDetail(String pubId) throws RemoteException, VisibilityException {
@@ -383,197 +382,144 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   }
 
   @Deprecated
-  public CompletePublication getCompletePublication(String pubId) throws RemoteException,
-      VisibilityException {
+  public CompletePublication getCompletePublication(String pubId) throws VisibilityException {
     SilverTrace.
         info("kmelia", "KMeliaTagUtil.getCompletePublication()", "root.MSG_GEN_ENTER_METHOD",
         "pubId = " + pubId);
-    try {
-      CompletePublication cPublication = getPublicationBm().getCompletePublication(getPublicationPK(
-          pubId));
+    CompletePublication cPublication = getPublicationBm().getCompletePublication(getPublicationPK(
+        pubId));
 
-      PublicationDetail pub = cPublication.getPublicationDetail();
-      checkPublicationStatus(pub);
-      checkPublicationLocation(pub);
+    PublicationDetail pub = cPublication.getPublicationDetail();
+    checkPublicationStatus(pub);
+    checkPublicationLocation(pub);
+    return cPublication;
 
-      return cPublication;
-    } catch (NoSuchObjectException nsoe) {
-      initEJB();
-      return getCompletePublication(pubId);
-    }
   }
 
-  public KmeliaPublication getPublication(String pubId) throws RemoteException,
-      VisibilityException {
+  public KmeliaPublication getPublication(String pubId) throws VisibilityException {
     SilverTrace.info("kmelia", "KMeliaTagUtil.getFullPublication()", "root.MSG_GEN_ENTER_METHOD",
         "pubId = " + pubId);
-    try {
-      KmeliaPublication publication = getKmeliaBm().getPublication(new PublicationPK(pubId,
-          componentId));
-
-      PublicationDetail pub = publication.getDetail();
-      checkPublicationStatus(pub);
-      checkPublicationLocation(pub);
-
-      return publication;
-    } catch (NoSuchObjectException nsoe) {
-      initEJB();
-      return getPublication(pubId);
-    }
+    KmeliaPublication publication = getKmeliaBm().getPublication(new PublicationPK(pubId,
+        componentId));
+    PublicationDetail pub = publication.getDetail();
+    checkPublicationStatus(pub);
+    checkPublicationLocation(pub);
+    return publication;
   }
 
-  public Collection getAllPublications() throws RemoteException {
+  public Collection<PublicationDetail> getAllPublications() {
     SilverTrace.info("kmelia", "KMeliaTagUtil.getAllPublications()", "root.MSG_GEN_ENTER_METHOD");
-    try {
-      return filterPublications(getPublicationBm().getAllPublications(new PublicationPK("useless",
-          componentId), "P.pubCreationDate desc"));
-    } catch (NoSuchObjectException nsoe) {
-      initEJB();
-      return getAllPublications();
-    }
+    return filterPublications(getPublicationBm().getAllPublications(new PublicationPK("useless",
+        componentId), "P.pubCreationDate desc"));
   }
 
   /**
    * The parameter must be split to get 3 parameters. The delimiter is a ,
    */
-  public Collection getPublicationsByTopic(String topicIdAndColumnNameAndSort) throws
-      RemoteException {
-    try {
-      SilverTrace.info("kmelia", "KMeliaTagUtil.getPublicationsByTopic()",
-          "root.MSG_GEN_ENTER_METHOD",
-          "topicIdAndColumnNameAndSort = " + topicIdAndColumnNameAndSort);
-      return getPublications(topicIdAndColumnNameAndSort, false);
-    } catch (NoSuchObjectException nsoe) {
-      initEJB();
-      return getPublicationsByTopic(topicIdAndColumnNameAndSort);
-    }
+  public Collection<PublicationDetail> getPublicationsByTopic(String topicIdAndColumnNameAndSort) {
+    SilverTrace.info("kmelia", "KMeliaTagUtil.getPublicationsByTopic()",
+        "root.MSG_GEN_ENTER_METHOD", "topicIdAndColumnNameAndSort = " + topicIdAndColumnNameAndSort);
+    return getPublications(topicIdAndColumnNameAndSort, false);
   }
 
-  public Collection getPublicationsBySubTree(String topicIdAndColumnNameAndSort) throws
-      RemoteException {
-    try {
-      SilverTrace.info("kmelia", "KMeliaTagUtil.getPublicationsBySubTree()",
-          "root.MSG_GEN_ENTER_METHOD",
-          "topicIdAndColumnNameAndSort = " + topicIdAndColumnNameAndSort);
-
-      return getPublications(topicIdAndColumnNameAndSort, true);
-    } catch (NoSuchObjectException nsoe) {
-      initEJB();
-      return getPublicationsBySubTree(topicIdAndColumnNameAndSort);
-    }
+  public Collection<PublicationDetail> getPublicationsBySubTree(String topicIdAndColumnNameAndSort) {
+    SilverTrace.info("kmelia", "KMeliaTagUtil.getPublicationsBySubTree()",
+        "root.MSG_GEN_ENTER_METHOD", "topicIdAndColumnNameAndSort = " + topicIdAndColumnNameAndSort);
+    return getPublications(topicIdAndColumnNameAndSort, true);
   }
 
   /**
    * The parameter must be split to get 3 parameters. The delimiter is a ,
    */
-  private Collection getPublications(String topicIdAndColumnNameAndSort, boolean recursive) throws
-      RemoteException {
-    try {
-      SilverTrace.info("kmelia", "KMeliaTagUtil.getPublications()", "root.MSG_GEN_ENTER_METHOD",
-          "topicIdAndColumnNameAndSort = " + topicIdAndColumnNameAndSort);
-
-      StringTokenizer tokenizer = new StringTokenizer(topicIdAndColumnNameAndSort, ",");
-      int i = 1;
-      String param;
-      String topicId = "";
-      String columnName = null;
-      String sort = null;
-      while (tokenizer.hasMoreTokens()) {
-        param = tokenizer.nextToken();
-        if (i == 1) {
-          topicId = param;
-        } else if (i == 2) {
-          columnName = param;
-        } else if (i == 3) {
-          sort = param;
-        }
-        i++;
+  private Collection<PublicationDetail> getPublications(String topicIdAndColumnNameAndSort,
+      boolean recursive) {
+    SilverTrace.info("kmelia", "KMeliaTagUtil.getPublications()", "root.MSG_GEN_ENTER_METHOD",
+        "topicIdAndColumnNameAndSort = " + topicIdAndColumnNameAndSort);
+    StringTokenizer tokenizer = new StringTokenizer(topicIdAndColumnNameAndSort, ",");
+    int i = 1;
+    String param;
+    String topicId = "";
+    String columnName = null;
+    String sort = null;
+    while (tokenizer.hasMoreTokens()) {
+      param = tokenizer.nextToken();
+      if (i == 1) {
+        topicId = param;
+      } else if (i == 2) {
+        columnName = param;
+      } else if (i == 3) {
+        sort = param;
       }
+      i++;
+    }
 
-      SilverTrace.info("kmelia", "KMeliaTagUtil.getPublications()", "root.MSG_GEN_PARAM_VALUE",
-          "topicId = " + topicId);
-      SilverTrace.info("kmelia", "KMeliaTagUtil.getPublications()", "root.MSG_GEN_PARAM_VALUE",
-          "sort = " + sort);
+    SilverTrace.info("kmelia", "KMeliaTagUtil.getPublications()", "root.MSG_GEN_PARAM_VALUE",
+        "topicId = " + topicId);
+    SilverTrace.info("kmelia", "KMeliaTagUtil.getPublications()", "root.MSG_GEN_PARAM_VALUE",
+        "sort = " + sort);
 
-      String sortString = getSortString(columnName, sort);
+    String sortString = getSortString(columnName, sort);
 
-      //NodePK			nodePK			= new NodePK(topicId, spaceId, componentId);
-      NodePK nodePK = getNodePK(topicId);
-      List publications;
-      ArrayList nodeIds = new ArrayList();
-      if (recursive) {
-        //get all nodes of the subtree where root is topicId
-        ArrayList nodes = getNodeBm().getSubTree(nodePK);
-
-        NodeDetail nodeDetail;
-        for (int n = 0; n < nodes.size(); n++) {
-          nodeDetail = (NodeDetail) nodes.get(n);
-          if (NodeDetail.STATUS_VISIBLE.equals(nodeDetail.getStatus())) {
-            nodeIds.add(nodeDetail.getNodePK().getId());
-          }
-        }
-      } else {
-        //get only publications linked to the topic identified by topicId
-        nodeIds.add(nodePK.getId());
-      }
-
-      PublicationPK pubPK = new PublicationPK("useless", componentId);
-      if (SiteTagUtil.isDevMode()) {
-        //all publications are shown
-        //we do nothing
-        publications = (List) getPublicationBm().getDetailsByFatherIds(nodeIds, pubPK, sortString);
-      } else if (SiteTagUtil.isRecetteMode()) {
-        //all publications are shown except the ones which are in draft
-        ArrayList statusList = new ArrayList();
-        statusList.add("Valid");
-        statusList.add("ToValidate");
-        publications = (List) getPublicationBm().getDetailsByFatherIdsAndStatusList(nodeIds, pubPK,
-            sortString, statusList);
-      } else {
-        //Production mode is enabled. Only validated publications are shown
-        String status = "Valid";
-        publications = (List) getPublicationBm().getDetailsByFatherIdsAndStatus(nodeIds, pubPK,
-            sortString, status);
-      }
-
-      /*
-       * publication is ignored if pub name starts with visibility filter
-       */
-      if (visibilityFilter != null) {
-        Iterator it = publications.iterator();
-        while (it.hasNext()) {
-          PublicationDetail pubDetail = (PublicationDetail) it.next();
-          if (pubDetail.getName().startsWith(visibilityFilter)) {
-            it.remove();
-          }
+    // NodePK nodePK = new NodePK(topicId, spaceId, componentId);
+    NodePK nodePK = getNodePK(topicId);
+    Collection<PublicationDetail> publications;
+    List<String> nodeIds = new ArrayList<String>();
+    if (recursive) {
+      // get all nodes of the subtree where root is topicId
+      List<NodeDetail> nodes = getNodeBm().getSubTree(nodePK);
+      for (NodeDetail nodeDetail : nodes) {
+        if (NodeDetail.STATUS_VISIBLE.equals(nodeDetail.getStatus())) {
+          nodeIds.add(nodeDetail.getNodePK().getId());
         }
       }
+    } else {
+      // get only publications linked to the topic identified by topicId
+      nodeIds.add(nodePK.getId());
+    }
 
-
-      if (!StringUtil.isDefined(getSiteLanguage())) {
-        return publications;
-      }
-
-      if (publications != null && StringUtil.isDefined(getSiteLanguage())) {
-        PublicationDetail publi;
-        for (int p = 0; p < publications.size(); p++) {
-          publi = (PublicationDetail) publications.get(p);
-
-          publi.setName(publi.getName(getSiteLanguage()));
-          publi.setDescription(publi.getDescription(getSiteLanguage()));
-          publi.setKeywords(publi.getKeywords(getSiteLanguage()));
+    PublicationPK pubPK = new PublicationPK("useless", componentId);
+    if (SiteTagUtil.isDevMode()) {
+      // all publications are shown
+      // we do nothing
+      publications = getPublicationBm().getDetailsByFatherIds(nodeIds, pubPK, sortString);
+    } else if (SiteTagUtil.isRecetteMode()) {
+      // all publications are shown except the ones which are in draft
+      List<String> statusList = new ArrayList<String>();
+      statusList.add("Valid");
+      statusList.add("ToValidate");
+      publications = getPublicationBm().getDetailsByFatherIdsAndStatusList(nodeIds, pubPK,
+          sortString, statusList);
+    } else {
+      // Production mode is enabled. Only validated publications are shown
+      String status = "Valid";
+      publications = getPublicationBm().getDetailsByFatherIdsAndStatus(nodeIds, pubPK,
+          sortString, status);
+    }
+    if (visibilityFilter != null) {
+      Iterator<PublicationDetail> it = publications.iterator();
+      while (it.hasNext()) {
+        PublicationDetail pubDetail = it.next();
+        if (pubDetail.getName().startsWith(visibilityFilter)) {
+          it.remove();
         }
       }
+    }
+    if (!StringUtil.isDefined(getSiteLanguage())) {
       return publications;
-    } catch (NoSuchObjectException nsoe) {
-      initEJB();
-      return getPublications(topicIdAndColumnNameAndSort, recursive);
     }
+    if (publications != null && StringUtil.isDefined(getSiteLanguage())) {
+      for (PublicationDetail publi : publications) {
+        publi.setName(publi.getName(getSiteLanguage()));
+        publi.setDescription(publi.getDescription(getSiteLanguage()));
+        publi.setKeywords(publi.getKeywords(getSiteLanguage()));
+      }
+    }
+    return publications;
   }
 
   private String getSortString(String columnName, String sort) {
     if (columnName != null) {
-      //first letter must be in upper case
+      // first letter must be in upper case
       String firstLetter = columnName.substring(0, 1);
       columnName = firstLetter.toUpperCase() + columnName.substring(1, columnName.length());
     }
@@ -597,27 +543,28 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     return sortString;
   }
 
-  public String getPublicationHTMLContent(String pubId) throws RemoteException, VisibilityException,
+  public String getPublicationHTMLContent(String pubId) throws RemoteException,
+      VisibilityException,
       WysiwygException {
 
-    //check publication
+    // check publication
     checkPublicationStatus(pubId);
     checkPublicationLocation(pubId);
 
     String htmlContent = "";
     String wysiwygContent = getWysiwyg(pubId);
     if (wysiwygContent == null) {
-      //the publication have no content of type wysiwyg
-      //The content is maybe stored in a database model
-      //CompletePublication completePublication = getKmeliaBm().getCompletePublication(pubId);
+      // the publication have no content of type wysiwyg
+      // The content is maybe stored in a database model
+      // CompletePublication completePublication = getKmeliaBm().getCompletePublication(pubId);
       CompletePublication completePublication = getPublicationBm().
           getCompletePublication(getPublicationPK(
           pubId));
       InfoDetail infoDetail = completePublication.getInfoDetail();
       ModelDetail modelDetail = completePublication.getModelDetail();
       if (infoDetail != null && modelDetail != null) {
-        //the publication have some content
-        //we merge the content with the model's displayer template
+        // the publication have some content
+        // we merge the content with the model's displayer template
         htmlContent = getModelHtmlContent(modelDetail, infoDetail);
       }
     } else {
@@ -626,23 +573,16 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     return parseHtmlContent(htmlContent);
   }
 
-  public Collection getPublicationPath(String pubId) throws RemoteException {
-    Collection path = new ArrayList();
-    try {
-      SilverTrace.info("kmelia", "KMeliaTagUtil.getPathList()", "root.MSG_GEN_ENTER_METHOD",
-          "pubId = " + pubId);
-      ArrayList paths = (ArrayList) getKmeliaBm().getPathList(getPublicationPK(pubId));
-      if (paths.size() > 0) {
-        //get only the first path
-        List pathInReverse = (List) paths.get(0);
-        //reverse the path from root to leaf
-        for (int i = pathInReverse.size() - 1; i >= 0; i--) {
-          path.add(pathInReverse.get(i));
-        }
-      }
-    } catch (NoSuchObjectException nsoe) {
-      initEJB();
-      return getPublicationPath(pubId);
+  public Collection<NodeDetail> getPublicationPath(String pubId) throws RemoteException {
+    Collection<NodeDetail> path = new ArrayList<NodeDetail>();
+    SilverTrace.info("kmelia", "KMeliaTagUtil.getPathList()", "root.MSG_GEN_ENTER_METHOD",
+        "pubId = " + pubId);
+    List<Collection<NodeDetail>> paths = new ArrayList<Collection<NodeDetail>>(getKmeliaBm().getPathList(getPublicationPK(pubId)));
+    if (paths.size() > 0) {
+      // get only the first path
+      List<NodeDetail> pathInReverse = new ArrayList<NodeDetail>(paths.get(0));
+      Collections.reverse(pathInReverse);// reverse the path from root to leaf
+      path = pathInReverse;
     }
     return path;
   }
@@ -650,23 +590,19 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   public NodeDetail getTopic(String topicId) throws RemoteException {
     SilverTrace.info("kmelia", "KMeliaTagUtil.getTopic()", "root.MSG_GEN_ENTER_METHOD",
         "topicId = " + topicId);
-    try {
-      NodeDetail topic = getNodeBm().getDetail(getNodePK(topicId));
-      topic = getTranslatedNode(topic, null);
-      if (SiteTagUtil.isDevMode()) {
-        //Web site is in developpement mode
-        //We get all sub topics (visibles and invisibles)
-        topic.setChildrenDetails(getTranslatedSubTopics(topic, false));
-      } else {
-        //Web site is in 'recette' or 'production' mode
-        //We get only visible subtopics
-        topic.setChildrenDetails(getTranslatedSubTopics(topic, true));
-      }
-      return topic;
-    } catch (NoSuchObjectException nsoe) {
-      initEJB();
-      return getTopic(topicId);
+    NodeDetail topic = getNodeBm().getDetail(getNodePK(topicId));
+    topic = getTranslatedNode(topic, null);
+    if (SiteTagUtil.isDevMode()) {
+      // Web site is in developpement mode
+      // We get all sub topics (visibles and invisibles)
+      topic.setChildrenDetails(getTranslatedSubTopics(topic, false));
+    } else {
+      // Web site is in 'recette' or 'production' mode
+      // We get only visible subtopics
+      topic.setChildrenDetails(getTranslatedSubTopics(topic, true));
     }
+    return topic;
+
   }
 
   /**
@@ -755,24 +691,19 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   public PublicationDetail getTopicEdito(String topicId) throws RemoteException {
     SilverTrace.info("kmelia", "KMeliaTagUtil.getTopicEdito()", "root.MSG_GEN_ENTER_METHOD",
         "topicId = " + topicId);
-    try {
-      //get all publications of topicId
-      String topicIdAndColumnNameAndSort = topicId + ",CreationDate,Desc";
-      List publications = (List) getPublicationsByTopic(topicIdAndColumnNameAndSort);
-      PublicationDetail publi, publiEdito = null;
-      for (int p = 0; p < publications.size(); p++) {
-        publi = (PublicationDetail) publications.get(p);
-        if (publi.getName().substring(0, BEGIN_EDITO.length()).equals(BEGIN_EDITO)) {
-          publiEdito = publi;
-          break;
-        }
+    // get all publications of topicId
+    String topicIdAndColumnNameAndSort = topicId + ",CreationDate,Desc";
+    List publications = (List) getPublicationsByTopic(topicIdAndColumnNameAndSort);
+    PublicationDetail publi, publiEdito = null;
+    for (int p = 0; p < publications.size(); p++) {
+      publi = (PublicationDetail) publications.get(p);
+      if (publi.getName().substring(0, BEGIN_EDITO.length()).equals(BEGIN_EDITO)) {
+        publiEdito = publi;
+        break;
       }
-
-      return publiEdito;
-    } catch (NoSuchObjectException nsoe) {
-      initEJB();
-      return getTopicEdito(topicId);
     }
+    return publiEdito;
+
   }
 
   private List getTranslatedSubTopics(NodeDetail node, boolean showOnlyVisibles) {
@@ -811,21 +742,12 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     return true;
   }
 
-  public Collection getTopicPath(String topicId) throws RemoteException {
+  public Collection<NodeDetail> getTopicPath(String topicId) {
     SilverTrace.info("kmelia", "KMeliaTagUtil.getTopicPath()", "root.MSG_GEN_ENTER_METHOD",
         "topicId = " + topicId);
-    Collection path = new ArrayList();
-    try {
-      List pathInReverse = (List) getNodeBm().getPath(getNodePK(topicId));
-      //reverse the path from root to leaf
-      for (int i = pathInReverse.size() - 1; i >= 0; i--) {
-        path.add(pathInReverse.get(i));
-      }
-    } catch (NoSuchObjectException nsoe) {
-      initEJB();
-      return getTopicPath(topicId);
-    }
-    return path;
+    List<NodeDetail> pathInReverse = new ArrayList(getNodeBm().getPath(getNodePK(topicId)));
+    Collections.reverse(pathInReverse);
+    return pathInReverse;
   }
 
   public Collection getTreeView(String topicId) throws RemoteException {
@@ -835,14 +757,14 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     try {
       tree = (ArrayList) getNodeBm().getSubTree(getNodePK(topicId));
 
-      //if topicId is the root, remove "basket" and "declassified zone"
+      // if topicId is the root, remove "basket" and "declassified zone"
       if ("0".equals(topicId)) {
         tree = removeSpecificNodes(tree);
       }
 
       if (SiteTagUtil.isDevMode()) {
-        //Web site is in developpement mode
-        //We get all topics (visibles and invisibles)
+        // Web site is in developpement mode
+        // We get all topics (visibles and invisibles)
         if (StringUtil.isDefined(SiteTagUtil.getLanguage())) {
           NodeDetail node;
           for (int n = 0; n < tree.size(); n++) {
@@ -853,8 +775,8 @@ public class KmeliaTagUtil extends ComponentTagUtil {
           return tree;
         }
       } else {
-        //Web site is in 'recette' or 'production' mode
-        //We get only visible topics
+        // Web site is in 'recette' or 'production' mode
+        // We get only visible topics
         tree = (ArrayList) getVisibleTreeView(tree);
       }
     } catch (NoSuchObjectException nsoe) {
@@ -892,12 +814,13 @@ public class KmeliaTagUtil extends ComponentTagUtil {
         if (i == 0) {
           return visibleNodes;
         } else {
-          //the node is invisible. We do not add it to the result treeview
+          // the node is invisible. We do not add it to the result treeview
           invisibleNodes.add(node.getNodePK().getId());
         }
       } else {
         if (invisibleNodes.contains(node.getFatherPK().getId())) {
-          //the father is invisible. Even if the node is Visible, we do not add it to the result treeview.
+          // the father is invisible. Even if the node is Visible, we do not add it to the result
+          // treeview.
           invisibleNodes.add(node.getNodePK().getId());
         } else {
           node.setChildrenDetails(getTranslatedSubTopics(node, true));
@@ -911,7 +834,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   public String getTopicHTMLContent(String topicId) throws RemoteException, VisibilityException,
       WysiwygException {
 
-    //check topic status
+    // check topic status
     checkTopicStatus(topicId);
 
     String wysiwygContent = getWysiwyg("Node_" + topicId);
@@ -924,14 +847,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   public int getSilverObjectId(String pubId) throws RemoteException {
     SilverTrace.info("kmelia", "KmeliaTagUtil.getSilverObjectId()", "root.MSG_GEN_ENTER_METHOD",
         "pubId = " + pubId);
-    int silverObjectId;
-    try {
-      silverObjectId = getKmeliaBm().getSilverObjectId(getPublicationPK(pubId));
-    } catch (NoSuchObjectException nsoe) {
-      initEJB();
-      return getSilverObjectId(pubId);
-    }
-    return silverObjectId;
+    return getKmeliaBm().getSilverObjectId(getPublicationPK(pubId));
   }
 
   /**
@@ -946,10 +862,11 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     String imageURL = "";
     PublicationDetail pubDetail = getPublicationDetail(pubId);
     if (pubDetail.getImage() != null) {
-      if (pubDetail.getImage().startsWith("/")) {//image provenant de la photothèque
+      if (pubDetail.getImage().startsWith("/")) {// image provenant de la photothèque
         imageURL = pubDetail.getImage();
-      } else {//image téléchargée
-        imageURL = "vignette?ComponentId=" + pubDetail.getInstanceId() + "&SourceFile=" + pubDetail.
+      } else {// image téléchargée
+        imageURL =
+            "vignette?ComponentId=" + pubDetail.getInstanceId() + "&SourceFile=" + pubDetail.
             getImage() + "&MimeType=image/jpeg&Directory=images";
       }
     }
@@ -959,63 +876,31 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   /**
    * ***********************************************************************************
    */
-  /* KMelia - Gestion des validations                                                   */
+  /* KMelia - Gestion des validations */
   /**
    * ***********************************************************************************
    */
   public Collection getPublicationsToValidate() throws RemoteException {
-    try {
-      SilverTrace.info("kmelia", "KmeliaTagUtil.getPublicationsToValidate()",
-          "root.MSG_GEN_ENTER_METHOD");
-      return getPublicationBm().getPublicationsByStatus("ToValidate", getPublicationPK("useless"));
-    } catch (NoSuchObjectException nsoe) {
-      initEJB();
-      return getPublicationsToValidate();
-    }
+    SilverTrace.info("kmelia", "KmeliaTagUtil.getPublicationsToValidate()",
+        "root.MSG_GEN_ENTER_METHOD");
+    return getPublicationBm().getPublicationsByStatus("ToValidate", getPublicationPK("useless"));
   }
 
   /**
    * ***********************************************************************************
    */
-  /* Gestion des fichiers joints		                                                  */
+  /* Gestion des fichiers joints */
   /**
    * ***********************************************************************************
    */
   public Collection getAttachments(String pubId) throws RemoteException, VisibilityException {
     SilverTrace.info("kmelia", "KmeliaTagUtil.getAttachments()", "root.MSG_GEN_ENTER_METHOD",
         "pubId = " + pubId);
-    try {
-      //check publication
-      checkPublicationStatus(pubId);
-      checkPublicationLocation(pubId);
-
-      List attachments = (List) getKmeliaBm().getAttachments(getPublicationPK(pubId));
-
-      if (!StringUtil.isDefined(SiteTagUtil.getLanguage())) {
-        return attachments;
-      }
-
-      AttachmentDetail attachment;
-      for (int a = 0; a < attachments.size(); a++) {
-        attachment = (AttachmentDetail) attachments.get(a);
-        AttachmentDetailI18N translation = (AttachmentDetailI18N) attachment.
-            getTranslation(SiteTagUtil.
-            getLanguage());
-        if (translation != null) {
-          attachment.setLogicalName(translation.getLogicalName());
-          attachment.setPhysicalName(translation.getPhysicalName());
-          attachment.setType(translation.getType());
-          attachment.setTitle(translation.getTitle());
-          attachment.setSize(translation.getSize());
-          attachment.setInfo(translation.getInfo());
-        }
-      }
-      return attachments;
-
-    } catch (NoSuchObjectException nsoe) {
-      initEJB();
-      return getAttachments(pubId);
-    }
+    // check publication
+    checkPublicationStatus(pubId);
+    checkPublicationLocation(pubId);
+    return AttachmentServiceFactory.getAttachmentService().listDocumentsByForeignKeyAndType(
+        getPublicationPK(pubId), DocumentType.attachment, SiteTagUtil.getLanguage());
   }
 
   /**
@@ -1024,12 +909,11 @@ public class KmeliaTagUtil extends ComponentTagUtil {
    * @param attachmentId
    * @return AttachmentDetail
    */
-  public AttachmentDetail getAttachment(String attachmentId) throws RemoteException,
-      VisibilityException {
+  public SimpleDocument getAttachment(String attachmentId) throws VisibilityException {
     SilverTrace.info("kmelia", "KmeliaTagUtil.getAttachment()", "root.MSG_GEN_ENTER_METHOD",
         "attachmentId = " + attachmentId);
-    AttachmentDetail attachment = AttachmentController.searchAttachmentByPK(new AttachmentPK(
-        attachmentId));
+    SimpleDocument attachment = AttachmentServiceFactory.getAttachmentService().searchDocumentById(
+        new SimpleDocumentPK(attachmentId), getSiteLanguage());
     return attachment;
   }
 
@@ -1039,13 +923,11 @@ public class KmeliaTagUtil extends ComponentTagUtil {
         "pubId = " + pubId);
     try {
       if (!pubId.startsWith("Node")) {
-        //check publication
+        // check publication
         checkPublicationStatus(pubId);
         checkPublicationLocation(pubId);
-
       }
       String wysiwyg = WysiwygController.load(componentId, pubId, getSiteLanguage());
-
       return parseHtmlContent(wysiwyg);
     } catch (NoSuchObjectException nsoe) {
       initEJB();
@@ -1080,10 +962,9 @@ public class KmeliaTagUtil extends ComponentTagUtil {
           String type = logicalName.
               substring(logicalName.lastIndexOf(".") + 1, logicalName.length());
 
-          if (type.equalsIgnoreCase("gif") || type.equalsIgnoreCase("jpg") || type.equalsIgnoreCase(
-              "jpe") || type.equalsIgnoreCase("jpeg") || type.equalsIgnoreCase("png")) {
-            String url = FileServerUtils.getUrl(imageDetail.getPK().getSpace(), imageDetail.getPK().
-                getComponentName(), logicalName, physicalName, mimeType, "images");
+          if (FileUtil.isImage(logicalName)) {
+            String url = FileServerUtils.getUrl(imageDetail.getPK().getComponentName(), logicalName,
+                physicalName, mimeType, "images");
             url = "http://fakeServer:fakePort" + url;
             htmlContent.append("<IMG BORDER=\"0\" SRC=\"").append(url).append("\">");
           }
@@ -1118,7 +999,6 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   }
 
   /**
-   *
    * @throws VisibilityException
    * @throws RemoteException
    */
@@ -1146,7 +1026,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       fieldValue = "";
     }
 
-    //Particular case of Image Field (in the XML forms)
+    // Particular case of Image Field (in the XML forms)
     String webContext = SiteTagUtil.getServerContext();
     List<XMLField> xmlFields = detail.getXmlFields();
     XMLField xmlField;
@@ -1155,7 +1035,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       if (fieldName.equals(xmlField.getName())) {
         if (xmlField.getValue() != null && (xmlField.getValue().startsWith("image_") || xmlField.
             getValue().startsWith("file_"))) {
-          //prefix the value with the webContext
+          // prefix the value with the webContext
           fieldValue = webContext + fieldValue;
           break;
         }
@@ -1198,7 +1078,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
 
         int d = link.indexOf("../../");
         if (d != -1) {
-          //C'est un lien relatif
+          // C'est un lien relatif
           d += 6;
           newWysiwygText.append("/silverpeas/");
           newWysiwygText.append(link.substring(d, link.length()));
@@ -1225,13 +1105,16 @@ public class KmeliaTagUtil extends ComponentTagUtil {
    * Forms
    *
    * @param content : the String to replace, for example the String
-   * /silverpeas/attached_file/componentId/kmelia24/attachmentId/19578/lang/fr/name/ESAT_Rhone-Alpes_synthese.jpg
+   * /silverpeas/attached_file/componentId
+   * /kmelia24/attachmentId/19578/lang/fr/name/ESAT_Rhone-Alpes_synthese.jpg
    * @param servletMapping : for example the String /attached_file/
    * @param attachmentUrl : the webContext, for example the String /webContext/attached_file/ For
    * example replace the String
-   * /silverpeas/attached_file/componentId/kmelia24/attachmentId/19578/lang/fr/name/ESAT_Rhone-Alpes_synthese.jpg
+   * /silverpeas/attached_file/componentId/kmelia24/attachmentId/19578/lang
+   * /fr/name/ESAT_Rhone-Alpes_synthese.jpg
    * @return the String replaced, in the example, return
-   * /webContext/attached_file/componentId/kmelia24/attachmentId/19578/lang/fr/name/ESAT_Rhone-Alpes_synthese.jpg
+   * /webContext/attached_file/componentId/kmelia24
+   * /attachmentId/19578/lang/fr/name/ESAT_Rhone-Alpes_synthese.jpg
    */
   public String convertRestToWebUrl(String content, String servletMapping, String attachmentUrl) {
     return content.replaceAll("\"/[^/]*" + servletMapping, '"' + attachmentUrl);
@@ -1309,7 +1192,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   private PublicationBm getPublicationBm() {
     if (publicationBm == null) {
       try {
-        publicationBm = (PublicationBm) EJBDynaProxy.createProxy(JNDINames.PUBLICATIONBM_EJBHOME,
+        publicationBm = EJBUtilitaire.getEJBObjectRef(JNDINames.PUBLICATIONBM_EJBHOME,
             PublicationBm.class);
       } catch (Exception e) {
         throw new KmeliaRuntimeException("KmeliaTagUtil.getPublicationBm",
@@ -1322,9 +1205,10 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   private NodeBm getNodeBm() {
     if (nodeBm == null) {
       try {
-        nodeBm = (NodeBm) EJBDynaProxy.createProxy(JNDINames.NODEBM_EJBHOME, NodeBm.class);
+        nodeBm = EJBUtilitaire.getEJBObjectRef(JNDINames.NODEBM_EJBHOME, NodeBm.class);
       } catch (Exception e) {
-        throw new KmeliaRuntimeException("KmeliaTagUtil.getNodeBm", SilverpeasRuntimeException.ERROR,
+        throw new KmeliaRuntimeException("KmeliaTagUtil.getNodeBm",
+            SilverpeasRuntimeException.ERROR,
             "root.EX_CANT_GET_REMOTE_OBJECT", e);
       }
     }

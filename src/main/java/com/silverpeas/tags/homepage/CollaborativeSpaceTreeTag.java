@@ -1,3 +1,27 @@
+/**
+ * Copyright (C) 2000 - 2012 Silverpeas
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * As a special exception to the terms and conditions of version 3.0 of
+ * the GPL, you may redistribute this Program in connection with Free/Libre
+ * Open Source Software ("FLOSS") applications as described in Silverpeas's
+ * FLOSS exception.  You should have received a copy of the text describing
+ * the FLOSS exception, and it is also available here:
+ * "http://www.silverpeas.org/legal/licensing"
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.silverpeas.tags.homepage;
 
 import java.io.IOException;
@@ -15,221 +39,238 @@ import com.stratelia.webactiv.beans.admin.OrganizationController;
 import com.stratelia.webactiv.beans.admin.SpaceInst;
 import com.stratelia.webactiv.homepage.HomePageFunctions;
 
-public class CollaborativeSpaceTreeTag extends TagSupport 
-{
-	protected String m_sPrivateDomain;
-	protected OrganizationController m_organizationCtrl;
-	protected String[] m_asPrivateDomainsIds;
-	protected String m_subDomain;
-	protected String m_sContext;
-	protected MainSessionController m_mainSessionCtrl;
+public class CollaborativeSpaceTreeTag extends TagSupport {
+  protected String m_sPrivateDomain;
+  protected OrganizationController m_organizationCtrl;
+  protected String[] m_asPrivateDomainsIds;
+  protected String m_subDomain;
+  protected String m_sContext;
+  protected MainSessionController m_mainSessionCtrl;
 
-	public void setSPrivateDomain(String sPrivateDomain)
-	{
-		this.m_sPrivateDomain = sPrivateDomain;
-	}
-	public void setOrganizationCtrl(OrganizationController organizationCtrl)
-	{
-		this.m_organizationCtrl = organizationCtrl;
-	}
-	public void setAsPrivateDomainsIds(String[] asPrivateDomainsIds)
-	{
-		this.m_asPrivateDomainsIds = asPrivateDomainsIds;
-	}
-	public void setSubDomain(String subDomain)
-	{
-		this.m_subDomain = subDomain;
-	}
-	public void setSContext(String sContext)
-	{
-		this.m_sContext = sContext;
-	}
-	public void setMainSessionCtrl(MainSessionController mainSessionCtrl)
-	{
-		this.m_mainSessionCtrl = mainSessionCtrl;
-	}
+  public void setSPrivateDomain(String sPrivateDomain) {
+    this.m_sPrivateDomain = sPrivateDomain;
+  }
 
-	public int doStartTag() throws JspException
-    {
-        try
-		{
-			pageContext.getOut().println("<tr class='intfdcolor51'>");
-			pageContext.getOut().println("	<td width='100%'>");
-			pageContext.getOut().println("		<table border='0' cellspacing='0' cellpadding='0' width='100%'>");
-			pageContext.getOut().println("			<tr>");
-			pageContext.getOut().println("				<td>&nbsp;</td>");
-			pageContext.getOut().println("				<td width='100%'><span class='txtnote'>");
-			pageContext.getOut().println("					<table cellpadding=0 cellspacing=0 border=0 width='100%'>");
-			pageContext.getOut().println("						<tr><td>");
+  public void setOrganizationCtrl(OrganizationController organizationCtrl) {
+    this.m_organizationCtrl = organizationCtrl;
+  }
 
-			int elementId = 0;
-			String elementLabel = "";
-			int spaceId = 0;
-			String objectLinked = null;
-			String link = null;
+  public void setAsPrivateDomainsIds(String[] asPrivateDomainsIds) {
+    this.m_asPrivateDomainsIds = asPrivateDomainsIds;
+  }
 
-			if ((m_sPrivateDomain != null) && (m_sPrivateDomain.length()>0))
-			{
-			  // Get all sub spaces
-			  String[] asSubSpaceIds = m_organizationCtrl.getAllSubSpaceIds(m_sPrivateDomain);
-			  String   sSubSpaceId;
-			  ArrayList alSubSpaces = new ArrayList();
+  public void setSubDomain(String subDomain) {
+    this.m_subDomain = subDomain;
+  }
 
-			  for (int nI = 0; nI < asSubSpaceIds.length; nI++)
-			  {
-					alSubSpaces.add(asSubSpaceIds[nI]);
-			  }
-			  // Keep only those available to current user
-			  while (alSubSpaces.size() > 0)
-			  {
-				  boolean bFound = false;
-				  sSubSpaceId = (String)alSubSpaces.remove(0);
-				  asSubSpaceIds = m_organizationCtrl.getAllSubSpaceIds(sSubSpaceId);
-				  for (int nI = 0; nI < asSubSpaceIds.length; nI++)
-				  {
-						alSubSpaces.add(nI,asSubSpaceIds[nI]);
-				  }
+  public void setSContext(String sContext) {
+    this.m_sContext = sContext;
+  }
 
-				  for (int nJ = 0; nJ < m_asPrivateDomainsIds.length && !bFound; nJ++)
-				  {
-					  if (sSubSpaceId.equals(m_asPrivateDomainsIds[nJ]))
-					  {
-						  bFound = true;
+  public void setMainSessionCtrl(MainSessionController mainSessionCtrl) {
+    this.m_mainSessionCtrl = mainSessionCtrl;
+  }
 
-						  if (m_subDomain!=null && m_subDomain.equals(sSubSpaceId))
-													  {
-							  SpaceInst spaceInst = m_organizationCtrl.getSpaceInstById(sSubSpaceId);
-							  String label = spaceInst.getName();
-							  String spaceLabel = "space"+spaceId;
+  public int doStartTag() throws JspException {
+    try {
+      pageContext.getOut().println("<tr class='intfdcolor51'>");
+      pageContext.getOut().println("	<td width='100%'>");
+      pageContext.getOut().println(
+          "		<table border='0' cellspacing='0' cellpadding='0' width='100%'>");
+      pageContext.getOut().println("			<tr>");
+      pageContext.getOut().println("				<td>&nbsp;</td>");
+      pageContext.getOut().println("				<td width='100%'><span class='txtnote'>");
+      pageContext.getOut()
+          .println("					<table cellpadding=0 cellspacing=0 border=0 width='100%'>");
+      pageContext.getOut().println("						<tr><td>");
 
-							  objectLinked = "";
+      int elementId = 0;
+      String elementLabel = "";
+      int spaceId = 0;
+      String objectLinked = null;
+      String link = null;
 
-							  link = "javascript:top.scriptFrame.changeSubSpace('','"+m_sContext+"/admin/jsp/Main.jsp');";
-							  pageContext.getOut().println(HomePageFunctions.getTabSpaces(spaceInst.getLevel()) + HomePageFunctions.urlFactory(link, "", spaceLabel, "", objectLinked, label, "", HomePageFunctions.SPACE, HomePageFunctions.SPACE_EXPANDED, "", m_sContext));
-							  String[] asAvailCompoForCurUser = m_organizationCtrl.getAvailDriverCompoIds(spaceInst.getId(), m_mainSessionCtrl.getUserId());
+      if ((m_sPrivateDomain != null) && (m_sPrivateDomain.length() > 0)) {
+        // Get all sub spaces
+        String[] asSubSpaceIds = m_organizationCtrl.getAllSubSpaceIds(m_sPrivateDomain);
+        String sSubSpaceId;
+        ArrayList alSubSpaces = new ArrayList();
 
-							  // Get all the component instances for the space
-							  ArrayList alCompoInst = spaceInst.getAllComponentsInst();
+        for (int nI = 0; nI < asSubSpaceIds.length; nI++) {
+          alSubSpaces.add(asSubSpaceIds[nI]);
+        }
+        // Keep only those available to current user
+        while (alSubSpaces.size() > 0) {
+          boolean bFound = false;
+          sSubSpaceId = (String) alSubSpaces.remove(0);
+          asSubSpaceIds = m_organizationCtrl.getAllSubSpaceIds(sSubSpaceId);
+          for (int nI = 0; nI < asSubSpaceIds.length; nI++) {
+            alSubSpaces.add(nI, asSubSpaceIds[nI]);
+          }
 
-							  String[] asCompoNames = new String[alCompoInst.size()];
-							  Vector vAllowedComponents = new Vector();
+          for (int nJ = 0; nJ < m_asPrivateDomainsIds.length && !bFound; nJ++) {
+            if (sSubSpaceId.equals(m_asPrivateDomainsIds[nJ])) {
+              bFound = true;
 
-							  // Build Vector of indexes of allowed components
-							  for(int nK = 0; nK <asCompoNames.length; nK++)
-							  {
-								  // Check if the component is accessible to the user
-								  boolean bAllowed = false;
-								  for(int nL=0; asAvailCompoForCurUser != null && nL < asAvailCompoForCurUser.length; nL++)
-									  if( HomePageFunctions.getDriverComponentId( ( (ComponentInst)alCompoInst.get(nK) ).getId()).equals(asAvailCompoForCurUser[nL]) )
-										  bAllowed = true;
+              if (m_subDomain != null && m_subDomain.equals(sSubSpaceId)) {
+                SpaceInst spaceInst = m_organizationCtrl.getSpaceInstById(sSubSpaceId);
+                String label = spaceInst.getName();
+                String spaceLabel = "space" + spaceId;
 
-								  if(bAllowed)
-										vAllowedComponents.add(new Integer(nK));
-							  }
+                objectLinked = "";
 
-							  // Print the allowed components
-							  String id;
+                link =
+                    "javascript:top.scriptFrame.changeSubSpace('','" + m_sContext +
+                        "/admin/jsp/Main.jsp');";
+                pageContext.getOut().println(
+                    HomePageFunctions.getTabSpaces(spaceInst.getLevel()) +
+                        HomePageFunctions.urlFactory(link, "", spaceLabel, "", objectLinked, label,
+                            "", HomePageFunctions.SPACE, HomePageFunctions.SPACE_EXPANDED, "",
+                            m_sContext));
+                String[] asAvailCompoForCurUser =
+                    m_organizationCtrl.getAvailDriverCompoIds(spaceInst.getId(), m_mainSessionCtrl
+                        .getUserId());
 
-							  // ArrayList sortedList  = JspHelper.sortComponentList(vAllowedComponents, alCompoInst);
-							  Vector sortedList  = vAllowedComponents;
+                // Get all the component instances for the space
+                ArrayList alCompoInst = spaceInst.getAllComponentsInst();
 
-							  for (int nAC=0; nAC<sortedList.size(); nAC++)
-							  {
-								  int nK = ((Integer) sortedList.get(nAC)).intValue();
-								  label = ((ComponentInst)alCompoInst.get(nK)).getLabel();
-								  if ((label == null) || (label.length() == 0))
-									  label = ((ComponentInst)alCompoInst.get(nK)).getName();
-								  id = ((ComponentInst)alCompoInst.get(nK)).getId();
-								  elementId++;
-								  elementLabel = "element"+elementId;
-								  objectLinked = ((ComponentInst)alCompoInst.get(nK)).getName();
-								  link = m_sContext + URLManager.getURL(((ComponentInst)alCompoInst.get(nK)).getName(), sSubSpaceId, ((ComponentInst)alCompoInst.get(nK)).getId()) + "Main";
-								  
-								  // Afffiche les sous espaces
-								  if (nAC == (sortedList.size()-1)) {
-									  pageContext.getOut().println(HomePageFunctions.getTabSpaces(spaceInst.getLevel()) + HomePageFunctions.urlFactory(link, "", elementLabel, id, objectLinked, label, "", HomePageFunctions.COMPONENT, HomePageFunctions.SUBSPACE_LAST_COMPONENT, "", m_sContext));
-								  } else {
-									  pageContext.getOut().println(HomePageFunctions.getTabSpaces(spaceInst.getLevel()) + HomePageFunctions.urlFactory(link, "", elementLabel, id, objectLinked, label, "", HomePageFunctions.COMPONENT, HomePageFunctions.SUBSPACE_COMPONENT, "", m_sContext));
-								  }
-							  }
-						  }
-						  else
-						  {
-							  spaceId++;
-							  SpaceInst spaceInst = m_organizationCtrl.getSpaceInstById(sSubSpaceId);
-							  String label = spaceInst.getName();
-							  String spaceLabel = "space"+spaceId;
-							  objectLinked = "";
-							  link = "javascript:top.scriptFrame.changeSubSpace('"+ sSubSpaceId +"','"+m_sContext+"/admin/jsp/Main.jsp');";
-							  pageContext.getOut().println(HomePageFunctions.getTabSpaces(spaceInst.getLevel()) + HomePageFunctions.urlFactory(link, "", spaceLabel, "", objectLinked, label, "", HomePageFunctions.SPACE, HomePageFunctions.SPACE_COLLAPSE, "", m_sContext));
-							}
-					  }
-				  }
-			  }
+                String[] asCompoNames = new String[alCompoInst.size()];
+                Vector vAllowedComponents = new Vector();
 
-			  SpaceInst spaceInst = m_organizationCtrl.getSpaceInstById(m_sPrivateDomain);
-			  String[] asAvailCompoForCurUser = m_organizationCtrl.getAvailDriverCompoIds(spaceInst.getId(), m_mainSessionCtrl.getUserId());
+                // Build Vector of indexes of allowed components
+                for (int nK = 0; nK < asCompoNames.length; nK++) {
+                  // Check if the component is accessible to the user
+                  boolean bAllowed = false;
+                  for (int nL = 0; asAvailCompoForCurUser != null &&
+                      nL < asAvailCompoForCurUser.length; nL++)
+                    if (HomePageFunctions.getDriverComponentId(
+                        ((ComponentInst) alCompoInst.get(nK)).getId()).equals(
+                        asAvailCompoForCurUser[nL]))
+                      bAllowed = true;
 
-			  // Get all the component instances for the space
-			  ArrayList alCompoInst = spaceInst.getAllComponentsInst();
+                  if (bAllowed)
+                    vAllowedComponents.add(new Integer(nK));
+                }
 
-			  String[] asCompoNames = new String[alCompoInst.size()];
-			  String id;
-			  Vector allowedComponents = new Vector();
+                // Print the allowed components
+                String id;
 
-			  for(int nI = 0; nI <asCompoNames.length; nI++)
-			  {
-				  // Check if the component is accassible to the user
-				  boolean bAllowed = false;
+                // ArrayList sortedList = JspHelper.sortComponentList(vAllowedComponents,
+                // alCompoInst);
+                Vector sortedList = vAllowedComponents;
 
-				  for(int nJ=0; asAvailCompoForCurUser != null && nJ < asAvailCompoForCurUser.length; nJ++)
-					  if( HomePageFunctions.getDriverComponentId( ( (ComponentInst)alCompoInst.get(nI) ).getId()).equals(asAvailCompoForCurUser[nJ]) )
-						  bAllowed = true;
+                for (int nAC = 0; nAC < sortedList.size(); nAC++) {
+                  int nK = ((Integer) sortedList.get(nAC)).intValue();
+                  label = ((ComponentInst) alCompoInst.get(nK)).getLabel();
+                  if ((label == null) || (label.length() == 0))
+                    label = ((ComponentInst) alCompoInst.get(nK)).getName();
+                  id = ((ComponentInst) alCompoInst.get(nK)).getId();
+                  elementId++;
+                  elementLabel = "element" + elementId;
+                  objectLinked = ((ComponentInst) alCompoInst.get(nK)).getName();
+                  link =
+                      m_sContext +
+                          URLManager.getURL(((ComponentInst) alCompoInst.get(nK)).getName(),
+                              sSubSpaceId, ((ComponentInst) alCompoInst.get(nK)).getId()) + "Main";
 
-				  if(bAllowed)
-				  {
-					  allowedComponents.add(new Integer(nI));
-				  }
-			  }
-
-			  // ArrayList sortedComponents = JspHelper.sortComponentList(allowedComponents, alCompoInst);
-			  Vector sortedComponents = allowedComponents;
-			  for(int nI = 0; nI < sortedComponents.size(); nI++)
-			  {
-				  int nK = ((Integer) sortedComponents.get(nI)).intValue();
-
-				  String label = ((ComponentInst)alCompoInst.get(nK)).getLabel();
-				  if ((label == null) || (label.length() == 0))
-					  label = ((ComponentInst)alCompoInst.get(nK)).getName();
-				  id = ((ComponentInst)alCompoInst.get(nK)).getId();
-				  elementId++;
-				  elementLabel = "element"+elementId;
-				  objectLinked = ((ComponentInst)alCompoInst.get(nK)).getName();
-				  link = m_sContext + URLManager.getURL(((ComponentInst)alCompoInst.get(nK)).getName(), m_sPrivateDomain, ((ComponentInst)alCompoInst.get(nK)).getId()) + "Main";
-				  pageContext.getOut().println(HomePageFunctions.urlFactory(link, "", elementLabel, id, objectLinked, label, "", HomePageFunctions.COMPONENT, HomePageFunctions.SPACE_COMPONENT, "", m_sContext));
-			  }
-
-		  }
-
-
-
-			pageContext.getOut().println("						</td></tr>");
-			pageContext.getOut().println("					</table>");
-			pageContext.getOut().println("				</span></td>");
-			pageContext.getOut().println("			</tr>");
-			pageContext.getOut().println("		</table>");
-			pageContext.getOut().println("	</td>");
-			pageContext.getOut().println("	<td><img src='icons/1px.gif'></td>");
-			pageContext.getOut().println("	<td class='intfdcolor'><img src='icons/1px.gif'></td>");
-			pageContext.getOut().println("</tr>");
-		} 
-		catch(IOException ioe) 
-		{
-            // User probably disconnected ...
-            throw new JspTagException("IO_ERROR");
+                  // Afffiche les sous espaces
+                  if (nAC == (sortedList.size() - 1)) {
+                    pageContext.getOut().println(
+                        HomePageFunctions.getTabSpaces(spaceInst.getLevel()) +
+                            HomePageFunctions.urlFactory(link, "", elementLabel, id, objectLinked,
+                                label, "", HomePageFunctions.COMPONENT,
+                                HomePageFunctions.SUBSPACE_LAST_COMPONENT, "", m_sContext));
+                  } else {
+                    pageContext.getOut().println(
+                        HomePageFunctions.getTabSpaces(spaceInst.getLevel()) +
+                            HomePageFunctions.urlFactory(link, "", elementLabel, id, objectLinked,
+                                label, "", HomePageFunctions.COMPONENT,
+                                HomePageFunctions.SUBSPACE_COMPONENT, "", m_sContext));
+                  }
+                }
+              } else {
+                spaceId++;
+                SpaceInst spaceInst = m_organizationCtrl.getSpaceInstById(sSubSpaceId);
+                String label = spaceInst.getName();
+                String spaceLabel = "space" + spaceId;
+                objectLinked = "";
+                link =
+                    "javascript:top.scriptFrame.changeSubSpace('" + sSubSpaceId + "','" +
+                        m_sContext + "/admin/jsp/Main.jsp');";
+                pageContext.getOut().println(
+                    HomePageFunctions.getTabSpaces(spaceInst.getLevel()) +
+                        HomePageFunctions.urlFactory(link, "", spaceLabel, "", objectLinked, label,
+                            "", HomePageFunctions.SPACE, HomePageFunctions.SPACE_COLLAPSE, "",
+                            m_sContext));
+              }
+            }
+          }
         }
 
-        return SKIP_BODY;
+        SpaceInst spaceInst = m_organizationCtrl.getSpaceInstById(m_sPrivateDomain);
+        String[] asAvailCompoForCurUser =
+            m_organizationCtrl.getAvailDriverCompoIds(spaceInst.getId(), m_mainSessionCtrl
+                .getUserId());
+
+        // Get all the component instances for the space
+        ArrayList alCompoInst = spaceInst.getAllComponentsInst();
+
+        String[] asCompoNames = new String[alCompoInst.size()];
+        String id;
+        Vector allowedComponents = new Vector();
+
+        for (int nI = 0; nI < asCompoNames.length; nI++) {
+          // Check if the component is accassible to the user
+          boolean bAllowed = false;
+
+          for (int nJ = 0; asAvailCompoForCurUser != null && nJ < asAvailCompoForCurUser.length; nJ++)
+            if (HomePageFunctions.getDriverComponentId(
+                ((ComponentInst) alCompoInst.get(nI)).getId()).equals(asAvailCompoForCurUser[nJ]))
+              bAllowed = true;
+
+          if (bAllowed) {
+            allowedComponents.add(new Integer(nI));
+          }
+        }
+
+        // ArrayList sortedComponents = JspHelper.sortComponentList(allowedComponents, alCompoInst);
+        Vector sortedComponents = allowedComponents;
+        for (int nI = 0; nI < sortedComponents.size(); nI++) {
+          int nK = ((Integer) sortedComponents.get(nI)).intValue();
+
+          String label = ((ComponentInst) alCompoInst.get(nK)).getLabel();
+          if ((label == null) || (label.length() == 0))
+            label = ((ComponentInst) alCompoInst.get(nK)).getName();
+          id = ((ComponentInst) alCompoInst.get(nK)).getId();
+          elementId++;
+          elementLabel = "element" + elementId;
+          objectLinked = ((ComponentInst) alCompoInst.get(nK)).getName();
+          link =
+              m_sContext +
+                  URLManager.getURL(((ComponentInst) alCompoInst.get(nK)).getName(),
+                      m_sPrivateDomain, ((ComponentInst) alCompoInst.get(nK)).getId()) + "Main";
+          pageContext.getOut().println(
+              HomePageFunctions.urlFactory(link, "", elementLabel, id, objectLinked, label, "",
+                  HomePageFunctions.COMPONENT, HomePageFunctions.SPACE_COMPONENT, "", m_sContext));
+        }
+
+      }
+
+      pageContext.getOut().println("						</td></tr>");
+      pageContext.getOut().println("					</table>");
+      pageContext.getOut().println("				</span></td>");
+      pageContext.getOut().println("			</tr>");
+      pageContext.getOut().println("		</table>");
+      pageContext.getOut().println("	</td>");
+      pageContext.getOut().println("	<td><img src='icons/1px.gif'></td>");
+      pageContext.getOut().println("	<td class='intfdcolor'><img src='icons/1px.gif'></td>");
+      pageContext.getOut().println("</tr>");
+    } catch (IOException ioe) {
+      // User probably disconnected ...
+      throw new JspTagException("IO_ERROR");
     }
+
+    return SKIP_BODY;
+  }
 
 }

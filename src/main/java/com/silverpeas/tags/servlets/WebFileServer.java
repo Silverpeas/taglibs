@@ -1,8 +1,26 @@
+/**
+ * Copyright (C) 2000 - 2012 Silverpeas
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * As a special exception to the terms and conditions of version 3.0 of the GPL, you may
+ * redistribute this Program in connection with Free/Libre Open Source Software ("FLOSS")
+ * applications as described in Silverpeas's FLOSS exception. You should have received a copy of the
+ * text describing the FLOSS exception, and it is also available here:
+ * "http://www.silverpeas.org/legal/licensing"
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.silverpeas.tags.servlets;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -15,23 +33,29 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.silverpeas.attachment.AttachmentServiceFactory;
+import org.silverpeas.attachment.model.SimpleDocument;
+import org.silverpeas.attachment.model.SimpleDocumentPK;
+import org.silverpeas.util.Charsets;
+
 import com.silverpeas.gallery.control.ejb.GalleryBm;
 import com.silverpeas.gallery.model.GalleryRuntimeException;
 import com.silverpeas.gallery.model.PhotoDetail;
 import com.silverpeas.gallery.model.PhotoPK;
 import com.silverpeas.tags.authentication.AuthenticationManager;
 import com.silverpeas.tags.util.Admin;
-import com.silverpeas.tags.util.EJBDynaProxy;
 import com.silverpeas.util.StringUtil;
 import com.silverpeas.util.web.servlet.RestRequest;
+
 import com.stratelia.silverpeas.silvertrace.SilverTrace;
+import com.stratelia.webactiv.util.EJBUtilitaire;
 import com.stratelia.webactiv.util.FileRepositoryManager;
 import com.stratelia.webactiv.util.JNDINames;
 import com.stratelia.webactiv.util.ResourceLocator;
-import com.stratelia.webactiv.util.attachment.control.AttachmentController;
-import com.stratelia.webactiv.util.attachment.ejb.AttachmentPK;
-import com.stratelia.webactiv.util.attachment.model.AttachmentDetail;
 import com.stratelia.webactiv.util.exception.SilverpeasRuntimeException;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 public class WebFileServer extends HttpServlet {
 
@@ -55,7 +79,7 @@ public class WebFileServer extends HttpServlet {
     String userId = AuthenticationManager.getUserId(req);
     String componentId = restRequest.getElementValue("componentId");
     if (!StringUtil.isDefined(componentId)) {
-      componentId = restRequest.getElementValue("ComponentId");	//forward compatibility
+      componentId = restRequest.getElementValue("ComponentId"); // forward compatibility
     }
     if (getAdmin().isUserAllowed(userId, componentId)) {
       OnlineFile file = getWantedFile(restRequest);
@@ -80,13 +104,13 @@ public class WebFileServer extends HttpServlet {
     String imageId = restRequest.getElementValue("ImageId");
 
     String attachmentId = restRequest.getWebRequest().getParameter("attachmentId");
-    AttachmentDetail attachment = null;
     if (StringUtil.isDefined(attachmentId)) {
-      attachment = AttachmentController.searchAttachmentByPK(new AttachmentPK(attachmentId));
+      SimpleDocument attachment = AttachmentServiceFactory.getAttachmentService().searchDocumentById(
+          new SimpleDocumentPK(attachmentId), null);
       if (attachment != null) {
-        mimeType = attachment.getType();
-        sourceFile = attachment.getPhysicalName();
-        directory = FileRepositoryManager.getRelativePath(FileRepositoryManager.getAttachmentContext(attachment.getContext()));
+        mimeType = attachment.getContentType();
+        sourceFile = attachment.getFilename();
+        directory = attachment.getAttachmentPath();
         file = new OnlineFile(mimeType, sourceFile, directory);
         file.setComponentId(componentId);
       }
@@ -115,9 +139,6 @@ public class WebFileServer extends HttpServlet {
     if (file == null) {
       file = getFileFromOldURL(restRequest);
     }
-    /*if(file == null) {
-    file = getWantedVersionnedDocument(restRequest);
-    }*/
     return file;
   }
 
@@ -130,126 +151,66 @@ public class WebFileServer extends HttpServlet {
     String attachmentId = restRequest.getElementValue("attachmentId");
     String language = restRequest.getElementValue("lang");
     if (StringUtil.isDefined(attachmentId)) {
-      AttachmentDetail attachment = AttachmentController.searchAttachmentByPK(new AttachmentPK(attachmentId));
+      SimpleDocument attachment =
+          AttachmentServiceFactory.getAttachmentService().searchDocumentById(new SimpleDocumentPK(
+          attachmentId), language);
       if (attachment != null) {
-        file = new OnlineFile(attachment.getType(language), attachment.getPhysicalName(language), FileRepositoryManager.getRelativePath(FileRepositoryManager.getAttachmentContext(attachment.getContext())));
+        file = new OnlineFile(attachment.getContentType(), attachment.getFilename(), attachment.
+            getAttachmentPath());
         file.setComponentId(componentId);
       }
     }
     return file;
   }
 
-  /*protected OnlineFile getWantedVersionnedDocument(RestRequest restRequest)
-  throws RemoteException {
-  String componentId = restRequest.getElementValue("componentId");
-  OnlineFile file = null;
-  String documentId = restRequest.getElementValue("documentId");
-  if (StringUtil.isDefined(documentId)) {
-  String versionId = restRequest.getElementValue("versionId");
-  VersioningUtil versioning = new VersioningUtil();
-  DocumentVersionPK versionPK = new DocumentVersionPK(Integer
-  .parseInt(versionId), "useless", componentId);
-  DocumentVersion version = versioning.getDocumentVersion(versionPK);
-  if (version != null) {
-  String[] path = new String[1];
-  path[0] = "Versioning";
-  file = new OnlineFile(version.getMimeType(), version.getPhysicalName(),
-  FileRepositoryManager.getRelativePath(path));
-  file.setComponentId(componentId);
-  }
-  }
-  return file;
-  }*/
   /**
    * This method writes the result of the preview action.
    *
-   * @param res
-   *          - The HttpServletResponse where the html code is write
-   * @param htmlFilePath
-   *          - the canonical path of the html document generated by the parser
-   *          tools. if this String is null that an exception had been catched
-   *          the html document generated is empty !! also, we display a warning
-   *          html page
+   * @param res - The HttpServletResponse where the html code is write
+   * @param htmlFilePath - the canonical path of the html document generated by the parser tools. if
+   * this String is null that an exception had been catched the html document generated is empty !!
+   * also, we display a warning html page
    */
-  private void display(HttpServletResponse res, OnlineFile file)
-      throws IOException {
+  private void display(HttpServletResponse res, OnlineFile file) throws IOException {
     String filePath = FileRepositoryManager.getAbsolutePath(file.getComponentId())
         + file.getDirectory() + File.separator + file.getSourceFile();
 
     File realFile = new File(filePath);
     if (!realFile.exists() && !realFile.isFile()) {
+      realFile = new File(file.getDirectory());
+    }
+    if (!realFile.exists() && !realFile.isFile()) {
       displayWarningHtmlCode(res);
       return;
     }
-    OutputStream out2 = res.getOutputStream();
-    BufferedInputStream input = null; // for the html document generated
-    SilverTrace.info("peasUtil", "OnlineFileServer.display()",
-        "root.MSG_GEN_ENTER_METHOD", " htmlFilePath " + filePath);
+    SilverTrace.info("peasUtil", "OnlineFileServer.display()", "root.MSG_GEN_ENTER_METHOD",
+        " htmlFilePath " + filePath);
     try {
       res.setContentType(file.getMimeType());
-      input = new BufferedInputStream(new FileInputStream(realFile));
-      byte[] buffer = new byte[8];
-      int read = 0;
-      SilverTrace.info("peasUtil", "OnlineFileServer.display()",
-          "root.MSG_GEN_ENTER_METHOD", " BufferedInputStream read " + read);
-      while ((read = input.read(buffer)) != -1) {
-        out2.write(buffer, 0, read);
-      }
+      FileUtils.copyFile(realFile, res.getOutputStream());
     } catch (Exception e) {
-      SilverTrace.warn("peasUtil", "OnlineFileServer.doPost",
-          "root.EX_CANT_READ_FILE", "file name=" + filePath);
+      SilverTrace.warn("peasUtil", "OnlineFileServer.doPost", "root.EX_CANT_READ_FILE", "file name="
+          + filePath);
       displayWarningHtmlCode(res);
-    } finally {
-      SilverTrace.info("peasUtil", "OnlineFileServer.display()", "",
-          " finally ");
-      // we must close the in and out streams
-      try {
-        if (input != null) {
-          input.close();
-        }
-        out2.close();
-      } catch (Exception e) {
-        SilverTrace.warn("peasUtil", "OnlineFileServer.display",
-            "root.EX_CANT_READ_FILE", "close failed");
-      }
     }
   }
 
-  // Add By Mohammed Hguig
-  private void displayWarningHtmlCode(HttpServletResponse res)
-      throws IOException {
-    StringReader sr = null;
+  private void displayWarningHtmlCode(HttpServletResponse res) throws IOException {
     OutputStream out2 = res.getOutputStream();
-    int read;
     ResourceLocator resourceLocator = new ResourceLocator(
-        "com.stratelia.webactiv.util.peasUtil.multiLang.fileServerBundle", "");
-
-    sr = new StringReader(resourceLocator.getString("warning"));
+        "org.silverpeas.util.peasUtil.multiLang.fileServerBundle", "");
     try {
-      read = sr.read();
-      while (read != -1) {
-        SilverTrace.info("peasUtil", "OnlineFileServer.displayHtmlCode()",
-            "root.MSG_GEN_ENTER_METHOD", " StringReader read " + read);
-        out2.write(read); // writes bytes into the response
-        read = sr.read();
-      }
+      out2.write(resourceLocator.getString("warning").getBytes(Charsets.UTF_8));
     } catch (Exception e) {
       SilverTrace.warn("peasUtil", "OnlineFileServer.displayWarningHtmlCode",
           "root.EX_CANT_READ_FILE", "warning properties");
     } finally {
-      try {
-        if (sr != null) {
-          sr.close();
-        }
-        out2.close();
-      } catch (Exception e) {
-        SilverTrace.warn("peasUtil", "OnlineFileServer.displayHtmlCode",
-            "root.EX_CANT_READ_FILE", "close failed");
-      }
+      IOUtils.closeQuietly(out2);
     }
   }
 
-  private void displayError(HttpServletResponse res, String userId, String componentId) throws ServletException, IOException {
+  private void displayError(HttpServletResponse res, String userId, String componentId)
+      throws ServletException, IOException {
     SilverTrace.info("peasUtil", "WebFileServer.displayError()", "root.MSG_GEN_ENTER_METHOD");
 
     res.setContentType("text/html");
@@ -280,7 +241,8 @@ public class WebFileServer extends HttpServlet {
       try {
         out2.close();
       } catch (Exception e) {
-        SilverTrace.warn("peasUtil", "WebFileServer.displayError", "root.EX_CANT_READ_FILE", "close failed");
+        SilverTrace.warn("peasUtil", "WebFileServer.displayError", "root.EX_CANT_READ_FILE",
+            "close failed");
       }
     }
   }
@@ -294,9 +256,10 @@ public class WebFileServer extends HttpServlet {
 
   private GalleryBm getGalleryBm() {
     try {
-      return (GalleryBm) EJBDynaProxy.createProxy(JNDINames.GALLERYBM_EJBHOME, GalleryBm.class);
+      return EJBUtilitaire.getEJBObjectRef(JNDINames.GALLERYBM_EJBHOME, GalleryBm.class);
     } catch (Exception e) {
-      throw new GalleryRuntimeException("WebFileServer.getGalleryBm", SilverpeasRuntimeException.ERROR, "root.EX_CANT_GET_REMOTE_OBJECT", e);
+      throw new GalleryRuntimeException("WebFileServer.getGalleryBm",
+          SilverpeasRuntimeException.ERROR, "root.EX_CANT_GET_REMOTE_OBJECT", e);
     }
   }
 }

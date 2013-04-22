@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.silverpeas</groupId>
     <artifactId>parent</artifactId>
-    <version>24</version>
+    <version>25-SNAPSHOT</version>
   </parent>
 
   <groupId>com.silverpeas</groupId>
@@ -16,25 +16,11 @@
   <url>http://www.silverpeas.com</url>
 
 
-  <distributionManagement>
-    <repository>
-      <id>silverpeas</id>
-      <name>Repository Silverpeas</name>
-      <layout>default</layout>
-      <url>http://www.silverpeas.org/nexus/content/repositories/sp-non-free/</url>
-    </repository>
-    <snapshotRepository>
-      <id>silverpeas-snapshots</id>
-      <name>Snapshots Repository Silverpeas</name>
-      <layout>default</layout>
-      <url>http://www.silverpeas.org/nexus/content/repositories/sp-dev-non-free/</url>
-    </snapshotRepository>
-  </distributionManagement>
-
   <scm>
-    <connection>scm:svn:https://www.silverpeas.org/svn/websites/professional-edition/taglibs/tags/taglibs-5.12</connection>
-    <developerConnection>scm:svn:https://www.silverpeas.org/svn/websites/professional-edition/taglibs/tags/taglibs-5.12</developerConnection>
-    <url>https://www.silverpeas.org/svn/websites/professional-edition/taglibs/tags/taglibs-5.12</url>
+    <connection>scm:git:git@github.com:Silverpeas/taglibs.git</connection>
+    <developerConnection>scm:git:git@github.com:Silverpeas/taglibs.git</developerConnection>
+    <url>http://github.com/Silverpeas/taglibs</url>
+    <tag>HEAD</tag>
   </scm>
 
   <repositories>
@@ -60,16 +46,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>javax.ejb</groupId>
-      <artifactId>ejb-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet.jsp</groupId>
-      <artifactId>jsp-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
     </dependency>
@@ -77,9 +53,17 @@
       <groupId>javax.servlet</groupId>
       <artifactId>jstl</artifactId>
     </dependency>
+   <dependency>
+      <groupId>javax.servlet.jsp</groupId>
+      <artifactId>jsp-api</artifactId>
+    </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.ejb</groupId>
+      <artifactId>ejb-api</artifactId>
     </dependency>
     <dependency>
       <groupId>taglibs</groupId>
@@ -101,35 +85,30 @@
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>admin</artifactId>
-      <classifier>client</classifier>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>authentication</artifactId>
-      <classifier>client</classifier>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>pdc</artifactId>
-      <classifier>client</classifier>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>node</artifactId>
-      <classifier>client</classifier>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>publication</artifactId>
-      <classifier>client</classifier>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -142,14 +121,12 @@
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>tagcloud</artifactId>
-      <classifier>client</classifier>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>notation</artifactId>
-      <classifier>client</classifier>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -162,34 +139,30 @@
     <dependency>
       <groupId>com.silverpeas.components.almanach</groupId>
       <artifactId>almanach-ejb</artifactId>
-      <classifier>client</classifier>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.components.kmelia</groupId>
       <artifactId>kmelia-ejb</artifactId>
-      <classifier>client</classifier>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.components.forums</groupId>
       <artifactId>forums-ejb</artifactId>
-      <classifier>client</classifier>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.components.gallery</groupId>
       <artifactId>gallery-ejb</artifactId>
-      <classifier>client</classifier>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
+      <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
