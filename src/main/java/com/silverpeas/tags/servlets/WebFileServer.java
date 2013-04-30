@@ -23,7 +23,6 @@ package com.silverpeas.tags.servlets;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.io.StringReader;
 import java.rmi.RemoteException;
 
@@ -44,12 +43,12 @@ import com.silverpeas.gallery.model.PhotoDetail;
 import com.silverpeas.gallery.model.PhotoPK;
 import com.silverpeas.tags.authentication.AuthenticationManager;
 import com.silverpeas.tags.util.Admin;
+import com.silverpeas.util.FileUtil;
 import com.silverpeas.util.StringUtil;
 import com.silverpeas.util.web.servlet.RestRequest;
 
 import com.stratelia.silverpeas.silvertrace.SilverTrace;
 import com.stratelia.webactiv.util.EJBUtilitaire;
-import com.stratelia.webactiv.util.FileRepositoryManager;
 import com.stratelia.webactiv.util.JNDINames;
 import com.stratelia.webactiv.util.ResourceLocator;
 import com.stratelia.webactiv.util.exception.SilverpeasRuntimeException;
@@ -59,7 +58,7 @@ import org.apache.commons.io.IOUtils;
 
 public class WebFileServer extends HttpServlet {
 
-  PrintWriter out;
+  private static final long serialVersionUID = 1L;
   private Admin admin = null;
 
   @Override
@@ -72,8 +71,8 @@ public class WebFileServer extends HttpServlet {
   }
 
   @Override
-  public void service(HttpServletRequest req, HttpServletResponse res)
-      throws ServletException, IOException {
+  public void service(HttpServletRequest req, HttpServletResponse res) throws ServletException,
+      IOException {
     SilverTrace.info("peasUtil", "OnlineFileServer.doPost", "root.MSG_GEN_ENTER_METHOD");
     RestRequest restRequest = new RestRequest(req, "");
     String userId = AuthenticationManager.getUserId(req);
@@ -105,14 +104,11 @@ public class WebFileServer extends HttpServlet {
 
     String attachmentId = restRequest.getWebRequest().getParameter("attachmentId");
     if (StringUtil.isDefined(attachmentId)) {
-      SimpleDocument attachment = AttachmentServiceFactory.getAttachmentService().searchDocumentById(
+      SimpleDocument attachment = AttachmentServiceFactory.getAttachmentService().
+          searchDocumentById(
           new SimpleDocumentPK(attachmentId), null);
       if (attachment != null) {
-        mimeType = attachment.getContentType();
-        sourceFile = attachment.getFilename();
-        directory = attachment.getAttachmentPath();
-        file = new OnlineFile(mimeType, sourceFile, directory);
-        file.setComponentId(componentId);
+        file = new OnlineAttachment(attachment);
       }
     } else if (StringUtil.isDefined(imageId)) {
       PhotoDetail image = getGalleryBm().getPhoto(new PhotoPK(imageId, componentId));
@@ -124,11 +120,9 @@ public class WebFileServer extends HttpServlet {
         sourceFile = image.getId() + "_preview.jpg";
       }
       directory = "image" + image.getId();
-      file = new OnlineFile(mimeType, sourceFile, directory);
-      file.setComponentId(componentId);
+      file = new OnlineFile(mimeType, sourceFile, directory, componentId);
     } else {
-      file = new OnlineFile(mimeType, sourceFile, directory);
-      file.setComponentId(componentId);
+      file = new OnlineFile(mimeType, sourceFile, directory, componentId);
     }
     return file;
   }
@@ -151,13 +145,16 @@ public class WebFileServer extends HttpServlet {
     String attachmentId = restRequest.getElementValue("attachmentId");
     String language = restRequest.getElementValue("lang");
     if (StringUtil.isDefined(attachmentId)) {
-      SimpleDocument attachment =
-          AttachmentServiceFactory.getAttachmentService().searchDocumentById(new SimpleDocumentPK(
-          attachmentId), language);
+      SimpleDocumentPK pk;
+      if (StringUtil.isDefined(componentId)) {
+        pk = new SimpleDocumentPK(attachmentId, componentId);
+      } else {
+        pk = new SimpleDocumentPK(attachmentId);
+      }
+      SimpleDocument attachment = AttachmentServiceFactory.getAttachmentService().
+          searchDocumentById(pk, language);
       if (attachment != null) {
-        file = new OnlineFile(attachment.getContentType(), attachment.getFilename(), attachment.
-            getAttachmentPath());
-        file.setComponentId(componentId);
+        file = new OnlineAttachment(attachment);
       }
     }
     return file;
@@ -171,27 +168,22 @@ public class WebFileServer extends HttpServlet {
    * this String is null that an exception had been catched the html document generated is empty !!
    * also, we display a warning html page
    */
-  private void display(HttpServletResponse res, OnlineFile file) throws IOException {
-    String filePath = FileRepositoryManager.getAbsolutePath(file.getComponentId())
-        + file.getDirectory() + File.separator + file.getSourceFile();
-
-    File realFile = new File(filePath);
+  private void display(HttpServletResponse response, OnlineFile file) throws IOException {
+    File realFile = file.getContentFile();
     if (!realFile.exists() && !realFile.isFile()) {
-      realFile = new File(file.getDirectory());
-    }
-    if (!realFile.exists() && !realFile.isFile()) {
-      displayWarningHtmlCode(res);
+      displayWarningHtmlCode(response);
       return;
     }
     SilverTrace.info("peasUtil", "OnlineFileServer.display()", "root.MSG_GEN_ENTER_METHOD",
-        " htmlFilePath " + filePath);
+        " htmlFilePath " + realFile.getPath());
     try {
-      res.setContentType(file.getMimeType());
-      FileUtils.copyFile(realFile, res.getOutputStream());
+      response.setContentType(FileUtil.getMimeType(realFile.getName()));
+      response.setHeader("Content-Length", String.valueOf(realFile.length()));
+      FileUtils.copyFile(realFile, response.getOutputStream());
     } catch (Exception e) {
       SilverTrace.warn("peasUtil", "OnlineFileServer.doPost", "root.EX_CANT_READ_FILE", "file name="
-          + filePath);
-      displayWarningHtmlCode(res);
+          + realFile.getPath());
+      displayWarningHtmlCode(response);
     }
   }
 

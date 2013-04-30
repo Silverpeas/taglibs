@@ -20,7 +20,6 @@
  */
 package com.silverpeas.tags.almanach;
 
-import java.util.Calendar;
 import java.util.Collection;
 
 import com.silverpeas.tags.ComponentTagUtil;
@@ -43,11 +42,6 @@ public class AlmanachTagUtil extends ComponentTagUtil {
     super(componentId, userId);
 
     this.componentId = componentId;
-  }
-
-  public Collection<EventDetail> getMonthEvents() {
-    return getAlmanachBm().getMonthEvents(new EventPK("", spaceId, componentId),
-        Calendar.getInstance().getTime());
   }
 
   public Collection<EventDetail> getAllEvents() {
