@@ -11,7 +11,7 @@
   <groupId>com.silverpeas</groupId>
   <artifactId>taglibs</artifactId>
   <packaging>jar</packaging>
-  <version>5.12</version>
+  <version>5.13-SNAPSHOT</version>
   <name>taglibs J2EE 1.4 Webapp</name>
   <url>http://www.silverpeas.com</url>
 
@@ -20,7 +20,7 @@
     <connection>scm:git:git@github.com:Silverpeas/taglibs.git</connection>
     <developerConnection>scm:git:git@github.com:Silverpeas/taglibs.git</developerConnection>
     <url>http://github.com/Silverpeas/taglibs</url>
-    <tag>taglibs-5.12</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <repositories>
