@@ -295,7 +295,7 @@ public class MenuTag extends TagSupport {
    * @return
    */
   private String getFinalClassName(NodeDetail theme, String className) throws RemoteException,
-      IOException, ServletException {
+      IOException {
     if (isSelectedItem(theme)) {
       if (selectedTopicNameInSession != null) {
         pageContext.getSession().setAttribute(selectedTopicNameInSession, theme);
@@ -311,8 +311,7 @@ public class MenuTag extends TagSupport {
    * @param topicId
    * @return
    */
-  private boolean isSelectedItem(NodeDetail theme) throws RemoteException, IOException,
-      ServletException {
+  private boolean isSelectedItem(NodeDetail theme) throws RemoteException, IOException {
     if (selectedTopicNameInSession != null) {
       NodeDetail node =
           (NodeDetail) pageContext.getSession().getAttribute(selectedTopicNameInSession);

@@ -577,7 +577,8 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     Collection<NodeDetail> path = new ArrayList<NodeDetail>();
     SilverTrace.info("kmelia", "KMeliaTagUtil.getPathList()", "root.MSG_GEN_ENTER_METHOD",
         "pubId = " + pubId);
-    List<Collection<NodeDetail>> paths = new ArrayList<Collection<NodeDetail>>(getKmeliaBm().getPathList(getPublicationPK(pubId)));
+    List<Collection<NodeDetail>> paths = new ArrayList<Collection<NodeDetail>>(getKmeliaBm()
+        .getPathList(getPublicationPK(pubId)));
     if (paths.size() > 0) {
       // get only the first path
       List<NodeDetail> pathInReverse = new ArrayList<NodeDetail>(paths.get(0));
@@ -753,61 +754,47 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   public Collection getTreeView(String topicId) throws RemoteException {
     SilverTrace.info("kmelia", "KMeliaTagUtil.getTreeView()", "root.MSG_GEN_ENTER_METHOD",
         "topicId = " + topicId);
-    List tree;
-    try {
-      tree = (ArrayList) getNodeBm().getSubTree(getNodePK(topicId));
+    List<NodeDetail> tree = getNodeBm().getSubTree(getNodePK(topicId));
+    // if topicId is the root, remove "basket" and "declassified zone"
+    if (NodePK.ROOT_NODE_ID.equals(topicId)) {
+      tree = removeSpecificNodes(tree);
+    }
 
-      // if topicId is the root, remove "basket" and "declassified zone"
-      if ("0".equals(topicId)) {
-        tree = removeSpecificNodes(tree);
-      }
-
-      if (SiteTagUtil.isDevMode()) {
-        // Web site is in developpement mode
-        // We get all topics (visibles and invisibles)
-        if (StringUtil.isDefined(SiteTagUtil.getLanguage())) {
-          NodeDetail node;
-          for (int n = 0; n < tree.size(); n++) {
-            node = (NodeDetail) tree.get(n);
-            getTranslatedNode(node, SiteTagUtil.getLanguage());
-          }
-        } else {
-          return tree;
+    if (SiteTagUtil.isDevMode()) {
+      // Web site is in developpement mode
+      // We get all topics (visibles and invisibles)
+      if (StringUtil.isDefined(SiteTagUtil.getLanguage())) {
+        for (NodeDetail node : tree) {
+          getTranslatedNode(node, SiteTagUtil.getLanguage());
         }
       } else {
-        // Web site is in 'recette' or 'production' mode
-        // We get only visible topics
-        tree = (ArrayList) getVisibleTreeView(tree);
+        return tree;
       }
-    } catch (NoSuchObjectException nsoe) {
-      initEJB();
-      return getTreeView(topicId);
+    } else {
+      // Web site is in 'recette' or 'production' mode
+      // We get only visible topics
+      tree = getVisibleTreeView(tree);
     }
     return tree;
   }
 
-  private List removeSpecificNodes(List tree) {
-    NodeDetail node;
-    String id;
-    List nodes = new ArrayList();
-    for (int i = 0; i < tree.size(); i++) {
-      node = (NodeDetail) tree.get(i);
-      id = node.getNodePK().getId();
-      if (!"1".equals(id) && !"2".equals(id)) {
+  private List<NodeDetail> removeSpecificNodes(List<NodeDetail> tree) {
+    List<NodeDetail> nodes = new ArrayList<NodeDetail>(tree.size());
+    for (NodeDetail node : tree) {
+      NodePK id = node.getNodePK();
+      if (!id.isTrash() && !id.isUnclassed()) {
         nodes.add(node);
       }
     }
     return nodes;
   }
 
-  private Collection getVisibleTreeView(List tree) throws RemoteException {
+  private List<NodeDetail> getVisibleTreeView(List<NodeDetail> tree) {
     SilverTrace.info("kmelia", "KMeliaTagUtil.getVisibleTreeView()", "root.MSG_GEN_ENTER_METHOD");
-
-    NodeDetail node;
-    ArrayList visibleNodes = new ArrayList();
-    ArrayList invisibleNodes = new ArrayList();
+    List<NodeDetail> visibleNodes = new ArrayList<NodeDetail>();
+    List<String> invisibleNodes = new ArrayList<String>();
     for (int i = 0; i < tree.size(); i++) {
-      node = (NodeDetail) tree.get(i);
+      NodeDetail node = tree.get(i);
       node = getTranslatedNode(node, null);
       if ((NodeDetail.STATUS_INVISIBLE.equals(node.getStatus())) || ((visibilityFilter != null)
           && node.getName(getSiteLanguage()).startsWith(visibilityFilter))) {
@@ -865,8 +852,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       if (pubDetail.getImage().startsWith("/")) {// image provenant de la photothèque
         imageURL = pubDetail.getImage();
       } else {// image téléchargée
-        imageURL =
-            "vignette?ComponentId=" + pubDetail.getInstanceId() + "&SourceFile=" + pubDetail.
+        imageURL = "vignette?ComponentId=" + pubDetail.getInstanceId() + "&SourceFile=" + pubDetail.
             getImage() + "&MimeType=image/jpeg&Directory=images";
       }
     }

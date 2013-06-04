@@ -20,21 +20,12 @@
  */
 package com.silverpeas.tags.quickinfo;
 
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-
-import org.silverpeas.attachment.model.DocumentType;
-import org.silverpeas.wysiwyg.control.WysiwygController;
-
 import com.silverpeas.tags.ComponentTagUtil;
 import com.silverpeas.tags.util.SiteTagUtil;
 import com.silverpeas.tags.util.VisibilityException;
 import com.silverpeas.util.ForeignPK;
 import com.silverpeas.util.StringUtil;
 import com.silverpeas.util.i18n.I18NHelper;
-
 import com.stratelia.silverpeas.silvertrace.SilverTrace;
 import com.stratelia.webactiv.kmelia.model.KmeliaRuntimeException;
 import com.stratelia.webactiv.util.EJBUtilitaire;
@@ -45,6 +36,13 @@ import com.stratelia.webactiv.util.publication.model.PublicationDetail;
 import com.stratelia.webactiv.util.publication.model.PublicationI18N;
 import com.stratelia.webactiv.util.publication.model.PublicationPK;
 import com.stratelia.webactiv.util.publication.model.PublicationRuntimeException;
+import org.silverpeas.attachment.model.DocumentType;
+import org.silverpeas.wysiwyg.control.WysiwygController;
+
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 public class QuickInfoTagUtil extends ComponentTagUtil {
 
@@ -117,7 +115,7 @@ public class QuickInfoTagUtil extends ComponentTagUtil {
     String wysiwygContent = null;
     try {
       wysiwygContent = WysiwygController.loadFileAndAttachment(new ForeignPK(pubPK),
-          DocumentType.wysiwyg.getName(), I18NHelper.defaultLanguage);
+          DocumentType.wysiwyg, I18NHelper.defaultLanguage);
     } catch (Exception e) {
       throw new KmeliaRuntimeException("quickinfo.getWysiwyg()", SilverpeasRuntimeException.ERROR,
           "quickinfo.EX_IMPOSSIBLE_DOBTENIR_LE_WYSIWYG", e);

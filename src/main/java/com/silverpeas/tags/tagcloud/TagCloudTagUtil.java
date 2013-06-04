@@ -143,7 +143,7 @@ public class TagCloudTagUtil extends ComponentTagUtil {
     return getTagCloudBm().getElementTagClouds(new TagCloudPK(elementId, componentId, type));
   }
 
-  private String getElementTags(int type) throws RemoteException {
+  private String getElementTags(int type) {
     return getTagCloudBm().getTagsByElement(new TagCloudPK(elementId, componentId, type));
   }
 

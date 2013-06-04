@@ -62,15 +62,6 @@ public class WebFileServer extends HttpServlet {
   private Admin admin = null;
 
   @Override
-  public void init(ServletConfig config) {
-    try {
-      super.init(config);
-    } catch (ServletException se) {
-      SilverTrace.fatal("peasUtil", "WebFileServer.init", "peasUtil.CANNOT_ACCESS_SUPERCLASS");
-    }
-  }
-
-  @Override
   public void service(HttpServletRequest req, HttpServletResponse res) throws ServletException,
       IOException {
     SilverTrace.info("peasUtil", "OnlineFileServer.doPost", "root.MSG_GEN_ENTER_METHOD");
@@ -202,7 +193,7 @@ public class WebFileServer extends HttpServlet {
   }
 
   private void displayError(HttpServletResponse res, String userId, String componentId)
-      throws ServletException, IOException {
+      throws IOException {
     SilverTrace.info("peasUtil", "WebFileServer.displayError()", "root.MSG_GEN_ENTER_METHOD");
 
     res.setContentType("text/html");
