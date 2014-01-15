@@ -271,6 +271,12 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   }
 
   private void checkPublicationLocation(PublicationDetail pubDetail) throws VisibilityException {
+    //instanceId must correspond to componentId set in the kmeliaTag
+    if(! pubDetail.getInstanceId().equals(getComponentId())){
+      throw new VisibilityException();
+    }
+    
+    //publication must not be in basket (node 1)
     List fathers = (List) getKmeliaBm().getPublicationFathers(pubDetail.getPK());
     if (fathers == null || fathers.isEmpty() || (fathers.size() == 1
         && "1".equals(((NodePK) fathers.get(0)).getId()))) {
