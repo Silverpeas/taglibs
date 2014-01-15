@@ -26,7 +26,6 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.rmi.RemoteException;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -203,9 +202,8 @@ public class WebFileServer extends HttpServlet {
     StringBuilder message = new StringBuilder(255);
     message.append("<HTML>");
     message.append("<BODY>");
-    message.append("Warning ! User identified by id '<b>").append(userId).append("</b>'");
-    message.append(" is not allowed to access to component identified by componentId '<b>");
-    message.append(componentId).append("</b>' !");
+    message.append("<h1>Erreur ... </h1>");
+    message.append("Le service a rencontr&eacute; un probl&egrave;me inattendu pendant le traitement de votre demande <br/>");
     message.append("</BODY>");
     message.append("</HTML>");
 
