@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.silverpeas</groupId>
     <artifactId>parent</artifactId>
-    <version>26-SNAPSHOT</version>
+    <version>26</version>
   </parent>
 
   <groupId>com.silverpeas</groupId>
@@ -39,8 +39,7 @@
   </repositories>
 
   <properties>
-    <core.version>5.13-SNAPSHOT</core.version>
-    <component.version>5.13-SNAPSHOT</component.version>
+    <silverpeas.version>5.13.4-SNAPSHOT</silverpeas.version>
   </properties>
 
 
@@ -73,91 +72,91 @@
     <dependency>
       <groupId>com.silverpeas.core</groupId>
       <artifactId>lib-core</artifactId>
-      <version>${project.version}</version>
+      <version>${silverpeas.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core</groupId>
       <artifactId>web-core</artifactId>
-      <version>${project.version}</version>
+      <version>${silverpeas.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>admin</artifactId>
-      <version>${project.version}</version>
+      <version>${silverpeas.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>authentication</artifactId>
-      <version>${project.version}</version>
+      <version>${silverpeas.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>pdc</artifactId>
-      <version>${project.version}</version>
+      <version>${silverpeas.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>node</artifactId>
-      <version>${project.version}</version>
+      <version>${silverpeas.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>publication</artifactId>
-      <version>${project.version}</version>
+      <version>${silverpeas.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>comment</artifactId>
-      <version>${project.version}</version>
+      <version>${silverpeas.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>tagcloud</artifactId>
-      <version>${project.version}</version>
+      <version>${silverpeas.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>notation</artifactId>
-      <version>${project.version}</version>
+      <version>${silverpeas.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.core.ejb-core</groupId>
       <artifactId>searchengine</artifactId>
-      <version>${project.version}</version>
+      <version>${silverpeas.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.components.almanach</groupId>
       <artifactId>almanach-ejb</artifactId>
-      <version>${project.version}</version>
+      <version>${silverpeas.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.components.kmelia</groupId>
       <artifactId>kmelia-ejb</artifactId>
-      <version>${project.version}</version>
+      <version>${silverpeas.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.components.forums</groupId>
       <artifactId>forums-ejb</artifactId>
-      <version>${project.version}</version>
+      <version>${silverpeas.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.silverpeas.components.gallery</groupId>
       <artifactId>gallery-ejb</artifactId>
-      <version>${project.version}</version>
+      <version>${silverpeas.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
