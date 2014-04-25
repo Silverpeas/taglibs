@@ -39,7 +39,7 @@
   </repositories>
 
   <properties>
-    <silverpeas.version>5.13.4-SNAPSHOT</silverpeas.version>
+    <silverpeas.version>5.14</silverpeas.version>
   </properties>
 
 
