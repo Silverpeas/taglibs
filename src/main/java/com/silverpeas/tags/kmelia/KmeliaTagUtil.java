@@ -35,6 +35,7 @@ import org.silverpeas.attachment.AttachmentServiceFactory;
 import org.silverpeas.attachment.model.DocumentType;
 import org.silverpeas.attachment.model.SimpleDocument;
 import org.silverpeas.attachment.model.SimpleDocumentPK;
+import org.silverpeas.rating.RatingPK;
 import org.silverpeas.search.SearchEngineFactory;
 import org.silverpeas.search.searchEngine.model.MatchingIndexEntry;
 import org.silverpeas.search.searchEngine.model.ParseException;
@@ -49,14 +50,12 @@ import com.silverpeas.comment.service.CommentServiceFactory;
 import com.silverpeas.form.importExport.XMLField;
 import com.silverpeas.notation.ejb.NotationBm;
 import com.silverpeas.notation.model.Notation;
-import com.silverpeas.notation.model.NotationPK;
 import com.silverpeas.tags.ComponentTagUtil;
 import com.silverpeas.tags.util.SiteTagUtil;
 import com.silverpeas.tags.util.VisibilityException;
 import com.silverpeas.util.FileUtil;
 import com.silverpeas.util.ForeignPK;
 import com.silverpeas.util.StringUtil;
-
 import com.stratelia.silverpeas.silvertrace.SilverTrace;
 import com.stratelia.webactiv.beans.admin.ComponentInst;
 import com.stratelia.webactiv.beans.admin.SpaceInst;
@@ -683,12 +682,12 @@ public class KmeliaTagUtil extends ComponentTagUtil {
         while (iter.hasNext()) {
           publication = (PublicationDetail) iter.next();
           publicationPK = publication.getPK();
-          notationsPks.add(new NotationPK(publicationPK.getId(),
-              publicationPK.getComponentName(), Notation.TYPE_PUBLICATION));
+          notationsPks.add(new RatingPK(publicationPK.getId(),
+              publicationPK.getComponentName(), "Publication"));
         }
 
         if (!notationsPks.isEmpty()) {
-          return getNotationBm().getBestNotations(notationsPks, notationsCount);
+          return getNotationBm().getBestRatings(notationsPks, notationsCount);
         }
       }
     }
