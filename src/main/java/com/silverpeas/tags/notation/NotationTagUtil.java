@@ -22,13 +22,13 @@ package com.silverpeas.tags.notation;
 
 import java.util.Collection;
 
+import org.silverpeas.rating.Rating;
+import org.silverpeas.rating.RatingPK;
+
 import com.silverpeas.notation.ejb.NotationBm;
 import com.silverpeas.notation.ejb.NotationRuntimeException;
 import com.silverpeas.notation.model.Notation;
-import com.silverpeas.notation.model.NotationDetail;
-import com.silverpeas.notation.model.NotationPK;
 import com.silverpeas.tags.ComponentTagUtil;
-
 import com.stratelia.webactiv.util.EJBUtilitaire;
 import com.stratelia.webactiv.util.JNDINames;
 import com.stratelia.webactiv.util.exception.SilverpeasRuntimeException;
@@ -47,38 +47,38 @@ public class NotationTagUtil extends ComponentTagUtil {
     this.authorId = authorId;
   }
 
-  public NotationDetail getPublicationNotation() {
-    return getNotationBm().getNotation(getPublicationNotationPK());
+  public Rating getPublicationNotation() {    	  
+	  return getNotationBm().getRating(getPublicationNotationPK());
   }
 
-  public NotationDetail getPublicationUpdatedNotation(String note) {
-    NotationPK pk = getPublicationNotationPK();
-    getNotationBm().updateNotation(pk, Integer.parseInt(note));
-    return getNotationBm().getNotation(pk);
+  public Rating getPublicationUpdatedNotation(String note) {
+    RatingPK pk = getPublicationNotationPK();
+    getNotationBm().updateRating(pk, Integer.parseInt(note));
+    return getNotationBm().getRating(pk);
   }
 
-  public NotationDetail getForumNotation() {
-    return getNotationBm().getNotation(getForumNotationPK());
+  public Rating getForumNotation() {
+    return getNotationBm().getRating(getForumNotationPK());
   }
 
-  public NotationDetail getForumUpdatedNotation(String note) {
-    NotationPK pk = getForumNotationPK();
-    getNotationBm().updateNotation(pk, Integer.parseInt(note));
-    return getNotationBm().getNotation(pk);
+  public Rating getForumUpdatedNotation(String note) {
+	  RatingPK pk = getForumNotationPK();
+    getNotationBm().updateRating(pk, Integer.parseInt(note));
+    return getNotationBm().getRating(pk);
   }
 
-  public NotationDetail getMessageNotation() {
-    return getNotationBm().getNotation(getMessageNotationPK());
+  public Rating getMessageNotation() {
+    return getNotationBm().getRating(getMessageNotationPK());
   }
 
-  public NotationDetail getMessageUpdatedNotation(String note) {
-    NotationPK pk = getMessageNotationPK();
-    getNotationBm().updateNotation(pk, Integer.parseInt(note));
-    return getNotationBm().getNotation(pk);
+  public Rating getMessageUpdatedNotation(String note) {
+	  RatingPK pk = getMessageNotationPK();
+    getNotationBm().updateRating(pk, Integer.parseInt(note));
+    return getNotationBm().getRating(pk);
   }
 
-  public Collection<NotationDetail> getPublicationsBestNotations(String notationsCount) {
-    return getNotationBm().getBestNotations(getPublicationNotationPK(), Integer.parseInt(
+  public Collection<Rating> getPublicationsBestNotations(String notationsCount) {
+    return getNotationBm().getBestRatings(getPublicationNotationPK(), Integer.parseInt(
         notationsCount));
   }
 
@@ -94,15 +94,15 @@ public class NotationTagUtil extends ComponentTagUtil {
     return notationBm;
   }
 
-  private NotationPK getPublicationNotationPK() {
-    return new NotationPK(elementId, componentId, Notation.TYPE_PUBLICATION, authorId);
+  private RatingPK getPublicationNotationPK() {
+    return new RatingPK(elementId, componentId, "Publication", authorId);
   }
 
-  private NotationPK getForumNotationPK() {
-    return new NotationPK(elementId, componentId, Notation.TYPE_FORUM, authorId);
+  private RatingPK getForumNotationPK() {
+    return new RatingPK(elementId, componentId, "Forum", authorId);
   }
 
-  private NotationPK getMessageNotationPK() {
-    return new NotationPK(elementId, componentId, Notation.TYPE_MESSAGE, authorId);
+  private RatingPK getMessageNotationPK() {
+    return new RatingPK(elementId, componentId, "Message", authorId);
   }
 }
