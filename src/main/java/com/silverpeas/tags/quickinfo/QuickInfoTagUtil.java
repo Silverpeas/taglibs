@@ -114,8 +114,7 @@ public class QuickInfoTagUtil extends ComponentTagUtil {
   public String getWysiwyg(PublicationPK pubPK) {
     String wysiwygContent = null;
     try {
-      wysiwygContent = WysiwygController.loadFileAndAttachment(new ForeignPK(pubPK),
-          DocumentType.wysiwyg, I18NHelper.defaultLanguage);
+      wysiwygContent = WysiwygController.load(pubPK.getInstanceId(), pubPK.getId(), I18NHelper.defaultLanguage);          
     } catch (Exception e) {
       throw new KmeliaRuntimeException("quickinfo.getWysiwyg()", SilverpeasRuntimeException.ERROR,
           "quickinfo.EX_IMPOSSIBLE_DOBTENIR_LE_WYSIWYG", e);

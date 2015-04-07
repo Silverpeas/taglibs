@@ -35,6 +35,7 @@ import org.silverpeas.attachment.AttachmentServiceFactory;
 import org.silverpeas.attachment.model.DocumentType;
 import org.silverpeas.attachment.model.SimpleDocument;
 import org.silverpeas.attachment.model.SimpleDocumentPK;
+import org.silverpeas.attachment.util.SimpleDocumentList;
 import org.silverpeas.search.SearchEngineFactory;
 import org.silverpeas.search.searchEngine.model.MatchingIndexEntry;
 import org.silverpeas.search.searchEngine.model.ParseException;
@@ -56,7 +57,6 @@ import com.silverpeas.tags.util.VisibilityException;
 import com.silverpeas.util.FileUtil;
 import com.silverpeas.util.ForeignPK;
 import com.silverpeas.util.StringUtil;
-
 import com.stratelia.silverpeas.silvertrace.SilverTrace;
 import com.stratelia.webactiv.beans.admin.ComponentInst;
 import com.stratelia.webactiv.beans.admin.SpaceInst;
@@ -66,6 +66,7 @@ import com.stratelia.webactiv.kmelia.model.KmeliaRuntimeException;
 import com.stratelia.webactiv.util.EJBUtilitaire;
 import com.stratelia.webactiv.util.FileServerUtils;
 import com.stratelia.webactiv.util.JNDINames;
+import com.stratelia.webactiv.util.WAPrimaryKey;
 import com.stratelia.webactiv.util.exception.SilverpeasRuntimeException;
 import com.stratelia.webactiv.util.node.control.NodeBm;
 import com.stratelia.webactiv.util.node.model.NodeDetail;
@@ -885,14 +886,23 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   /**
    * ***********************************************************************************
    */
-  public Collection getAttachments(String pubId) throws RemoteException, VisibilityException {
+  public SimpleDocumentList<SimpleDocument> getAttachments(String pubId) throws RemoteException, VisibilityException {
     SilverTrace.info("kmelia", "KmeliaTagUtil.getAttachments()", "root.MSG_GEN_ENTER_METHOD",
         "pubId = " + pubId);
     // check publication
     checkPublicationStatus(pubId);
-    checkPublicationLocation(pubId);
-    return AttachmentServiceFactory.getAttachmentService().listDocumentsByForeignKeyAndType(
-        getPublicationPK(pubId), DocumentType.attachment, SiteTagUtil.getLanguage());
+    checkPublicationLocation(pubId);    
+    
+    String lang = SiteTagUtil.getLanguage();
+    WAPrimaryKey foreignKey= getPublicationPK(pubId);
+    
+    try {
+    	SimpleDocumentList<SimpleDocument> att = AttachmentServiceFactory.getAttachmentService().listDocumentsByForeignKeyAndType(foreignKey, DocumentType.attachment, lang);
+    } catch(Throwable t) {
+    	t.printStackTrace();
+    }
+    
+    return AttachmentServiceFactory.getAttachmentService().listDocumentsByForeignKeyAndType(foreignKey, DocumentType.attachment, lang);
   }
 
   /**
