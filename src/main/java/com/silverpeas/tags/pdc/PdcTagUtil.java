@@ -233,7 +233,7 @@ public class PdcTagUtil implements java.io.Serializable {
   }
 
   /**
-   * @param value - La valeur a recherché dans la liste des synonymes
+   * @param valueId - La valeur a recherché dans la liste des synonymes
    * @param synonyms - Une liste de Synonym
    * @return Le synonyme associé à la valeur. null si aucun synonyme n'est associé à la valeur.
    */
@@ -769,7 +769,7 @@ public class PdcTagUtil implements java.io.Serializable {
 
   private SearchContext getSearchContext(String axisId, String valueId) throws Exception {
     // build the search context
-    SearchContext context = new SearchContext();
+    SearchContext context = new SearchContext(getUserId());
 
     if (valueId != null && !valueId.startsWith("/")) {
       SilverTrace.info("Pdc", "PdcTagUtil.getSearchContext()", "root.MSG_GEN_PARAM_VALUE",
@@ -1155,7 +1155,7 @@ public class PdcTagUtil implements java.io.Serializable {
   /**
    * Get translated Value in current site lang or lang as parameter
    *
-   * @param gsc
+   * @param value
    * @param language
    * @return Value
    */
