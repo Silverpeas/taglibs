@@ -31,6 +31,7 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.stratelia.webactiv.util.publication.model.Alias;
 import org.silverpeas.attachment.AttachmentServiceFactory;
 import org.silverpeas.attachment.model.DocumentType;
 import org.silverpeas.attachment.model.SimpleDocument;
@@ -272,16 +273,28 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   }
 
   private void checkPublicationLocation(PublicationDetail pubDetail) throws VisibilityException {
-    //instanceId must correspond to componentId set in the kmeliaTag
-    if(! pubDetail.getInstanceId().equals(getComponentId())){
-      throw new VisibilityException();
-    }
-    
     //publication must not be in basket (node 1)
-    List fathers = (List) getKmeliaBm().getPublicationFathers(pubDetail.getPK());
+    List<NodePK> fathers = (List<NodePK>) getKmeliaBm().getPublicationFathers(pubDetail.getPK());
     if (fathers == null || fathers.isEmpty() || (fathers.size() == 1
         && "1".equals(((NodePK) fathers.get(0)).getId()))) {
       throw new VisibilityException();
+    }
+
+    //instanceId must correspond to componentId set in the kmeliaTag
+    //or is an alias of componentId set in the kmeliaTag
+    if (! pubDetail.getInstanceId().equals(getComponentId())) {
+      boolean isAlias = false;
+      Collection<Alias> listAlias = (Collection<Alias>) getKmeliaBm().getAlias(pubDetail.getPK());
+      for (Alias alias : listAlias) {
+        if(alias.getInstanceId().equals(getComponentId())) {
+          isAlias = true;
+          break;
+        }
+      }
+
+      if(! isAlias) {
+        throw new VisibilityException();
+      }
     }
   }
 
