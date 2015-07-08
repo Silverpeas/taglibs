@@ -100,7 +100,7 @@ public class CategoriesTreeTag extends TagSupport {
     try {
       if (StringUtil.isDefined(m_spaceOrSubSpace)) {
         List<String> availableComponentIds = new ArrayList<String>();
-        SearchContext searchContext = new SearchContext();
+        SearchContext searchContext = new SearchContext(mainSessionController.getUserId());
 
         if (StringUtil.isDefined(componentId)) {
           primaryAxis = pdcBm.getPertinentAxisByInstanceId(searchContext, "P", componentId);
