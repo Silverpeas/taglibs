@@ -25,18 +25,19 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.stratelia.webactiv.util.publication.model.Alias;
 import org.silverpeas.attachment.AttachmentServiceFactory;
 import org.silverpeas.attachment.model.DocumentType;
 import org.silverpeas.attachment.model.SimpleDocument;
 import org.silverpeas.attachment.model.SimpleDocumentPK;
-import org.silverpeas.rating.RatingPK;
+import org.silverpeas.rating.ContributionRating;
 import org.silverpeas.search.SearchEngineFactory;
 import org.silverpeas.search.searchEngine.model.MatchingIndexEntry;
 import org.silverpeas.search.searchEngine.model.ParseException;
@@ -44,13 +45,14 @@ import org.silverpeas.search.searchEngine.model.QueryDescription;
 import org.silverpeas.wysiwyg.WysiwygException;
 import org.silverpeas.wysiwyg.control.WysiwygController;
 
+import com.silverpeas.SilverpeasContent;
 import com.silverpeas.comment.model.CommentPK;
 import com.silverpeas.comment.model.CommentedPublicationInfo;
 import com.silverpeas.comment.service.CommentService;
 import com.silverpeas.comment.service.CommentServiceFactory;
 import com.silverpeas.form.importExport.XMLField;
-import com.silverpeas.notation.ejb.NotationBm;
-import com.silverpeas.notation.model.Notation;
+import com.silverpeas.notation.ejb.RatingBm;
+import com.silverpeas.notation.ejb.RatingServiceFactory;
 import com.silverpeas.tags.ComponentTagUtil;
 import com.silverpeas.tags.util.SiteTagUtil;
 import com.silverpeas.tags.util.VisibilityException;
@@ -72,10 +74,7 @@ import com.stratelia.webactiv.util.node.model.NodeDetail;
 import com.stratelia.webactiv.util.node.model.NodeI18NDetail;
 import com.stratelia.webactiv.util.node.model.NodePK;
 import com.stratelia.webactiv.util.publication.control.PublicationBm;
-import com.stratelia.webactiv.util.publication.info.model.InfoDetail;
-import com.stratelia.webactiv.util.publication.info.model.InfoImageDetail;
-import com.stratelia.webactiv.util.publication.info.model.InfoTextDetail;
-import com.stratelia.webactiv.util.publication.info.model.ModelDetail;
+import com.stratelia.webactiv.util.publication.model.Alias;
 import com.stratelia.webactiv.util.publication.model.CompletePublication;
 import com.stratelia.webactiv.util.publication.model.PublicationDetail;
 import com.stratelia.webactiv.util.publication.model.PublicationI18N;
@@ -91,8 +90,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
   private PublicationBm publicationBm = null;
   private NodeBm nodeBm = null;
   private CommentService commentService = null;
-  private NotationBm notationBm = null;
-
+  
   public KmeliaTagUtil(String spaceId, String componentId, String userId) {
     super(componentId, userId);
 
@@ -158,18 +156,6 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       commentService = serviceFactory.getCommentService();
     }
     return commentService;
-  }
-
-  private NotationBm getNotationBm() {
-    if (notationBm == null) {
-      try {
-        notationBm = EJBUtilitaire.getEJBObjectRef(JNDINames.NOTATIONBM_EJBHOME, NotationBm.class);
-      } catch (Exception e) {
-        throw new KmeliaRuntimeException("KmeliaTagUtil.getNotationBm",
-            SilverpeasRuntimeException.ERROR, "root.EX_CANT_GET_REMOTE_OBJECT", e);
-      }
-    }
-    return notationBm;
   }
 
   public void setVisibilityFilter(String visibilityFilter) {
@@ -386,19 +372,6 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     return filterPublications(getPublicationBm().getPublications(pubPKs));
   }
 
-  public InfoDetail getInfoDetail(String pubId) throws RemoteException, VisibilityException {
-    SilverTrace.info("kmelia", "KMeliaTagUtil.getInfoDetail()", "root.MSG_GEN_ENTER_METHOD",
-        "pubId = " + pubId);
-    try {
-      checkPublicationStatus(pubId);
-      checkPublicationLocation(pubId);
-      return getPublicationBm().getInfoDetail(getPublicationPK(pubId));
-    } catch (NoSuchObjectException nsoe) {
-      initEJB();
-      return getInfoDetail(pubId);
-    }
-  }
-
   @Deprecated
   public CompletePublication getCompletePublication(String pubId) throws VisibilityException {
     SilverTrace.
@@ -577,14 +550,16 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       // CompletePublication completePublication = getKmeliaBm().getCompletePublication(pubId);
       CompletePublication completePublication = getPublicationBm().
           getCompletePublication(getPublicationPK(
-          pubId));
-      InfoDetail infoDetail = completePublication.getInfoDetail();
-      ModelDetail modelDetail = completePublication.getModelDetail();
-      if (infoDetail != null && modelDetail != null) {
+          pubId));      
+      //InfoDetail infoDetail = completePublication.getInfoDetail();
+      //ModelDetail modelDetail = completePublication.getModelDetail();
+      
+      
+      /*if (infoDetail != null && modelDetail != null) {
         // the publication have some content
         // we merge the content with the model's displayer template
         htmlContent = getModelHtmlContent(modelDetail, infoDetail);
-      }
+      }*/
     } else {
       htmlContent = wysiwygContent;
     }
@@ -689,18 +664,30 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       if (notationsCount > 0) {
         Collection publications = getPublications(topicId, true);
         Iterator iter = publications.iterator();
-        ArrayList notationsPks = new ArrayList();
+        ArrayList<KmeliaPublication> notationsPks = new ArrayList<KmeliaPublication>();
         PublicationDetail publication;
         PublicationPK publicationPK;
         while (iter.hasNext()) {
           publication = (PublicationDetail) iter.next();
-          publicationPK = publication.getPK();
-          notationsPks.add(new RatingPK(publicationPK.getId(),
-              publicationPK.getComponentName(), "Publication"));
+          publicationPK = publication.getPK();          
+          notationsPks.add(KmeliaPublication.aKmeliaPublicationWithPk(publicationPK));        		  
         }
-
-        if (!notationsPks.isEmpty()) {
-          return getNotationBm().getBestRatings(notationsPks, notationsCount);
+        if (!notationsPks.isEmpty()) { 	
+        	Map<String, ContributionRating> r = RatingServiceFactory.getRatingService().getRatings(notationsPks.toArray(new SilverpeasContent[notationsPks.size()]));
+        	ArrayList<ContributionRating> r2 = new ArrayList<ContributionRating>(r.values());        	
+        	Collections.sort(r2, new Comparator<ContributionRating>() {
+				@Override
+				public int compare(ContributionRating o1, ContributionRating o2) {
+					Float av1 = new Float(o1.getRatingAverage()); 
+					Float av2 = new Float(o2.getRatingAverage());
+					return av1.compareTo(av2);					
+				}        		
+			});
+        	Collections.reverse(r2);
+        	if (notationsCount <r2.size()) {
+        		r2 = (ArrayList<ContributionRating>) r2.subList(0, notationsCount);
+        	}        	
+        	return r2;
         }
       }
     }
@@ -939,7 +926,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
     }
   }
 
-  private String getModelHtmlContent(ModelDetail model, InfoDetail infos) {
+  /*private String getModelHtmlContent(ModelDetail model, InfoDetail infos) {
     String toParse = model.getHtmlDisplayer();
     Iterator textIterator = infos.getInfoTextList().iterator();
     Iterator imageIterator = infos.getInfoImageList().iterator();
@@ -980,7 +967,7 @@ public class KmeliaTagUtil extends ComponentTagUtil {
       posit = toParse.indexOf("%WA");
     }
     return htmlContent.toString();
-  }
+  }*/
 
   private String encode(String javastring) {
     StringBuilder res = new StringBuilder();

@@ -27,8 +27,6 @@ package com.silverpeas.tags;
 import java.beans.IntrospectionException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
@@ -38,7 +36,6 @@ import javax.servlet.jsp.tagext.TagSupport;
 import com.stratelia.webactiv.util.EJBUtilitaire;
 import com.stratelia.webactiv.util.JNDINames;
 import com.stratelia.webactiv.util.publication.control.PublicationBm;
-import com.stratelia.webactiv.util.publication.info.model.InfoTextDetail;
 import com.stratelia.webactiv.util.publication.model.CompletePublication;
 import com.stratelia.webactiv.util.publication.model.PublicationDetail;
 
@@ -154,15 +151,15 @@ public class PublicationTag extends TagSupport {
         try {
           PublicationDetail pubDetail = (PublicationDetail) v;
           CompletePublication cp = getPublicationBm().getCompletePublication(pubDetail.getPK());
-          ArrayList contentList = (ArrayList) cp.getInfoDetail().getInfoTextList();
-          StringBuffer content = new StringBuffer();
-          if (contentList != null) {
+          //ArrayList contentList = (ArrayList) cp.getInfoDetail().getInfoTextList();
+          StringBuffer content = new StringBuffer(cp.getPublicationDetail().getWysiwyg());
+          /*if (contentList != null) {
             Iterator it = contentList.iterator();
             while (it.hasNext()) {
               InfoTextDetail textDetail = (InfoTextDetail) it.next();
               content.append(textDetail.getContent());
             }
-          }
+          }*/
           return content;
         } catch (Exception e) {
           throw new JspTagException("getCompletePublication failed ! : " + objName);

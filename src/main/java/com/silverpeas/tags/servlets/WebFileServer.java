@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2000 - 2012 Silverpeas
+ * Copyright (C) 2000 - 2015 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -38,14 +38,14 @@ import org.silverpeas.util.Charsets;
 
 import com.silverpeas.gallery.control.ejb.GalleryBm;
 import com.silverpeas.gallery.model.GalleryRuntimeException;
-import com.silverpeas.gallery.model.PhotoDetail;
-import com.silverpeas.gallery.model.PhotoPK;
+import com.silverpeas.gallery.model.Media;
+import com.silverpeas.gallery.model.MediaPK;
+import com.silverpeas.gallery.model.Photo;
 import com.silverpeas.tags.authentication.AuthenticationManager;
 import com.silverpeas.tags.util.Admin;
 import com.silverpeas.util.FileUtil;
 import com.silverpeas.util.StringUtil;
 import com.silverpeas.util.web.servlet.RestRequest;
-
 import com.stratelia.silverpeas.silvertrace.SilverTrace;
 import com.stratelia.webactiv.util.EJBUtilitaire;
 import com.stratelia.webactiv.util.JNDINames;
@@ -101,11 +101,12 @@ public class WebFileServer extends HttpServlet {
         file = new OnlineAttachment(attachment);
       }
     } else if (StringUtil.isDefined(imageId)) {
-      PhotoDetail image = getGalleryBm().getPhoto(new PhotoPK(imageId, componentId));
+      Media media = getGalleryBm().getPhoto(new MediaPK(imageId, componentId));
+      Photo image = media.getPhoto();
       mimeType = "image/jpg";
       boolean useOriginal = Boolean.parseBoolean(restRequest.getElementValue("UseOriginal"));
       if (useOriginal) {
-        sourceFile = image.getImageName();
+        sourceFile = image.getFileName();
       } else {
         sourceFile = image.getId() + "_preview.jpg";
       }

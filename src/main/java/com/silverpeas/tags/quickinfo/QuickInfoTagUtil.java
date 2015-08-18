@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2000 - 2012 Silverpeas
+ * Copyright (C) 2000 - 2015 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -23,7 +23,6 @@ package com.silverpeas.tags.quickinfo;
 import com.silverpeas.tags.ComponentTagUtil;
 import com.silverpeas.tags.util.SiteTagUtil;
 import com.silverpeas.tags.util.VisibilityException;
-import com.silverpeas.util.ForeignPK;
 import com.silverpeas.util.StringUtil;
 import com.silverpeas.util.i18n.I18NHelper;
 import com.stratelia.silverpeas.silvertrace.SilverTrace;
@@ -36,7 +35,6 @@ import com.stratelia.webactiv.util.publication.model.PublicationDetail;
 import com.stratelia.webactiv.util.publication.model.PublicationI18N;
 import com.stratelia.webactiv.util.publication.model.PublicationPK;
 import com.stratelia.webactiv.util.publication.model.PublicationRuntimeException;
-import org.silverpeas.attachment.model.DocumentType;
 import org.silverpeas.wysiwyg.control.WysiwygController;
 
 import java.rmi.RemoteException;
@@ -114,8 +112,7 @@ public class QuickInfoTagUtil extends ComponentTagUtil {
   public String getWysiwyg(PublicationPK pubPK) {
     String wysiwygContent = null;
     try {
-      wysiwygContent = WysiwygController.loadFileAndAttachment(new ForeignPK(pubPK),
-          DocumentType.wysiwyg, I18NHelper.defaultLanguage);
+      wysiwygContent = WysiwygController.load(pubPK.getInstanceId(), pubPK.getId(), I18NHelper.defaultLanguage);    		  
     } catch (Exception e) {
       throw new KmeliaRuntimeException("quickinfo.getWysiwyg()", SilverpeasRuntimeException.ERROR,
           "quickinfo.EX_IMPOSSIBLE_DOBTENIR_LE_WYSIWYG", e);

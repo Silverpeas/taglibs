@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2000 - 2012 Silverpeas
+ * Copyright (C) 2000 - 2015 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -32,15 +32,16 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import com.silverpeas.gallery.control.ejb.GalleryBm;
+import com.silverpeas.gallery.control.ejb.MediaServiceFactory;
 import com.silverpeas.gallery.model.AlbumDetail;
-import com.silverpeas.gallery.model.PhotoDetail;
-import com.silverpeas.gallery.model.PhotoPK;
+import com.silverpeas.gallery.model.Media;
+import com.silverpeas.gallery.model.MediaCriteria.VISIBILITY;
+import com.silverpeas.gallery.model.MediaPK;
+import com.silverpeas.gallery.model.Photo;
 import com.silverpeas.tags.ComponentTagUtil;
-
 import com.stratelia.webactiv.kmelia.model.KmeliaRuntimeException;
-import com.stratelia.webactiv.util.EJBUtilitaire;
-import com.stratelia.webactiv.util.JNDINames;
 import com.stratelia.webactiv.util.exception.SilverpeasRuntimeException;
+import com.stratelia.webactiv.util.node.model.NodeDetail;
 import com.stratelia.webactiv.util.node.model.NodePK;
 
 /**
@@ -106,8 +107,9 @@ public class GalleryTagUtil extends ComponentTagUtil {
 
   private GalleryBm getGalleryBm() {
     if (galleryBm == null) {
-      try {
-        galleryBm = EJBUtilitaire.getEJBObjectRef(JNDINames.GALLERYBM_EJBHOME, GalleryBm.class);
+      try {    	  
+    	galleryBm = MediaServiceFactory.getMediaService();
+        //galleryBm = EJBUtilitaire.getEJBObjectRef(JNDINames.GALLERYBM_EJBHOME, GalleryBm.class);
       } catch (Exception e) {
         throw new KmeliaRuntimeException("KmeliaTagUtil.getGalleryBm",
             SilverpeasRuntimeException.ERROR, "root.EX_CANT_GET_REMOTE_OBJECT", e);
@@ -119,11 +121,11 @@ public class GalleryTagUtil extends ComponentTagUtil {
   /**
    * Get the detail of photo with given id.
    * @param photoId the photo id
-   * @return a PhotoDetail object
+   * @return a Photo object
    * @throws RemoteException
    */
-  public PhotoDetail getPhotoDetail(String photoId) throws RemoteException {
-    PhotoPK photoPk = new PhotoPK(photoId, this.getSpaceId(), this.getComponentId());
+  public Photo getPhotoDetail(String photoId) throws RemoteException {
+	MediaPK photoPk = new MediaPK(photoId, this.getSpaceId(), this.getComponentId());
     return getGalleryBm().getPhoto(photoPk);
   }
 
@@ -134,8 +136,8 @@ public class GalleryTagUtil extends ComponentTagUtil {
    * @throws RemoteException
    */
   public AlbumDetail getAlbumsDetail(String albumId) throws RemoteException {
-    return getGalleryBm().getAlbum(new NodePK(albumId, this.getSpaceId(), this.getComponentId()),
-        true);
+    return getGalleryBm().getAlbum( new NodePK(albumId, this.getSpaceId(), this.getComponentId()),
+        VISIBILITY.FORCE_GET_ALL);
   }
 
   /**
@@ -143,8 +145,15 @@ public class GalleryTagUtil extends ComponentTagUtil {
    * @return A Collection of PhotoDetail objects
    * @throws RemoteException
    */
-  public Collection<PhotoDetail> getAllPhotos() throws RemoteException {
-    return getGalleryBm().getAllPhotos(this.getComponentId());
+  public Collection<Photo> getAllPhotos() throws RemoteException {
+    Collection<Media> medias = getGalleryBm().getAllMedia(this.getComponentId());
+    Collection<Photo> photos = new ArrayList<Photo>();
+    for (Media media : medias) {
+		if (media.getType().isPhoto()) {
+			photos.add(media.getPhoto());
+		}
+	}
+    return photos;    		
   }
 
   /**
@@ -153,23 +162,22 @@ public class GalleryTagUtil extends ComponentTagUtil {
    * @return A Collection of PhotoDetail objects
    * @throws RemoteException
    */
-  public Collection<PhotoDetail> getPhotosByAlbum(String albumIdAndNameAndSort)
+  public Collection<Photo> getPhotosByAlbum(String albumIdAndNameAndSort)
       throws RemoteException {
     ArrayList<String> listParameters = new ArrayList<String>();
     listParameters.add("albumId");
     listParameters.add("fieldName");
     listParameters.add("sortType");
     HashMap<String, String> parsedParameters = parseSort(listParameters, albumIdAndNameAndSort);
-    Collection<PhotoDetail> photos = new ArrayList<PhotoDetail>();
+    Collection<Photo> photos = new ArrayList<Photo>();
     if (parsedParameters.get("albumId") != null) {
       String albumId = parsedParameters.get("albumId");
       NodePK nodePK = new NodePK(albumId, this.getSpaceId(), this.getComponentId());
       if (parsedParameters.get("sortType") != null && parsedParameters.get("fieldName") != null) {
-        photos =
-            getGalleryBm().getAllPhotosSorted(nodePK, parsedParameters, true);
+        //photos = getGalleryBm().getAllPhotosSorted(nodePK, parsedParameters, true);
+    	photos = getGalleryBm().getAllPhotos(nodePK, VISIBILITY.FORCE_GET_ALL);
       } else {
-        photos =
-            getGalleryBm().getAllPhoto(nodePK, true);
+        photos = getGalleryBm().getAllPhotos(nodePK, VISIBILITY.FORCE_GET_ALL);
       }
     }
     return photos;
@@ -184,7 +192,7 @@ public class GalleryTagUtil extends ComponentTagUtil {
   public Collection<AlbumDetail> getAlbumPath(String albumId) throws RemoteException {
     AlbumDetail currentAlbum =
         getGalleryBm().getAlbum(new NodePK(albumId, this.getSpaceId(), this.getComponentId()),
-        false);
+        VISIBILITY.VISIBLE_ONLY);
     Collection<AlbumDetail> albums = new ArrayList<AlbumDetail>();
     ArrayList<Integer> fatherPathIds = parsePath(currentAlbum.getPath());
     AlbumDetail fatherAlbum = null;
@@ -194,7 +202,7 @@ public class GalleryTagUtil extends ComponentTagUtil {
           getGalleryBm()
           .getAlbum(
           new NodePK(String.valueOf(fatherId), this.getSpaceId(), this.getComponentId()),
-          false);
+          VISIBILITY.VISIBLE_ONLY);
       albums.add(fatherAlbum);
     }
     albums.add(currentAlbum);
@@ -208,9 +216,8 @@ public class GalleryTagUtil extends ComponentTagUtil {
    * @throws RemoteException
    */
   public Collection<AlbumDetail> getPhotoPath(String photoId) throws RemoteException {
-    ArrayList<String> pathList =
-        (ArrayList<String>) getGalleryBm().getPathList(this.getComponentId(), photoId);
-    return getAlbumPath(pathList.get(0));
+	ArrayList<NodeDetail> pathList = new ArrayList<NodeDetail>(getGalleryBm().getPath(new NodePK(photoId, this.getComponentId())));
+    return getAlbumPath(String.valueOf(pathList.get(0).getId()));
   }
 
   private HashMap<String, String> parseSort(ArrayList<String> listParameters,

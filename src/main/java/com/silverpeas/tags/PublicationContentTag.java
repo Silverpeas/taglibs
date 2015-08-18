@@ -20,8 +20,6 @@
  */
 package com.silverpeas.tags;
 
-import java.util.Collection;
-
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.PageContext;
@@ -30,7 +28,6 @@ import javax.servlet.jsp.tagext.TagSupport;
 import com.stratelia.webactiv.util.EJBUtilitaire;
 import com.stratelia.webactiv.util.JNDINames;
 import com.stratelia.webactiv.util.publication.control.PublicationBm;
-import com.stratelia.webactiv.util.publication.info.model.InfoTextDetail;
 import com.stratelia.webactiv.util.publication.model.CompletePublication;
 import com.stratelia.webactiv.util.publication.model.PublicationDetail;
 
@@ -112,13 +109,15 @@ public class PublicationContentTag extends TagSupport {
   protected void processObject(CompletePublication cp) throws JspException {
     try {
       if (null != cp) {
-        Collection<InfoTextDetail> contentList = cp.getInfoDetail().getInfoTextList();
-        StringBuilder content = new StringBuilder();
-        if (contentList != null) {
+    	  
+        //Collection<InfoTextDetail> contentList = cp.getInfoDetail().getInfoTextList();
+        StringBuilder content = new StringBuilder(cp.getPublicationDetail().getWysiwyg());
+        
+        /*if (contentList != null) {
           for (InfoTextDetail textDetail : contentList) {
             content.append(textDetail.getContent());
           }
-        }
+        }*/
         pageContext.getOut().println(content.toString());
       } else {
         pageContext.getOut().println("INSTEAD_NULL");

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2000 - 2012 Silverpeas
+ * Copyright (C) 2000 - 2015 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -20,22 +20,25 @@
  */
 package com.silverpeas.tags.notation;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
-import org.silverpeas.rating.Rating;
-import org.silverpeas.rating.RatingPK;
+import org.silverpeas.rating.ContributionRating;
+import org.silverpeas.rating.RaterRatingPK;
 
-import com.silverpeas.notation.ejb.NotationBm;
-import com.silverpeas.notation.ejb.NotationRuntimeException;
-import com.silverpeas.notation.model.Notation;
+import com.silverpeas.notation.ejb.RatingBm;
+import com.silverpeas.notation.ejb.RatingRuntimeException;
 import com.silverpeas.tags.ComponentTagUtil;
+import com.stratelia.webactiv.beans.admin.UserDetail;
 import com.stratelia.webactiv.util.EJBUtilitaire;
 import com.stratelia.webactiv.util.JNDINames;
 import com.stratelia.webactiv.util.exception.SilverpeasRuntimeException;
 
 public class NotationTagUtil extends ComponentTagUtil {
 
-  private NotationBm notationBm = null;
+  private RatingBm notationBm = null;
   private String componentId = null;
   private String elementId = null;
   private String authorId = null;
@@ -47,62 +50,73 @@ public class NotationTagUtil extends ComponentTagUtil {
     this.authorId = authorId;
   }
 
-  public Rating getPublicationNotation() {    	  
+  public ContributionRating getPublicationNotation() {    	  
 	  return getNotationBm().getRating(getPublicationNotationPK());
   }
 
-  public Rating getPublicationUpdatedNotation(String note) {
-    RatingPK pk = getPublicationNotationPK();
+  public ContributionRating getPublicationUpdatedNotation(String note) {
+	RaterRatingPK pk = getPublicationNotationPK();
     getNotationBm().updateRating(pk, Integer.parseInt(note));
     return getNotationBm().getRating(pk);
   }
 
-  public Rating getForumNotation() {
+  public ContributionRating getForumNotation() {
     return getNotationBm().getRating(getForumNotationPK());
   }
 
-  public Rating getForumUpdatedNotation(String note) {
-	  RatingPK pk = getForumNotationPK();
+  public ContributionRating getForumUpdatedNotation(String note) {
+	RaterRatingPK pk = getForumNotationPK();
     getNotationBm().updateRating(pk, Integer.parseInt(note));
     return getNotationBm().getRating(pk);
   }
 
-  public Rating getMessageNotation() {
+  public ContributionRating getMessageNotation() {
     return getNotationBm().getRating(getMessageNotationPK());
   }
 
-  public Rating getMessageUpdatedNotation(String note) {
-	  RatingPK pk = getMessageNotationPK();
+  public ContributionRating getMessageUpdatedNotation(String note) {
+	RaterRatingPK pk = getMessageNotationPK();
     getNotationBm().updateRating(pk, Integer.parseInt(note));
     return getNotationBm().getRating(pk);
   }
 
-  public Collection<Rating> getPublicationsBestNotations(String notationsCount) {
-    return getNotationBm().getBestRatings(getPublicationNotationPK(), Integer.parseInt(
-        notationsCount));
+  public Collection<Integer> getPublicationsBestNotations(String notationsCount) {
+	  ContributionRating r = getNotationBm().getRating(getPublicationNotationPK());	  
+	  Collection<Integer> bestRates = new ArrayList<Integer>();
+	  List<Integer> ratings = new ArrayList<Integer>(r.getRaterRatings().values());	  
+	  Collections.sort(ratings);
+	  Collections.reverse(ratings);
+	  int max= Integer.parseInt(notationsCount);
+	  int i = 0;
+	  for (Integer rate : ratings) {
+		  if (i > max) return bestRates;
+		  bestRates.add(rate);
+		  i++;
+	  }
+	  return bestRates;
   }
 
-  private NotationBm getNotationBm() {
+  private RatingBm getNotationBm() {
     if (notationBm == null) {
       try {
-        notationBm = EJBUtilitaire.getEJBObjectRef(JNDINames.NOTATIONBM_EJBHOME, NotationBm.class);
+        notationBm = EJBUtilitaire.getEJBObjectRef(JNDINames.RATINGBM_EJBHOME, RatingBm.class);
       } catch (Exception e) {
-        throw new NotationRuntimeException("NotationTagUtil.getNotationBm",
+        throw new RatingRuntimeException("NotationTagUtil.getNotationBm",
             SilverpeasRuntimeException.ERROR, "root.EX_CANT_GET_REMOTE_OBJECT", e);
       }
     }
     return notationBm;
   }
 
-  private RatingPK getPublicationNotationPK() {
-    return new RatingPK(elementId, componentId, "Publication", authorId);
+  private RaterRatingPK getPublicationNotationPK() {	  
+	  return new RaterRatingPK(elementId, componentId, "Publication", UserDetail.getById(authorId));    
   }
 
-  private RatingPK getForumNotationPK() {
-    return new RatingPK(elementId, componentId, "Forum", authorId);
+  private RaterRatingPK getForumNotationPK() {
+    return new RaterRatingPK(elementId, componentId, "Forum", UserDetail.getById(authorId));
   }
 
-  private RatingPK getMessageNotationPK() {
-    return new RatingPK(elementId, componentId, "Message", authorId);
+  private RaterRatingPK getMessageNotationPK() {
+    return new RaterRatingPK(elementId, componentId, "Message", UserDetail.getById(authorId));
   }
 }
